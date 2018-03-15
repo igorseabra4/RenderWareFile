@@ -1,1 +1,1 @@
-RenderWareBSP is a small library for working with RenderWare binary files.
+RenderWareFile is a small library for working with RenderWare binary files.
