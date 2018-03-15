@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 
 namespace RenderWareChunk
-{
-    public enum Section : int
+{	
+    public enum Section
     {
         None = 0x0,
         Struct = 0x1,
