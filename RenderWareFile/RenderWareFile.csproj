@@ -7,8 +7,8 @@
     <ProjectGuid>{005F2D00-06DE-4EF9-BFEE-80EFAC49E114}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RenderWareBSP</RootNamespace>
-    <AssemblyName>RenderWareBSP</AssemblyName>
+    <RootNamespace>RenderWareFile</RootNamespace>
+    <AssemblyName>RenderWareFile</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
@@ -37,13 +37,28 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sections\AtomicSection_0009.cs" />
+    <Compile Include="Sections\Atomic_0014.cs" />
+    <Compile Include="Sections\BinMeshPLG_050E.cs" />
+    <Compile Include="Sections\ChunkGroupEnd_002A.cs" />
+    <Compile Include="Sections\ChunkGroupStart_0029.cs" />
+    <Compile Include="Sections\Clump_0010.cs" />
+    <Compile Include="Sections\Extension_0003.cs" />
+    <Compile Include="Sections\FrameList_000E.cs" />
+    <Compile Include="Sections\GeometryList_001A.cs" />
+    <Compile Include="Sections\Geometry_000F.cs" />
+    <Compile Include="Sections\MaterialList_0008.cs" />
+    <Compile Include="Sections\Material_0007.cs" />
+    <Compile Include="Sections\PlaneSection_000A.cs" />
     <Compile Include="ReadFileMethods.cs" />
-    <Compile Include="RenderWareChunk.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RWSection.cs" />
+    <Compile Include="Sections\String_0002.cs" />
+    <Compile Include="Sections\Texture_0006.cs" />
+    <Compile Include="Sections\World_000B.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

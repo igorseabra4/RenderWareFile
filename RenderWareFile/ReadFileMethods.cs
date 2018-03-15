@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace RenderWareChunk
+namespace RenderWareFile
 {
     public static class ReadFileMethods
     {
@@ -37,6 +37,15 @@ namespace RenderWareChunk
             }
 
             return renderWareFile.ToArray();
+        }
+
+        public static byte[] ExportRenderWareFile(RWSection[] RWFile, int version)
+        {
+            List<byte> list = new List<byte>();
+            foreach (RWSection i in RWFile)
+                list.AddRange(i.GetBytes(version));
+
+            return list.ToArray();
         }
     }
 }
