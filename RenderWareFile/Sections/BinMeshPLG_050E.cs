@@ -12,7 +12,7 @@ namespace RenderWareFile
         public int numMeshes; // number of objects/meshes (usually same number of materials)
         public int totalIndexCount; // total number of indices
 
-        BinMesh[] binMeshList;
+        public BinMesh[] binMeshList;
 
         public BinMeshPLG_050E Read(BinaryReader binaryReader)
         {

@@ -62,16 +62,16 @@ namespace RenderWareFile
 
     public class WorldStruct_0001 : RWSection
     {
-        public int structVersion;
-        public int unknown2;
-        public int unknown3;
-        public int unknown4;
-        public int numTriangles;
-        public int numVertices;
-        public int numPlaneSections;
-        public int numAtomicSections;
-        public int unknown5;
-        public int unknown6;
+        public uint structVersion;
+        public uint unknown1;
+        public uint unknown2;
+        public uint unknown3;
+        public uint numTriangles;
+        public uint numVertices;
+        public uint numPlaneSections;
+        public uint numAtomicSections;
+        public uint unknown4;
+        public uint unknown5;
         public float[] boxMaximum = new float[3];
         public float[] boxMinimum = new float[3];
 
@@ -85,16 +85,16 @@ namespace RenderWareFile
 
             if (sectionSize == 0x40)
             {
-                structVersion = binaryReader.ReadInt32();
-                unknown2 = binaryReader.ReadInt32();
-                unknown3 = binaryReader.ReadInt32();
-                unknown4 = binaryReader.ReadInt32();
-                numTriangles = binaryReader.ReadInt32();
-                numVertices = binaryReader.ReadInt32();
-                numPlaneSections = binaryReader.ReadInt32();
-                numAtomicSections = binaryReader.ReadInt32();
-                unknown5 = binaryReader.ReadInt32();
-                unknown6 = binaryReader.ReadInt32();
+                structVersion = binaryReader.ReadUInt32();
+                unknown1 = binaryReader.ReadUInt32();
+                unknown2 = binaryReader.ReadUInt32();
+                unknown3 = binaryReader.ReadUInt32();
+                numTriangles = binaryReader.ReadUInt32();
+                numVertices = binaryReader.ReadUInt32();
+                numPlaneSections = binaryReader.ReadUInt32();
+                numAtomicSections = binaryReader.ReadUInt32();
+                unknown4 = binaryReader.ReadUInt32();
+                unknown5 = binaryReader.ReadUInt32();
                 boxMaximum = new float[3];
                 boxMaximum[0] = binaryReader.ReadSingle();
                 boxMaximum[1] = binaryReader.ReadSingle();
@@ -106,21 +106,21 @@ namespace RenderWareFile
             }
             else if (sectionSize == 0x34)
             {
-                structVersion = binaryReader.ReadInt32();
-                unknown2 = binaryReader.ReadInt32();
-                unknown3 = binaryReader.ReadInt32();
-                unknown4 = binaryReader.ReadInt32();
+                structVersion = binaryReader.ReadUInt32();
+                unknown1 = binaryReader.ReadUInt32();
+                unknown2 = binaryReader.ReadUInt32();
+                unknown3 = binaryReader.ReadUInt32();
                 boxMaximum = new float[3];
                 boxMaximum[0] = binaryReader.ReadSingle();
                 boxMaximum[1] = binaryReader.ReadSingle();
                 boxMaximum[2] = binaryReader.ReadSingle();
                 boxMinimum = boxMaximum;
-                numTriangles = binaryReader.ReadInt32();
-                numVertices = binaryReader.ReadInt32();
-                numPlaneSections = binaryReader.ReadInt32();
-                numAtomicSections = binaryReader.ReadInt32();
-                unknown5 = binaryReader.ReadInt32();
-                unknown6 = binaryReader.ReadInt32();
+                numTriangles = binaryReader.ReadUInt32();
+                numVertices = binaryReader.ReadUInt32();
+                numPlaneSections = binaryReader.ReadUInt32();
+                numAtomicSections = binaryReader.ReadUInt32();
+                unknown4 = binaryReader.ReadUInt32();
+                unknown5 = binaryReader.ReadUInt32();
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
@@ -133,15 +133,15 @@ namespace RenderWareFile
             sectionIdentifier = Section.Struct;
 
             listBytes.AddRange(BitConverter.GetBytes(structVersion));
+            listBytes.AddRange(BitConverter.GetBytes(unknown1));
             listBytes.AddRange(BitConverter.GetBytes(unknown2));
             listBytes.AddRange(BitConverter.GetBytes(unknown3));
-            listBytes.AddRange(BitConverter.GetBytes(unknown4));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numPlaneSections));
             listBytes.AddRange(BitConverter.GetBytes(numAtomicSections));
+            listBytes.AddRange(BitConverter.GetBytes(unknown4));
             listBytes.AddRange(BitConverter.GetBytes(unknown5));
-            listBytes.AddRange(BitConverter.GetBytes(unknown6));
             listBytes.AddRange(BitConverter.GetBytes(boxMaximum[0]));
             listBytes.AddRange(BitConverter.GetBytes(boxMaximum[1]));
             listBytes.AddRange(BitConverter.GetBytes(boxMaximum[2]));

@@ -36,6 +36,8 @@ namespace RenderWareFile
                 else throw new Exception(currentSection.ToString());
             }
 
+            binaryReader.Close();
+
             return renderWareFile.ToArray();
         }
 

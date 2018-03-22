@@ -71,12 +71,25 @@ namespace RenderWareFile
         public float X;
         public float Y;
         public float Z;
+
+        public Vertex3(float a, float b, float c)
+        {
+            X = a;
+            Y = b;
+            Z = c;
+        }
     }
 
     public struct TextCoord
     {
         public float X;
         public float Y;
+
+        public TextCoord(float a, float b)
+        {
+            X = a;
+            Y = b;
+        }
     }
 
     public struct Color
@@ -85,6 +98,14 @@ namespace RenderWareFile
         public byte G;
         public byte B;
         public byte A;
+
+        public Color(byte r, byte g, byte b, byte a)
+        {
+            R = r;
+            G = g;
+            B = b;
+            A = a;
+        }
 
         public static explicit operator int(Color v)
         {
@@ -98,6 +119,13 @@ namespace RenderWareFile
         public ushort vertex1;
         public ushort vertex2;
         public ushort vertex3;
-    }
 
+        public Triangle(ushort m, ushort v1, ushort v2, ushort v3)
+        {
+            materialIndex = m;
+            vertex1 = v1;
+            vertex2 = v2;
+            vertex3 = v3;
+        }
+    }
 }
