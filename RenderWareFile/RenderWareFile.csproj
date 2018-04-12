@@ -52,6 +52,7 @@
     <Compile Include="Sections\Geometry_000F.cs" />
     <Compile Include="Sections\MaterialList_0008.cs" />
     <Compile Include="Sections\Material_0007.cs" />
+    <Compile Include="Sections\NativeDataPLG_0510.cs" />
     <Compile Include="Sections\PlaneSection_000A.cs" />
     <Compile Include="ReadFileMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,13 +8,23 @@ namespace RenderWareFile
 {
     public class Extension_0003 : RWSection
     {
+        List<RWSection> ExtensionSectionList;
+
         public Extension_0003 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Extension;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            binaryReader.BaseStream.Position += sectionSize;
+            long CurrentPosition = binaryReader.BaseStream.Position;
+
+            ExtensionSectionList = new List<RWSection>();
+            while (binaryReader.BaseStream.Position < CurrentPosition + sectionSize)
+            {
+                Section currentSection = (Section)binaryReader.ReadInt32();
+                if (currentSection == Section.NativeDataPLG) ExtensionSectionList.Add(new NativeDataPLG_0510().Read(binaryReader));
+                else ExtensionSectionList.Add(new GenericSection().Read(binaryReader, currentSection));
+            }
 
             return this;
         }

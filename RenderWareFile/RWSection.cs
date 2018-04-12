@@ -24,7 +24,8 @@ namespace RenderWareFile
         GeometryList = 0x1A,
         ChunkGroupStart = 0x29,
         ChunkGroupEnd = 0x2A,
-        BinMeshPLG = 0x50E
+        BinMeshPLG = 0x50E,
+        NativeDataPLG = 0x510
     }
 
     public abstract class RWSection
@@ -65,7 +66,29 @@ namespace RenderWareFile
 
         public abstract void SetListBytes(int fileVersion, ref List<byte> listBytes);
     }
-    
+
+    public class GenericSection : RWSection
+    {
+        byte[] data;
+
+        public GenericSection Read(BinaryReader binaryReader, Section section)
+        {
+            sectionIdentifier = section;
+            sectionSize = binaryReader.ReadInt32();
+            renderWareVersion = binaryReader.ReadInt32();
+
+            data = binaryReader.ReadBytes(sectionSize);
+
+            return this;
+        }
+
+        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        {
+            sectionIdentifier = Section.None;
+            throw new NotImplementedException();
+        }
+    }
+
     public struct Vertex3
     {
         public float X;
@@ -107,6 +130,19 @@ namespace RenderWareFile
             A = a;
         }
 
+        public Color(byte[] v)
+        {
+            R = v[0];
+            G = v[1];
+            B = v[2];
+            A = v[3];
+        }
+
+        public Color(int a)
+        {
+            this = new Color(BitConverter.GetBytes(a));
+        }
+
         public static explicit operator int(Color v)
         {
             return BitConverter.ToInt32(new byte[] { v.R, v.G, v.B, v.A }, 0);
@@ -126,6 +162,27 @@ namespace RenderWareFile
             vertex1 = v1;
             vertex2 = v2;
             vertex3 = v3;
+        }
+    }
+
+    public static class EndianFunctions
+    {
+        public static float Switch(float f)
+        {
+            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
+            return BitConverter.ToSingle(a, 0);
+        }
+
+        public static int Switch(int f)
+        {
+            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
+            return BitConverter.ToInt32(a, 0);
+        }
+
+        public static short Switch(short f)
+        {
+            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
+            return BitConverter.ToInt16(a, 0);
         }
     }
 }

@@ -31,9 +31,7 @@ namespace RenderWareFile
                 Section currentSection = (Section)binaryReader.ReadInt32();
                 if (currentSection == Section.World) renderWareFile.Add(new World_000B().Read(binaryReader));
                 else if (currentSection == Section.Clump) renderWareFile.Add(new Clump_0010().Read(binaryReader));
-                else if (currentSection == Section.ChunkGroupStart) renderWareFile.Add(new ChunkGroupStart_0029().Read(binaryReader));
-                else if (currentSection == Section.ChunkGroupEnd) renderWareFile.Add(new ChunkGroupEnd_002A().Read(binaryReader));
-                else throw new Exception(currentSection.ToString());
+                else renderWareFile.Add(new GenericSection().Read(binaryReader, currentSection));
             }
 
             binaryReader.Close();

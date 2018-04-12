@@ -132,22 +132,43 @@ namespace RenderWareFile
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.AddRange(BitConverter.GetBytes(structVersion));
-            listBytes.AddRange(BitConverter.GetBytes(unknown1));
-            listBytes.AddRange(BitConverter.GetBytes(unknown2));
-            listBytes.AddRange(BitConverter.GetBytes(unknown3));
-            listBytes.AddRange(BitConverter.GetBytes(numTriangles));
-            listBytes.AddRange(BitConverter.GetBytes(numVertices));
-            listBytes.AddRange(BitConverter.GetBytes(numPlaneSections));
-            listBytes.AddRange(BitConverter.GetBytes(numAtomicSections));
-            listBytes.AddRange(BitConverter.GetBytes(unknown4));
-            listBytes.AddRange(BitConverter.GetBytes(unknown5));
-            listBytes.AddRange(BitConverter.GetBytes(boxMaximum[0]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMaximum[1]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMaximum[2]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMinimum[0]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMinimum[1]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMinimum[2]));
+            sectionSize = 0x40;
+
+            if (sectionSize == 0x40)
+            {
+                listBytes.AddRange(BitConverter.GetBytes(structVersion));
+                listBytes.AddRange(BitConverter.GetBytes(unknown1));
+                listBytes.AddRange(BitConverter.GetBytes(unknown2));
+                listBytes.AddRange(BitConverter.GetBytes(unknown3));
+                listBytes.AddRange(BitConverter.GetBytes(numTriangles));
+                listBytes.AddRange(BitConverter.GetBytes(numVertices));
+                listBytes.AddRange(BitConverter.GetBytes(numPlaneSections));
+                listBytes.AddRange(BitConverter.GetBytes(numAtomicSections));
+                listBytes.AddRange(BitConverter.GetBytes(unknown4));
+                listBytes.AddRange(BitConverter.GetBytes(unknown5));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum[0]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum[1]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum[2]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMinimum[0]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMinimum[1]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMinimum[2]));
+            }
+            else if (sectionSize == 0x34)
+            {
+                listBytes.AddRange(BitConverter.GetBytes(structVersion));
+                listBytes.AddRange(BitConverter.GetBytes(unknown1));
+                listBytes.AddRange(BitConverter.GetBytes(unknown2));
+                listBytes.AddRange(BitConverter.GetBytes(unknown3));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum[0]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum[1]));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum[2]));
+                listBytes.AddRange(BitConverter.GetBytes(numTriangles));
+                listBytes.AddRange(BitConverter.GetBytes(numVertices));
+                listBytes.AddRange(BitConverter.GetBytes(numPlaneSections));
+                listBytes.AddRange(BitConverter.GetBytes(numAtomicSections));
+                listBytes.AddRange(BitConverter.GetBytes(unknown4));
+                listBytes.AddRange(BitConverter.GetBytes(unknown5));
+            }
         }
     }
 }

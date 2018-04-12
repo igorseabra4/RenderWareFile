@@ -9,9 +9,9 @@ namespace RenderWareFile
     public class Clump_0010 : RWSection
     {
         public ClumpStruct_0001 clumpStruct;
-        public FrameList_000E frameList;
+        public RWSection frameList;
         public GeometryList_001A geometryList;
-        public List<Atomic_0014> atomicList;
+        public List<RWSection> atomicList;
         public Extension_0003 clumpExtension;
 
         public Clump_0010 Read(BinaryReader binaryReader)
@@ -28,18 +28,18 @@ namespace RenderWareFile
 
             Section frameListSection = (Section)binaryReader.ReadInt32();
             if (frameListSection != Section.FrameList) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            frameList = new FrameList_000E().Read(binaryReader);
+            frameList = new GenericSection().Read(binaryReader, frameListSection);
 
             Section geometryListSection = (Section)binaryReader.ReadInt32();
             if (geometryListSection != Section.GeometryList) throw new Exception(binaryReader.BaseStream.Position.ToString());
             geometryList = new GeometryList_001A().Read(binaryReader);
 
-            atomicList = new List<Atomic_0014>();
+            atomicList = new List<RWSection>();
             for (int i = 0; i < clumpStruct.atomicCount; i++)
             {
                 Section atomicListSection = (Section)binaryReader.ReadInt32();
                 if (atomicListSection != Section.Atomic) throw new Exception(binaryReader.BaseStream.Position.ToString());
-                atomicList.Add(new Atomic_0014().Read(binaryReader));
+                atomicList.Add(new GenericSection().Read(binaryReader, atomicListSection));
             }
 
             Section clumpExtensionSection = (Section)binaryReader.ReadInt32();
