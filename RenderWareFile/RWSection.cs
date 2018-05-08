@@ -143,9 +143,26 @@ namespace RenderWareFile
             this = new Color(BitConverter.GetBytes(a));
         }
 
+        public static Color FromString(string s)
+        {
+            if (s.Length != 8) throw new InvalidDataException();
+
+            Color c;
+            c.R = Convert.ToByte(new string(new char[] { s[0], s[1] }), 16);
+            c.G = Convert.ToByte(new string(new char[] { s[2], s[3] }), 16);
+            c.B = Convert.ToByte(new string(new char[] { s[4], s[5] }), 16);
+            c.A = Convert.ToByte(new string(new char[] { s[6], s[7] }), 16);            
+            return c;
+        }
+
         public static explicit operator int(Color v)
         {
             return BitConverter.ToInt32(new byte[] { v.R, v.G, v.B, v.A }, 0);
+        }
+
+        public override string ToString()
+        {
+            return String.Format("{0, 2:X2}{1, 2:X2}{2, 2:X2}{3, 2:X2}", R, G, B, A);
         }
     }
 
@@ -165,7 +182,7 @@ namespace RenderWareFile
         }
     }
 
-    public static class EndianFunctions
+    public static class General
     {
         public static float Switch(float f)
         {
@@ -184,5 +201,7 @@ namespace RenderWareFile
             byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
             return BitConverter.ToInt16(a, 0);
         }
+
+        public static List<int> MaterialList;
     }
 }

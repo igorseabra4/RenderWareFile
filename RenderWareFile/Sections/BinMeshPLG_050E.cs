@@ -14,6 +14,8 @@ namespace RenderWareFile
 
         public BinMesh[] binMeshList;
 
+        public bool isNativeData = false;
+
         public BinMeshPLG_050E Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.BinMeshPLG;
@@ -26,6 +28,8 @@ namespace RenderWareFile
 
             binMeshList = new BinMesh[numMeshes];
 
+            General.MaterialList = new List<int>();
+
             for (int i = 0; i < numMeshes; i++)
             {
                 binMeshList[i] = new BinMesh
@@ -33,10 +37,19 @@ namespace RenderWareFile
                     indexCount = binaryReader.ReadInt32(),
                     materialIndex = binaryReader.ReadInt32()
                 };
-                binMeshList[i].vertexIndices = new int[binMeshList[i].indexCount];
 
-                for (int j = 0; j < binMeshList[i].vertexIndices.Count(); j++)
-                    binMeshList[i].vertexIndices[j] = binaryReader.ReadInt32();
+                if (sectionSize != 12 + 8 * numMeshes)
+                {
+                    binMeshList[i].vertexIndices = new int[binMeshList[i].indexCount];
+
+                    for (int j = 0; j < binMeshList[i].vertexIndices.Count(); j++)
+                        binMeshList[i].vertexIndices[j] = binaryReader.ReadInt32();
+                }
+                else
+                {
+                    General.MaterialList.Add(binMeshList[i].materialIndex);
+                    isNativeData = true;
+                }
             }
 
             return this;

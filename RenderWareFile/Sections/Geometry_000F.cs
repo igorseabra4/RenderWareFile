@@ -8,22 +8,21 @@ namespace RenderWareFile
 {
     public enum GeometryFlags
     {
-        isTristrip = 0x00000001,
-        hasVertexPositions = 0x00000002,
-        hasTextCoords = 0x00000004,
-        hasVertexColors = 0x00000008,
-        hasNormals = 0x00000010,
-        hasLights = 0x00000020,
-        modeulateMaterialColor = 0x00000040,
-        hasTextCoords2 = 0x00000080,
-        isNativeGeometry = 0x01000000
+        isTristrip = 0x0001,
+        hasVertexPositions = 0x0002,
+        hasTextCoords = 0x0004,
+        hasVertexColors = 0x0008,
+        hasNormals = 0x0010,
+        hasLights = 0x0020,
+        modeulateMaterialColor = 0x00040,
+        hasTextCoords2 = 0x0080
     }
 
     public class Geometry_000F : RWSection
     {
         public GeometryStruct_0001 geometryStruct;
         public MaterialList_0008 materialList;
-        public AtomicExtension_0003 geometryExtension;
+        public Extension_0003 geometryExtension;
 
         public Geometry_000F Read(BinaryReader binaryReader)
         {
@@ -43,7 +42,7 @@ namespace RenderWareFile
 
             Section geometryExtensionSection = (Section)binaryReader.ReadInt32();
             if (geometryExtensionSection != Section.Extension) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            geometryExtension = new AtomicExtension_0003().Read(binaryReader);
+            geometryExtension = new Extension_0003().Read(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 
@@ -73,7 +72,8 @@ namespace RenderWareFile
     
     public class GeometryStruct_0001 : RWSection
     {
-        public int geometryFlags;
+        public short geometryFlags;
+        public short geometryFlags2;
         public int numTriangles;
         public int numVertices;
         public int numMorphTargets;
@@ -95,7 +95,8 @@ namespace RenderWareFile
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            geometryFlags = binaryReader.ReadInt32();
+            geometryFlags = binaryReader.ReadInt16();
+            geometryFlags2 = binaryReader.ReadInt16();
             numTriangles = binaryReader.ReadInt32();
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
@@ -106,7 +107,7 @@ namespace RenderWareFile
 
             if (ambient != 1f | specular != 1f | diffuse != 1f) binaryReader.BaseStream.Position -= 3 * 4;
 
-            if ((geometryFlags & (int)GeometryFlags.isNativeGeometry) == 0)
+            if (geometryFlags2 != 0x0101)
             {
                 if ((geometryFlags & (int)GeometryFlags.hasVertexColors) != 0)
                 {
@@ -147,49 +148,50 @@ namespace RenderWareFile
                         vertex3 = binaryReader.ReadUInt16()
                     };
                 }
-            }
 
-            morphTargets = new MorphTarget[numMorphTargets];
-            for (int i = 0; i < numMorphTargets; i++)
-            {
-                MorphTarget m = new MorphTarget();
-
-                m.sphereCenter.X = binaryReader.ReadSingle();
-                m.sphereCenter.Y = binaryReader.ReadSingle();
-                m.sphereCenter.Z = binaryReader.ReadSingle();
-                m.radius = binaryReader.ReadSingle();
-                m.hasVertices = binaryReader.ReadInt32();
-                m.hasNormals = binaryReader.ReadInt32();
-
-                if (m.hasVertices != 0)
+                morphTargets = new MorphTarget[numMorphTargets];
+                for (int i = 0; i < numMorphTargets; i++)
                 {
-                    m.vertices = new Vertex3[numVertices];
-                    for (int j = 0; j < numVertices; j++)
+                    MorphTarget m = new MorphTarget();
+
+                    m.sphereCenter.X = binaryReader.ReadSingle();
+                    m.sphereCenter.Y = binaryReader.ReadSingle();
+                    m.sphereCenter.Z = binaryReader.ReadSingle();
+                    m.radius = binaryReader.ReadSingle();
+                    m.hasVertices = binaryReader.ReadInt32();
+                    m.hasNormals = binaryReader.ReadInt32();
+
+                    if (m.hasVertices != 0)
                     {
-                        m.vertices[j] = new Vertex3()
+                        m.vertices = new Vertex3[numVertices];
+                        for (int j = 0; j < numVertices; j++)
                         {
-                            X = binaryReader.ReadSingle(),
-                            Y = binaryReader.ReadSingle(),
-                            Z = binaryReader.ReadSingle()
-                        };
+                            m.vertices[j] = new Vertex3()
+                            {
+                                X = binaryReader.ReadSingle(),
+                                Y = binaryReader.ReadSingle(),
+                                Z = binaryReader.ReadSingle()
+                            };
+                        }
                     }
+
+                    if (m.hasNormals != 0)
+                    {
+                        m.normals = new Vertex3[numVertices];
+                        for (int j = 0; j < numVertices; j++)
+                        {
+                            m.normals[j] = new Vertex3()
+                            {
+                                X = binaryReader.ReadSingle(),
+                                Y = binaryReader.ReadSingle(),
+                                Z = binaryReader.ReadSingle()
+                            };
+                        }
+                    }
+
+                    morphTargets[i] = m;
                 }
 
-                if (m.hasNormals != 0)
-                {
-                    m.normals = new Vertex3[numVertices];
-                    for (int j = 0; j < numVertices; j++)
-                    {
-                        m.normals[j] = new Vertex3()
-                        {
-                            X = binaryReader.ReadSingle(),
-                            Y = binaryReader.ReadSingle(),
-                            Z = binaryReader.ReadSingle()
-                        };
-                    }
-                }
-
-                morphTargets[i] = m;
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
@@ -202,6 +204,7 @@ namespace RenderWareFile
             sectionIdentifier = Section.Struct;
 
             listBytes.AddRange(BitConverter.GetBytes(geometryFlags));
+            listBytes.AddRange(BitConverter.GetBytes(geometryFlags2));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
@@ -213,7 +216,7 @@ namespace RenderWareFile
                 listBytes.AddRange(BitConverter.GetBytes(diffuse));
             }
 
-            if ((geometryFlags & (int)GeometryFlags.isNativeGeometry) == 0)
+            if (geometryFlags2 != 0x0101)
             {
                 if ((geometryFlags & (int)GeometryFlags.hasVertexColors) != 0)
                 {

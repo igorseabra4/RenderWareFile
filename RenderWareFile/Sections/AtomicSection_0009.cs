@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace RenderWareFile
 {
     public class AtomicSection_0009 : RWSection
     {
         public AtomicStruct_0001 atomicStruct;
-        public AtomicExtension_0003 atomicExtension;
+        public Extension_0003 atomicExtension;
 
         public AtomicSection_0009 Read(BinaryReader binaryReader)
         {
@@ -25,7 +24,7 @@ namespace RenderWareFile
 
             Section atomicExtensionSection = (Section)binaryReader.ReadInt32();
             if (atomicExtensionSection != Section.Extension) throw new Exception();
-            atomicExtension = new AtomicExtension_0003().Read(binaryReader);
+            atomicExtension = new Extension_0003().Read(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 
@@ -50,11 +49,13 @@ namespace RenderWareFile
         public float[] boxMinimum = new float[3];
         public int unknown1;
         public int unknown2;
-
+                
         public Vertex3[] vertexArray;
         public Color[] colorArray;
         public TextCoord[] uvArray;
         public Triangle[] triangleArray;
+
+        public bool isNativeData = false;
 
         public AtomicStruct_0001 Read(BinaryReader binaryReader)
         {
@@ -77,6 +78,12 @@ namespace RenderWareFile
             boxMinimum[2] = binaryReader.ReadSingle();
             unknown1 = binaryReader.ReadInt32();
             unknown2 = binaryReader.ReadInt32();
+
+            if (binaryReader.BaseStream.Position == startSectionPosition + sectionSize)
+            {
+                isNativeData = true;
+                return this;
+            }
 
             binaryReader.BaseStream.Position = startSectionPosition + 11 * 4;
 
@@ -210,35 +217,6 @@ namespace RenderWareFile
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].vertex2));
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].vertex3));
                 }
-        }
-    }
-
-    public class AtomicExtension_0003 : RWSection
-    {
-        public BinMeshPLG_050E binMeshPLG;
-
-        public AtomicExtension_0003 Read(BinaryReader binaryReader)
-        {
-            sectionIdentifier = Section.Extension;
-            sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
-
-            long startSectionPosition = binaryReader.BaseStream.Position;
-
-            Section binMeshPLGSection = (Section)binaryReader.ReadInt32();
-            if (binMeshPLGSection != Section.BinMeshPLG) throw new Exception();
-            binMeshPLG = new BinMeshPLG_050E().Read(binaryReader);
-
-            binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
-        }
-
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
-        {
-            sectionIdentifier = Section.Extension;
-
-            listBytes.AddRange(binMeshPLG.GetBytes(fileVersion));
         }
     }
 }

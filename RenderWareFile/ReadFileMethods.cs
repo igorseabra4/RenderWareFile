@@ -9,19 +9,17 @@ namespace RenderWareFile
         public static bool isShadow = false;
         public static bool isCollision = false;
 
-        public static RWSection[] ReadRenderWareFile(string FileName)
+        public static RWSection[] ReadRenderWareFile(string fileName)
         {
-            FileStream fileStream = new FileStream(FileName, FileMode.Open);
-            return ReadRenderWareFile(fileStream, FileName);
+            return ReadRenderWareFile(new FileStream(fileName, FileMode.Open));
         }
 
-        public static RWSection[] ReadRenderWareFile(byte[] File, string FileName)
+        public static RWSection[] ReadRenderWareFile(byte[] file)
         {
-            MemoryStream memoryStream = new MemoryStream(File);
-            return ReadRenderWareFile(memoryStream, FileName);
+            return ReadRenderWareFile(new MemoryStream(file));
         }
 
-        public static RWSection[] ReadRenderWareFile(Stream File, string FileName)
+        public static RWSection[] ReadRenderWareFile(Stream File)
         {
             BinaryReader binaryReader = new BinaryReader(File);
             List<RWSection> renderWareFile = new List<RWSection>();
