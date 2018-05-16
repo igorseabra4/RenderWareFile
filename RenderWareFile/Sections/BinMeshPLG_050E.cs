@@ -2,13 +2,31 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
-namespace RenderWareFile
+namespace RenderWareFile.Sections
 {
+    public enum BinMeshHeaderFlags : int
+    {
+        TriangleList = 0x00000000,
+        TriangleStrip = 0x00000001,
+        TriangleFan = 0x00000002,
+        LineList = 0x00000004,
+        PolyLine = 0x00000008,
+        PointList = 0x00000010,
+        PrimitiveMask = 0x000000FF,
+        Unindexed = 0x00000100
+    }
+
+    public struct BinMesh
+    {
+        public int indexCount; // number of vertex indices in this mesh
+        public int materialIndex; // material index
+        public int[] vertexIndices; // vertex indices
+    }
+
     public class BinMeshPLG_050E : RWSection
     {
-        public int isTristrips; // 0 = triangle lists, 1 = triangle strips
+        public BinMeshHeaderFlags binMeshHeaderFlags; 
         public int numMeshes; // number of objects/meshes (usually same number of materials)
         public int totalIndexCount; // total number of indices
 
@@ -22,7 +40,7 @@ namespace RenderWareFile
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            isTristrips = binaryReader.ReadInt32();
+            binMeshHeaderFlags = (BinMeshHeaderFlags)binaryReader.ReadInt32();
             numMeshes = binaryReader.ReadInt32();
             totalIndexCount = binaryReader.ReadInt32();
 
@@ -59,7 +77,7 @@ namespace RenderWareFile
         {
             sectionIdentifier = Section.BinMeshPLG;
 
-            listBytes.AddRange(BitConverter.GetBytes(isTristrips));
+            listBytes.AddRange(BitConverter.GetBytes((int)binMeshHeaderFlags));
             listBytes.AddRange(BitConverter.GetBytes(numMeshes));
             listBytes.AddRange(BitConverter.GetBytes(totalIndexCount));
 
@@ -71,13 +89,6 @@ namespace RenderWareFile
                 for (int j = 0; j < binMeshList[i].vertexIndices.Count(); j++)
                     listBytes.AddRange(BitConverter.GetBytes(binMeshList[i].vertexIndices[j]));
             }
-        }        
-    }
-
-    public struct BinMesh
-    {
-        public int indexCount; // number of vertex indices in this mesh
-        public int materialIndex; // material index
-        public int[] vertexIndices; // vertex indices
+        }
     }
 }

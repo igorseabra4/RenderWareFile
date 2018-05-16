@@ -1,54 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
-namespace RenderWareFile
+namespace RenderWareFile.Sections
 {
-    public class AtomicSection_0009 : RWSection
+    public class AtomicSectorStruct_0001 : RWSection
     {
-        public AtomicStruct_0001 atomicStruct;
-        public Extension_0003 atomicExtension;
-
-        public AtomicSection_0009 Read(BinaryReader binaryReader)
-        {
-            sectionIdentifier = Section.AtomicSection;
-            sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
-
-            long startSectionPosition = binaryReader.BaseStream.Position;
-
-            Section atomicStructSection = (Section)binaryReader.ReadInt32();
-            if (atomicStructSection != Section.Struct) throw new Exception();
-            atomicStruct = new AtomicStruct_0001().Read(binaryReader);
-
-            Section atomicExtensionSection = (Section)binaryReader.ReadInt32();
-            if (atomicExtensionSection != Section.Extension) throw new Exception();
-            atomicExtension = new Extension_0003().Read(binaryReader);
-
-            binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
-        }
-
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
-        {
-            sectionIdentifier = Section.AtomicSection;
-
-            listBytes.AddRange(atomicStruct.GetBytes(fileVersion));
-            listBytes.AddRange(atomicExtension.GetBytes(fileVersion));
-        }
-    }
-
-    public class AtomicStruct_0001 : RWSection
-    {
-        public int flags;
+        public int matListWindowBase;
         public int numTriangles;
         public int numVertices;
-        public float[] boxMaximum = new float[3];
-        public float[] boxMinimum = new float[3];
-        public int unknown1;
-        public int unknown2;
+        public Vertex3 boxMaximum;
+        public Vertex3 boxMinimum;
+        public int collSectorPresent;
+        public int unused;
                 
         public Vertex3[] vertexArray;
         public Color[] colorArray;
@@ -57,7 +21,7 @@ namespace RenderWareFile
 
         public bool isNativeData = false;
 
-        public AtomicStruct_0001 Read(BinaryReader binaryReader)
+        public AtomicSectorStruct_0001 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -65,19 +29,13 @@ namespace RenderWareFile
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            flags = binaryReader.ReadInt32();
+            matListWindowBase = binaryReader.ReadInt32();
             numTriangles = binaryReader.ReadInt32();
             numVertices = binaryReader.ReadInt32();
-            boxMaximum = new float[3];
-            boxMaximum[0] = binaryReader.ReadSingle();
-            boxMaximum[1] = binaryReader.ReadSingle();
-            boxMaximum[2] = binaryReader.ReadSingle();
-            boxMinimum = new float[3];
-            boxMinimum[0] = binaryReader.ReadSingle();
-            boxMinimum[1] = binaryReader.ReadSingle();
-            boxMinimum[2] = binaryReader.ReadSingle();
-            unknown1 = binaryReader.ReadInt32();
-            unknown2 = binaryReader.ReadInt32();
+            boxMaximum = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
+            boxMinimum = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
+            collSectorPresent = binaryReader.ReadInt32();
+            unused = binaryReader.ReadInt32();
 
             if (binaryReader.BaseStream.Position == startSectionPosition + sectionSize)
             {
@@ -133,7 +91,7 @@ namespace RenderWareFile
 
             if (ReadFileMethods.isShadow)
             {
-                // shadow xbox
+                // shadow
                 triangleArray = new Triangle[numTriangles];
                 for (int i = 0; i < numTriangles; i++)
                 {
@@ -165,19 +123,19 @@ namespace RenderWareFile
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.AddRange(BitConverter.GetBytes(flags));
+            listBytes.AddRange(BitConverter.GetBytes(matListWindowBase));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
-            listBytes.AddRange(BitConverter.GetBytes(boxMaximum[0]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMaximum[1]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMaximum[2]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMinimum[0]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMinimum[1]));
-            listBytes.AddRange(BitConverter.GetBytes(boxMinimum[2]));
-            listBytes.AddRange(BitConverter.GetBytes(unknown1));
-            listBytes.AddRange(BitConverter.GetBytes(unknown2));
-
-            for (int i = 0; i < vertexArray.Count(); i++)
+            listBytes.AddRange(BitConverter.GetBytes(boxMaximum.X));
+            listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Y));
+            listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Z));
+            listBytes.AddRange(BitConverter.GetBytes(boxMinimum.X));
+            listBytes.AddRange(BitConverter.GetBytes(boxMinimum.Y));
+            listBytes.AddRange(BitConverter.GetBytes(boxMinimum.Z));
+            listBytes.AddRange(BitConverter.GetBytes(collSectorPresent));
+            listBytes.AddRange(BitConverter.GetBytes(unused));
+            
+            for (int i = 0; i < vertexArray.Length; i++)
             {
                 listBytes.AddRange(BitConverter.GetBytes(vertexArray[i].X));
                 listBytes.AddRange(BitConverter.GetBytes(vertexArray[i].Y));
@@ -186,7 +144,7 @@ namespace RenderWareFile
 
             if (!ReadFileMethods.isCollision)
             {
-                for (int i = 0; i < colorArray.Count(); i++)
+                for (int i = 0; i < colorArray.Length; i++)
                 {
                     listBytes.Add(colorArray[i].R);
                     listBytes.Add(colorArray[i].G);
@@ -194,7 +152,7 @@ namespace RenderWareFile
                     listBytes.Add(colorArray[i].A);
                 }
 
-                for (int i = 0; i < uvArray.Count(); i++)
+                for (int i = 0; i < uvArray.Length; i++)
                 {
                     listBytes.AddRange(BitConverter.GetBytes(uvArray[i].X));
                     listBytes.AddRange(BitConverter.GetBytes(uvArray[i].Y));
@@ -202,7 +160,7 @@ namespace RenderWareFile
             }
 
             if (ReadFileMethods.isShadow)
-                for (int i = 0; i < triangleArray.Count(); i++)
+                for (int i = 0; i < triangleArray.Length; i++)
                 {
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].vertex1));
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].vertex2));
@@ -210,7 +168,7 @@ namespace RenderWareFile
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].materialIndex));
                 }
             else
-                for (int i = 0; i < triangleArray.Count(); i++)
+                for (int i = 0; i < triangleArray.Length; i++)
                 {
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].materialIndex));
                     listBytes.AddRange(BitConverter.GetBytes(triangleArray[i].vertex1));

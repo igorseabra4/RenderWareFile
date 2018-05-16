@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
-namespace RenderWareFile
+namespace RenderWareFile.Sections
 {
     public class String_0002 : RWSection
     {
@@ -17,15 +15,7 @@ namespace RenderWareFile
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            List<char> charList = new List<char>(sectionSize);
-            char c = binaryReader.ReadChar();
-            while (c != 0)
-            {
-                charList.Add(c);
-                c = binaryReader.ReadChar();
-            }
-
-            stringString = new string(charList.ToArray());
+            stringString = General.ReadFromZeroTerminatedString(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 

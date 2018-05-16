@@ -2,7 +2,7 @@
 using System.Linq;
 using System.IO;
 
-namespace RenderWareFile
+namespace RenderWareFile.Sections
 {
     public class Extension_0003 : RWSection
     {
@@ -22,6 +22,8 @@ namespace RenderWareFile
                 Section currentSection = (Section)binaryReader.ReadInt32();
                 if (currentSection == Section.BinMeshPLG) extensionSectionList.Add(new BinMeshPLG_050E().Read(binaryReader));
                 else if (currentSection == Section.NativeDataPLG) extensionSectionList.Add(new NativeDataPLG_0510().Read(binaryReader));
+                else if (currentSection == Section.CollisionPLG) extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
+                else if (currentSection == Section.UserDataPLG) extensionSectionList.Add(new UserDataPLG_011F().Read(binaryReader));
                 else extensionSectionList.Add(new GenericSection().Read(binaryReader, currentSection));
             }
 

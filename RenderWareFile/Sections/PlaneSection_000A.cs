@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
-namespace RenderWareFile
+namespace RenderWareFile.Sections
 {
-    public class PlaneSection_000A : RWSection
+    public class PlaneSector_000A : RWSection
     {
         public PlaneStruct_0001 planeStruct;
         public RWSection leftSection;
         public RWSection rightSection;
 
-        public PlaneSection_000A Read(BinaryReader binaryReader)
+        public PlaneSector_000A Read(BinaryReader binaryReader)
         {
-            sectionIdentifier = Section.PlaneSection;
+            sectionIdentifier = Section.PlaneSector;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
@@ -23,24 +21,24 @@ namespace RenderWareFile
             planeStruct = new PlaneStruct_0001().Read(binaryReader);
 
             Section leftSectionSection = (Section)binaryReader.ReadInt32();
-            if (leftSectionSection == Section.AtomicSection & planeStruct.leftIsAtomic == 1)
+            if (leftSectionSection == Section.AtomicSector & planeStruct.leftIsAtomic == 1)
             {
-                leftSection = new AtomicSection_0009().Read(binaryReader);
+                leftSection = new AtomicSector_0009().Read(binaryReader);
             }
-            else if (leftSectionSection == Section.PlaneSection & planeStruct.leftIsAtomic == 0)
+            else if (leftSectionSection == Section.PlaneSector & planeStruct.leftIsAtomic == 0)
             {
-                leftSection = new PlaneSection_000A().Read(binaryReader);
+                leftSection = new PlaneSector_000A().Read(binaryReader);
             }
             else throw new Exception();
 
             Section rightSectionSection = (Section)binaryReader.ReadInt32();
-            if (rightSectionSection == Section.AtomicSection & planeStruct.rightIsAtomic == 1)
+            if (rightSectionSection == Section.AtomicSector & planeStruct.rightIsAtomic == 1)
             {
-                rightSection = new AtomicSection_0009().Read(binaryReader);
+                rightSection = new AtomicSector_0009().Read(binaryReader);
             }
-            else if (rightSectionSection == Section.PlaneSection & planeStruct.rightIsAtomic == 0)
+            else if (rightSectionSection == Section.PlaneSector & planeStruct.rightIsAtomic == 0)
             {
-                rightSection = new PlaneSection_000A().Read(binaryReader);
+                rightSection = new PlaneSector_000A().Read(binaryReader);
             }
             else throw new Exception();
 
@@ -49,49 +47,11 @@ namespace RenderWareFile
 
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
-            sectionIdentifier = Section.PlaneSection;
+            sectionIdentifier = Section.PlaneSector;
 
             listBytes.AddRange(planeStruct.GetBytes(fileVersion));
             listBytes.AddRange(leftSection.GetBytes(fileVersion));
             listBytes.AddRange(rightSection.GetBytes(fileVersion));
-        }
-    }
-
-    public class PlaneStruct_0001 : RWSection
-    {
-        public int type;
-        public float value;
-        public int leftIsAtomic;
-        public int rightIsAtomic;
-        public float leftValue;
-        public float rightValue;
-
-        public PlaneStruct_0001 Read(BinaryReader binaryReader)
-        {
-            sectionIdentifier = Section.Struct;
-            sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
-
-            type = binaryReader.ReadInt32();
-            value = binaryReader.ReadSingle();
-            leftIsAtomic = binaryReader.ReadInt32();
-            rightIsAtomic = binaryReader.ReadInt32();
-            leftValue = binaryReader.ReadSingle();
-            rightValue = binaryReader.ReadSingle();
-
-            return this;
-        }
-
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
-        {
-            sectionIdentifier = Section.Struct;
-
-            listBytes.AddRange(BitConverter.GetBytes(type));
-            listBytes.AddRange(BitConverter.GetBytes(value));
-            listBytes.AddRange(BitConverter.GetBytes(leftIsAtomic));
-            listBytes.AddRange(BitConverter.GetBytes(rightIsAtomic));
-            listBytes.AddRange(BitConverter.GetBytes(leftValue));
-            listBytes.AddRange(BitConverter.GetBytes(rightValue));
         }
     }
 }

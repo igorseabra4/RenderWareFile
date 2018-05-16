@@ -1,31 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
-namespace RenderWareFile
+namespace RenderWareFile.Sections
 {
-    //public class Atomic_0014 : RWSection
-    //{
-    //    // Not yet implemented
+    public class Atomic_0014 : RWSection
+    {
+        byte[] data;
 
-    //    public Atomic_0014 Read(BinaryReader binaryReader)
-    //    {
-    //        sectionIdentifier = Section.Atomic;
-    //        sectionSize = binaryReader.ReadInt32();
-    //        renderWareVersion = binaryReader.ReadInt32();
+        public Atomic_0014 Read(BinaryReader binaryReader, Section section)
+        {
+            sectionIdentifier = Section.Atomic;
+            sectionSize = binaryReader.ReadInt32();
+            renderWareVersion = binaryReader.ReadInt32();
 
-    //        binaryReader.BaseStream.Position += sectionSize;
+            data = binaryReader.ReadBytes(sectionSize);
 
-    //        return this;
-    //    }
+            return this;
+        }
 
-    //    public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
-    //    {
-    //        sectionIdentifier = Section.Atomic;
-
-    //        throw new NotImplementedException();
-    //    }
-    //}
+        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        {
+            sectionIdentifier = Section.Atomic;
+            throw new NotImplementedException();
+        }
+    }
 }
