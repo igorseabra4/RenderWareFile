@@ -17,8 +17,7 @@ namespace RenderWareFile.Sections
 
             if (colTreeStructSection == Section.Struct)
                 colTreeStruct = new ColTreeStruct_0001().Read(binaryReader);
-            else
-                colTreeStruct = new GenericSection().Read(binaryReader, colTreeStructSection);
+            else throw new System.Exception();
             
             return this;
         }

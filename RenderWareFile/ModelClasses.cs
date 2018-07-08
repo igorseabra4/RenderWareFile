@@ -76,6 +76,28 @@ namespace RenderWareFile
             return BitConverter.ToInt32(new byte[] { v.R, v.G, v.B, v.A }, 0);
         }
 
+        public static bool operator ==(Color c1, Color c2)
+        {
+            return Equals(c1, c2);
+        }
+
+        public static bool operator !=(Color c1, Color c2)
+        {
+            return !Equals(c1, c2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Color c)
+            {
+                return (R == c.R & G == c.G & B == c.B & A == c.A);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public override string ToString()
         {
             return String.Format("{0, 2:X2}{1, 2:X2}{2, 2:X2}{3, 2:X2}", R, G, B, A);

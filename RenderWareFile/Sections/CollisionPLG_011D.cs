@@ -14,14 +14,20 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.CollisionPLG;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
+            
+            if (ReadFileMethods.isShadow & ReadFileMethods.isCollision)
+            {
+                unknownValue = binaryReader.ReadInt32();
 
-            unknownValue = binaryReader.ReadInt32();
-
-            Section colTreeSection = (Section)binaryReader.ReadInt32();
-            if (colTreeSection == Section.ColTree)
-                colTree = new ColTree_002C().Read(binaryReader);
+                Section colTreeSection = (Section)binaryReader.ReadInt32();
+                if (colTreeSection == Section.ColTree)
+                    colTree = new ColTree_002C().Read(binaryReader);
+                else throw new Exception();
+            }
             else
-                colTree = new GenericSection().Read(binaryReader, colTreeSection);
+            {
+                binaryReader.BaseStream.Position += sectionSize;
+            }
 
             return this;
         }

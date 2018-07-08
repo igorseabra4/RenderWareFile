@@ -26,7 +26,7 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            if (true)
+            if (!ReadFileMethods.isCollision)
             {
                 data = binaryReader.ReadBytes(sectionSize);
                 return this;

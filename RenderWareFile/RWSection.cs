@@ -25,8 +25,10 @@ namespace RenderWareFile
         ChunkGroupStart = 0x29,
         ChunkGroupEnd = 0x2A,
         ColTree = 0x2C,
-        CollisionPLG = 0X11D,
-        UserDataPLG = 0X11F,
+        MorphPLG = 0x105,
+        SkyMipmapVal = 0x110,
+        CollisionPLG = 0x11D,
+        UserDataPLG = 0x11F,
         BinMeshPLG = 0x50E,
         NativeDataPLG = 0x510
     }
