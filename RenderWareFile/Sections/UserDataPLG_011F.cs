@@ -8,7 +8,7 @@ namespace RenderWareFile.Sections
     {
         public byte[] data;
 
-        public int unknown1;
+        public int userDataType;
         public int unknown2;
         public string attribute;
         public int unknown3;
@@ -22,27 +22,33 @@ namespace RenderWareFile.Sections
 
         public UserDataPLG_011F Read(BinaryReader binaryReader)
         {
-            sectionIdentifier = Section.CollisionPLG;
+            sectionIdentifier = Section.UserDataPLG;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
+            data = binaryReader.ReadBytes(sectionSize);
+
             if (!ReadFileMethods.isCollision)
-            {
-                data = binaryReader.ReadBytes(sectionSize);
                 return this;
+
+            binaryReader.BaseStream.Position -= sectionSize;
+
+            userDataType = binaryReader.ReadInt32();
+
+            if (userDataType == 0x02)
+            {
+                unknown2 = binaryReader.ReadInt32();
+                attribute = General.ReadFromZeroTerminatedString(binaryReader);
+                unknown3 = binaryReader.ReadInt32();
+                numTriangles = binaryReader.ReadInt32();
+                collisionFlags = new Color[numTriangles];
+                for (int i = 0; i < numTriangles; i++)
+                {
+                    collisionFlags[i] = new Color(binaryReader.ReadInt32());
+                }
+                unknown4 = binaryReader.ReadInt32();
             }
 
-            unknown1 = binaryReader.ReadInt32();
-            unknown2 = binaryReader.ReadInt32();
-            attribute = General.ReadFromZeroTerminatedString(binaryReader);
-            unknown3 = binaryReader.ReadInt32();
-            numTriangles = binaryReader.ReadInt32();
-            collisionFlags = new Color[numTriangles];
-            for (int i = 0; i < numTriangles; i++)
-            {
-                collisionFlags[i] = new Color(binaryReader.ReadInt32());
-            }
-            unknown4 = binaryReader.ReadInt32();
             userData = General.ReadFromZeroTerminatedString(binaryReader);
             unknown5 = binaryReader.ReadInt32();
             unknown6 = binaryReader.ReadInt32();
@@ -55,7 +61,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.UserDataPLG;
 
-            listBytes.AddRange(BitConverter.GetBytes(unknown1));
+            listBytes.AddRange(BitConverter.GetBytes(userDataType));
             listBytes.AddRange(BitConverter.GetBytes(unknown2));
             foreach (char i in attribute)
                 listBytes.Add((byte)i);
