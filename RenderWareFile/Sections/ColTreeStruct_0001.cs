@@ -4,7 +4,6 @@ using System.IO;
 
 namespace RenderWareFile.Sections
 {
-
     public class Split
     {
         public Sector negativeSector;

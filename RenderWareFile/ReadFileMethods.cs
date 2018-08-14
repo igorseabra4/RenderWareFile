@@ -30,6 +30,7 @@ namespace RenderWareFile
                 Section currentSection = (Section)binaryReader.ReadInt32();
                 if (currentSection == Section.World) renderWareFile.Add(new World_000B().Read(binaryReader));
                 else if (currentSection == Section.Clump) renderWareFile.Add(new Clump_0010().Read(binaryReader));
+                else if (currentSection == Section.TextureDictionary) renderWareFile.Add(new TextureDictionary_0016().Read(binaryReader));
                 else renderWareFile.Add(new GenericSection().Read(binaryReader, currentSection));
             }
 

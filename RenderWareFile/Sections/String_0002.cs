@@ -15,7 +15,7 @@ namespace RenderWareFile.Sections
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            stringString = General.ReadFromZeroTerminatedString(binaryReader);
+            stringString = Shared.ReadFromZeroTerminatedString(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 

@@ -38,7 +38,7 @@ namespace RenderWareFile.Sections
             if (userDataType == 0x02)
             {
                 unknown2 = binaryReader.ReadInt32();
-                attribute = General.ReadFromZeroTerminatedString(binaryReader);
+                attribute = Shared.ReadFromZeroTerminatedString(binaryReader);
                 unknown3 = binaryReader.ReadInt32();
                 numTriangles = binaryReader.ReadInt32();
                 collisionFlags = new Color[numTriangles];
@@ -49,7 +49,7 @@ namespace RenderWareFile.Sections
                 unknown4 = binaryReader.ReadInt32();
             }
 
-            userData = General.ReadFromZeroTerminatedString(binaryReader);
+            userData = Shared.ReadFromZeroTerminatedString(binaryReader);
             unknown5 = binaryReader.ReadInt32();
             unknown6 = binaryReader.ReadInt32();
             unknown7 = binaryReader.ReadInt32();

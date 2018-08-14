@@ -5,18 +5,6 @@ using System.Linq;
 
 namespace RenderWareFile.Sections
 {
-    public enum BinMeshHeaderFlags : int
-    {
-        TriangleList = 0x00000000,
-        TriangleStrip = 0x00000001,
-        TriangleFan = 0x00000002,
-        LineList = 0x00000004,
-        PolyLine = 0x00000008,
-        PointList = 0x00000010,
-        PrimitiveMask = 0x000000FF,
-        Unindexed = 0x00000100
-    }
-
     public struct BinMesh
     {
         public int indexCount; // number of vertex indices in this mesh
@@ -46,7 +34,7 @@ namespace RenderWareFile.Sections
 
             binMeshList = new BinMesh[numMeshes];
 
-            General.MaterialList = new List<int>();
+            Shared.MaterialList = new List<int>();
 
             for (int i = 0; i < numMeshes; i++)
             {
@@ -65,7 +53,7 @@ namespace RenderWareFile.Sections
                 }
                 else
                 {
-                    General.MaterialList.Add(binMeshList[i].materialIndex);
+                    Shared.MaterialList.Add(binMeshList[i].materialIndex);
                     isNativeData = true;
                 }
             }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using static RenderWareFile.General;
+using static RenderWareFile.Shared;
 
 namespace RenderWareFile.Sections
 {
