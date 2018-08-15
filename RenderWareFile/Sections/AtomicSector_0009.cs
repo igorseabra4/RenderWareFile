@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace RenderWareFile.Sections
 {
     public class AtomicSector_0009 : RWSection
     {
-        public AtomicSectorStruct_0001 atomicStruct;
-        public Extension_0003 atomicExtension;
+        public AtomicSectorStruct_0001 atomicSectorStruct;
+        public Extension_0003 atomicSectorExtension;
 
         public AtomicSector_0009 Read(BinaryReader binaryReader)
         {
@@ -20,11 +19,11 @@ namespace RenderWareFile.Sections
 
             Section atomicStructSection = (Section)binaryReader.ReadInt32();
             if (atomicStructSection != Section.Struct) throw new Exception();
-            atomicStruct = new AtomicSectorStruct_0001().Read(binaryReader);
+            atomicSectorStruct = new AtomicSectorStruct_0001().Read(binaryReader);
 
             Section atomicExtensionSection = (Section)binaryReader.ReadInt32();
             if (atomicExtensionSection != Section.Extension) throw new Exception();
-            atomicExtension = new Extension_0003().Read(binaryReader);
+            atomicSectorExtension = new Extension_0003().Read(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 
@@ -35,8 +34,8 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.AtomicSector;
 
-            listBytes.AddRange(atomicStruct.GetBytes(fileVersion));
-            listBytes.AddRange(atomicExtension.GetBytes(fileVersion));
+            listBytes.AddRange(atomicSectorStruct.GetBytes(fileVersion));
+            listBytes.AddRange(atomicSectorExtension.GetBytes(fileVersion));
         }
     }
 }

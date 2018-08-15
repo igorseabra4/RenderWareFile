@@ -28,7 +28,7 @@ namespace RenderWareFile.Sections
         public float diffuse;
 
         public Color[] vertexColors;
-        public TextCoord[] textCoords;
+        public Vertex2[] textCoords;
         public Triangle[] triangles;
         public MorphTarget[] morphTargets;
 
@@ -71,10 +71,10 @@ namespace RenderWareFile.Sections
 
                 if ((geometryFlags & (int)GeometryFlags.hasTextCoords) != 0)
                 {
-                    textCoords = new TextCoord[numVertices];
+                    textCoords = new Vertex2[numVertices];
                     for (int i = 0; i < numVertices; i++)
                     {
-                        textCoords[i] = new TextCoord()
+                        textCoords[i] = new Vertex2()
                         {
                             X = binaryReader.ReadSingle(),
                             Y = binaryReader.ReadSingle()

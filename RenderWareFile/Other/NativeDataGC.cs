@@ -185,7 +185,7 @@ namespace RenderWareFile.Sections
                 {
                     for (int i = 0; i < data.Count(); i += 0x8)
                     {
-                        TextCoord v = new TextCoord(
+                        Vertex2 v = new Vertex2(
                             BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
                             BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0));
                         declarations[d].entryList.Add(v);
@@ -252,7 +252,7 @@ namespace RenderWareFile.Sections
                 }
                 else if (d.declarationType == Declarations.TextCoord)
                 {
-                    foreach (TextCoord tc in d.entryList)
+                    foreach (Vertex2 tc in d.entryList)
                     {
                         listData.AddRange(BitConverter.GetBytes(tc.X).Reverse());
                         listData.AddRange(BitConverter.GetBytes(tc.Y).Reverse());

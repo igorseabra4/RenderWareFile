@@ -1,36 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace RenderWareFile
 {
-    public struct Vertex3
-    {
-        public float X;
-        public float Y;
-        public float Z;
-
-        public Vertex3(float a, float b, float c)
-        {
-            X = a;
-            Y = b;
-            Z = c;
-        }
-    }
-
-    public struct TextCoord
-    {
-        public float X;
-        public float Y;
-
-        public TextCoord(float a, float b)
-        {
-            X = a;
-            Y = b;
-        }
-    }
-
     public struct Color
     {
         public byte R;
@@ -86,37 +57,25 @@ namespace RenderWareFile
             return !Equals(c1, c2);
         }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is Color c)
-            {
-                return (R == c.R & G == c.G & B == c.B & A == c.A);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
         public override string ToString()
         {
             return String.Format("{0, 2:X2}{1, 2:X2}{2, 2:X2}{3, 2:X2}", R, G, B, A);
         }
-    }
 
-    public struct Triangle
-    {
-        public ushort materialIndex;
-        public ushort vertex1;
-        public ushort vertex2;
-        public ushort vertex3;
-
-        public Triangle(ushort m, ushort v1, ushort v2, ushort v3)
+        public override bool Equals(object obj)
         {
-            materialIndex = m;
-            vertex1 = v1;
-            vertex2 = v2;
-            vertex3 = v3;
+            if (obj is Color c) return (GetHashCode() == c.GetHashCode());
+            else return false;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 1960784236;
+            hashCode = hashCode * -1521134295 + R.GetHashCode();
+            hashCode = hashCode * -1521134295 + G.GetHashCode();
+            hashCode = hashCode * -1521134295 + B.GetHashCode();
+            hashCode = hashCode * -1521134295 + A.GetHashCode();
+            return hashCode;
         }
     }
 }

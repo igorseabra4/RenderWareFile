@@ -16,7 +16,7 @@ namespace RenderWareFile.Sections
                 
         public Vertex3[] vertexArray;
         public Color[] colorArray;
-        public TextCoord[] uvArray;
+        public Vertex2[] uvArray;
         public Triangle[] triangleArray;
 
         public bool isNativeData = false;
@@ -79,7 +79,7 @@ namespace RenderWareFile.Sections
                 else
                     binaryReader.BaseStream.Position = startSectionPosition + 11 * 4 + 16 * numVertices;
 
-                uvArray = new TextCoord[numVertices];
+                uvArray = new Vertex2[numVertices];
                 for (int i = 0; i < numVertices; i++)
                 {
                     uvArray[i].X = binaryReader.ReadSingle();
