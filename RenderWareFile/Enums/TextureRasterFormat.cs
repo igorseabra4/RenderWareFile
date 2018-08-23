@@ -17,5 +17,5 @@
         RASTER_PAL8 = 0x2000,
         RASTER_PAL4 = 0x4000,
         RASTER_MIPMAP = 0x8000
-    };
+    }
 }
