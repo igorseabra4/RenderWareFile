@@ -32,7 +32,7 @@ namespace RenderWareFile.Sections
         public byte mipMapCount;
         public byte type;
         public byte compression;
-        public Color[] pallete;
+        public Color[] palette;
         public MipMapEntry[] mipMaps;
 
         public TextureNativeStruct_0001 Read(BinaryReader binaryReader)
@@ -92,9 +92,9 @@ namespace RenderWareFile.Sections
 
             if (palleteSize != 0)
             {
-                pallete = new Color[palleteSize];
+                palette = new Color[palleteSize];
                 for (int i = 0; i < palleteSize; i++)
-                    pallete[i] = new Color(binaryReader.ReadInt32());
+                    palette[i] = new Color(binaryReader.ReadInt32());
             }
 
             mipMaps = new MipMapEntry[mipMapCount];
