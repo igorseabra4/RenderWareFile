@@ -6,7 +6,8 @@ namespace RenderWareFile.Sections
 {
     public class TextureDictionaryStruct_0001 : RWSection
     {
-        public int textureCount;
+        public short textureCount;
+        public short unknown;
 
         public TextureDictionaryStruct_0001 Read(BinaryReader binaryReader)
         {
@@ -14,7 +15,8 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            textureCount = binaryReader.ReadInt32();
+            textureCount = binaryReader.ReadInt16();
+            unknown = binaryReader.ReadInt16();
 
             return this;
         }
