@@ -27,6 +27,9 @@
         CollisionPLG = 0x11D,
         UserDataPLG = 0x11F,
         BinMeshPLG = 0x50E,
-        NativeDataPLG = 0x510
+        NativeDataPLG = 0x510,
+        BFBB_CollisionData_Section1 = 0x00BEEF01,
+        BFBB_CollisionData_Section2 = 0x00BEEF02,
+        BFBB_CollisionData_Section3 = 0x00BEEF03,
     }
 }
