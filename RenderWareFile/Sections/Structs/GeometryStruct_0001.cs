@@ -52,95 +52,97 @@ namespace RenderWareFile.Sections
 
             if (ambient != 1f | specular != 1f | diffuse != 1f) binaryReader.BaseStream.Position -= 3 * 4;
 
-            if (geometryFlags2 != 0x0101)
+            if ((geometryFlags2 & (int)GeometryFlags2.isNativeGeometry) != 0)
             {
-                if ((geometryFlags & (int)GeometryFlags.hasVertexColors) != 0)
-                {
-                    vertexColors = new Color[numVertices];
-                    for (int i = 0; i < numVertices; i++)
-                    {
-                        vertexColors[i] = new Color()
-                        {
-                            R = binaryReader.ReadByte(),
-                            G = binaryReader.ReadByte(),
-                            B = binaryReader.ReadByte(),
-                            A = binaryReader.ReadByte()
-                        };
-                    }
-                }
-
-                if ((geometryFlags & (int)GeometryFlags.hasTextCoords) != 0)
-                {
-                    textCoords = new Vertex2[numVertices];
-                    for (int i = 0; i < numVertices; i++)
-                    {
-                        textCoords[i] = new Vertex2()
-                        {
-                            X = binaryReader.ReadSingle(),
-                            Y = binaryReader.ReadSingle()
-                        };
-                    }
-                }
-
-                triangles = new Triangle[numTriangles];
-                for (int i = 0; i < numTriangles; i++)
-                {
-                    triangles[i] = new Triangle()
-                    {
-                        vertex2 = binaryReader.ReadUInt16(),
-                        vertex1 = binaryReader.ReadUInt16(),
-                        materialIndex = binaryReader.ReadUInt16(),
-                        vertex3 = binaryReader.ReadUInt16()
-                    };
-                }
-
-                morphTargets = new MorphTarget[numMorphTargets];
-                for (int i = 0; i < numMorphTargets; i++)
-                {
-                    MorphTarget m = new MorphTarget();
-
-                    m.sphereCenter.X = binaryReader.ReadSingle();
-                    m.sphereCenter.Y = binaryReader.ReadSingle();
-                    m.sphereCenter.Z = binaryReader.ReadSingle();
-                    m.radius = binaryReader.ReadSingle();
-                    m.hasVertices = binaryReader.ReadInt32();
-                    m.hasNormals = binaryReader.ReadInt32();
-
-                    if (m.hasVertices != 0)
-                    {
-                        m.vertices = new Vertex3[numVertices];
-                        for (int j = 0; j < numVertices; j++)
-                        {
-                            m.vertices[j] = new Vertex3()
-                            {
-                                X = binaryReader.ReadSingle(),
-                                Y = binaryReader.ReadSingle(),
-                                Z = binaryReader.ReadSingle()
-                            };
-                        }
-                    }
-
-                    if (m.hasNormals != 0)
-                    {
-                        m.normals = new Vertex3[numVertices];
-                        for (int j = 0; j < numVertices; j++)
-                        {
-                            m.normals[j] = new Vertex3()
-                            {
-                                X = binaryReader.ReadSingle(),
-                                Y = binaryReader.ReadSingle(),
-                                Z = binaryReader.ReadSingle()
-                            };
-                        }
-                    }
-
-                    morphTargets[i] = m;
-                }
-
+                binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
+                return this;
             }
 
-            binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
+            if ((geometryFlags & (int)GeometryFlags.hasVertexColors) != 0)
+            {
+                vertexColors = new Color[numVertices];
+                for (int i = 0; i < numVertices; i++)
+                {
+                    vertexColors[i] = new Color()
+                    {
+                        R = binaryReader.ReadByte(),
+                        G = binaryReader.ReadByte(),
+                        B = binaryReader.ReadByte(),
+                        A = binaryReader.ReadByte()
+                    };
+                }
+            }
 
+            if ((geometryFlags & (int)GeometryFlags.hasTextCoords) != 0)
+            {
+                textCoords = new Vertex2[numVertices];
+                for (int i = 0; i < numVertices; i++)
+                {
+                    textCoords[i] = new Vertex2()
+                    {
+                        X = binaryReader.ReadSingle(),
+                        Y = binaryReader.ReadSingle()
+                    };
+                }
+            }
+
+            triangles = new Triangle[numTriangles];
+            for (int i = 0; i < numTriangles; i++)
+            {
+                triangles[i] = new Triangle()
+                {
+                    vertex2 = binaryReader.ReadUInt16(),
+                    vertex1 = binaryReader.ReadUInt16(),
+                    materialIndex = binaryReader.ReadUInt16(),
+                    vertex3 = binaryReader.ReadUInt16()
+                };
+            }
+
+            morphTargets = new MorphTarget[numMorphTargets];
+            for (int i = 0; i < numMorphTargets; i++)
+            {
+                MorphTarget m = new MorphTarget();
+
+                m.sphereCenter.X = binaryReader.ReadSingle();
+                m.sphereCenter.Y = binaryReader.ReadSingle();
+                m.sphereCenter.Z = binaryReader.ReadSingle();
+                m.radius = binaryReader.ReadSingle();
+                m.hasVertices = binaryReader.ReadInt32();
+                m.hasNormals = binaryReader.ReadInt32();
+
+                if (m.hasVertices != 0)
+                {
+                    m.vertices = new Vertex3[numVertices];
+                    for (int j = 0; j < numVertices; j++)
+                    {
+                        m.vertices[j] = new Vertex3()
+                        {
+                            X = binaryReader.ReadSingle(),
+                            Y = binaryReader.ReadSingle(),
+                            Z = binaryReader.ReadSingle()
+                        };
+                    }
+                }
+
+                if (m.vertices == null) throw new Exception();
+
+                if (m.hasNormals != 0)
+                {
+                    m.normals = new Vertex3[numVertices];
+                    for (int j = 0; j < numVertices; j++)
+                    {
+                        m.normals[j] = new Vertex3()
+                        {
+                            X = binaryReader.ReadSingle(),
+                            Y = binaryReader.ReadSingle(),
+                            Z = binaryReader.ReadSingle()
+                        };
+                    }
+                }
+
+                morphTargets[i] = m;
+            }
+            
             return this;
         }
 

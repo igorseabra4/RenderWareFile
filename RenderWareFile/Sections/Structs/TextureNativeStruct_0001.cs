@@ -42,13 +42,16 @@ namespace RenderWareFile.Sections
 
         private int totalMipMapDataSize;
 
+        private byte[] sectionData;
+        private long startSectionPosition;
+
         public TextureNativeStruct_0001 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-
-            long startSectionPosition = binaryReader.BaseStream.Position;
+            
+            startSectionPosition = binaryReader.BaseStream.Position;
 
             platformType = binaryReader.ReadInt32();
 
@@ -72,7 +75,7 @@ namespace RenderWareFile.Sections
         {
             filterMode = (TextureFilterMode)binaryReader.ReadByte();
             byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)(addressMode & 0xF0);
+            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
             addressModeV = (TextureAddressMode)(addressMode & 0x0F);
             binaryReader.BaseStream.Position += 2;
 
@@ -130,7 +133,7 @@ namespace RenderWareFile.Sections
         {
             binaryReader.BaseStream.Position += 2;
             byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)(addressMode & 0xF0);
+            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
             addressModeV = (TextureAddressMode)(addressMode & 0x0F);
             filterMode = (TextureFilterMode)binaryReader.ReadByte();
 
@@ -141,6 +144,12 @@ namespace RenderWareFile.Sections
 
             textureName = ReadString(binaryReader);
             alphaName = ReadString(binaryReader);
+
+            if (ReadFileMethods.treatTexturesAsByteArray)
+            {
+                sectionData = binaryReader.ReadBytes((int)(sectionSize - (binaryReader.BaseStream.Position - startSectionPosition)));
+                return;
+            }
 
             rasterFormatFlags = (TextureRasterFormat)Shared.Switch(binaryReader.ReadInt32());
             width = binaryReader.ReadInt16();
@@ -192,12 +201,16 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
-
+            
             listBytes.AddRange(BitConverter.GetBytes(platformType));
 
             if (platformType == 8 | platformType == 5)
             {
                 SetNormalListBytes(fileVersion, ref listBytes);
+            }
+            else if (platformType == 100663296)
+            {
+                SetGameCubeListBytes(fileVersion, ref listBytes);
             }
             else throw new NotImplementedException("Unsupported writing of this platform type");
         }
@@ -205,7 +218,7 @@ namespace RenderWareFile.Sections
         private void SetNormalListBytes(int fileVersion, ref List<byte> listBytes)
         {
             listBytes.Add((byte)filterMode);
-            listBytes.Add((byte)((byte)addressModeV + 16 * (byte)addressModeU));
+            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
             listBytes.Add(0);
             listBytes.Add(0);
 
@@ -257,6 +270,35 @@ namespace RenderWareFile.Sections
                 foreach (byte j in i.data)
                     listBytes.Add(j);
             }
+        }
+
+        private void SetGameCubeListBytes(int fileVersion, ref List<byte> listBytes)
+        {
+            listBytes.Add(0);
+            listBytes.Add(0);
+            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
+            listBytes.Add((byte)filterMode);
+
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown1));
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown2));
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown3));
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown4));
+
+            foreach (char i in textureName)
+                listBytes.Add((byte)i);
+            for (int i = textureName.Length; i < 32; i++)
+                listBytes.Add(0);
+            foreach (char i in alphaName)
+                listBytes.Add((byte)i);
+            for (int i = alphaName.Length; i < 32; i++)
+                listBytes.Add(0);
+
+            if (ReadFileMethods.treatTexturesAsByteArray)
+            {
+                listBytes.AddRange(sectionData);
+                return;
+            }
+            else throw new NotImplementedException("Can't write GameCube texture as actual data yet.");
         }
     }
 }

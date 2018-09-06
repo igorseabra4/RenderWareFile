@@ -37,21 +37,26 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.BFBB_CollisionData_Section1;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
+            
+            CCOL = new string(binaryReader.ReadChars(4).ToArray());
 
-            CCOL = new string(binaryReader.ReadChars(4).Reverse().ToArray());
+            if (CCOL == "CCOL")
+                DoNotSwitch = true;
+            else
+                DoNotSwitch = false;
 
-            amountOf1 = Switch(binaryReader.ReadInt32());
-            amountOf2 = Switch(binaryReader.ReadInt32());
+            amountOf1 = SwitchToggleable(binaryReader.ReadInt32());
+            amountOf2 = SwitchToggleable(binaryReader.ReadInt32());
 
             list1 = new List<Struct1>();
             for (int i = 0; i < amountOf1; i++)
             {
                 list1.Add(new Struct1()
                 {
-                    unknown1 = Switch(binaryReader.ReadInt32()),
-                    unknown2 = Switch(binaryReader.ReadInt32()),
-                    unknown3 = Switch(binaryReader.ReadSingle()),
-                    unknown4 = Switch(binaryReader.ReadSingle())
+                    unknown1 = SwitchToggleable(binaryReader.ReadInt32()),
+                    unknown2 = SwitchToggleable(binaryReader.ReadInt32()),
+                    unknown3 = SwitchToggleable(binaryReader.ReadSingle()),
+                    unknown4 = SwitchToggleable(binaryReader.ReadSingle())
                 });
             }
 
@@ -60,11 +65,11 @@ namespace RenderWareFile.Sections
             {
                 list2.Add(new Struct2()
                 {
-                    unknown1 = Switch(binaryReader.ReadInt16()),
-                    unknown2 = Switch(binaryReader.ReadInt16()),
+                    unknown1 = SwitchToggleable(binaryReader.ReadInt16()),
+                    unknown2 = SwitchToggleable(binaryReader.ReadInt16()),
                     unknown3 = binaryReader.ReadByte(),
                     unknown4 = binaryReader.ReadByte(),
-                    unknown5 = Switch(binaryReader.ReadInt16())
+                    unknown5 = SwitchToggleable(binaryReader.ReadInt16())
                 });
             }
 
@@ -75,25 +80,31 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section1;
 
-            listBytes.AddRange(CCOL.Cast<Byte>().Reverse());
-            listBytes.AddRange(BitConverter.GetBytes(Switch(amountOf1)));
-            listBytes.AddRange(BitConverter.GetBytes(Switch(amountOf2)));
+            listBytes.AddRange(CCOL.Cast<Byte>());
+
+            if (CCOL == "CCOL")
+                DoNotSwitch = true;
+            else
+                DoNotSwitch = false;
+
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(amountOf1)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(amountOf2)));
 
             for (int i = 0; i < amountOf1; i++)
             {
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list1[i].unknown1)));
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list1[i].unknown2)));
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list1[i].unknown3)));
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list1[i].unknown4)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown1)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown2)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown3)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown4)));
             }
 
             for (int i = 0; i < amountOf2; i++)
             {
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list2[i].unknown1)));
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list2[i].unknown2)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list2[i].unknown1)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list2[i].unknown2)));
                 listBytes.Add(list2[i].unknown3);
                 listBytes.Add(list2[i].unknown4);
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list2[i].unknown5)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list2[i].unknown5)));
             }
         }
     }

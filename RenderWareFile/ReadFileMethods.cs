@@ -8,6 +8,7 @@ namespace RenderWareFile
     {
         public static bool isShadow = false;
         public static bool isCollision = false;
+        public static bool treatTexturesAsByteArray = false;
 
         public static RWSection[] ReadRenderWareFile(string fileName)
         {
@@ -39,6 +40,14 @@ namespace RenderWareFile
             binaryReader.Close();
 
             return renderWareFile.ToArray();
+        }
+
+        public static byte[] ExportRenderWareFile(RWSection RWFile, int version)
+        {
+            List<byte> list = new List<byte>();
+            list.AddRange(RWFile.GetBytes(version));
+
+            return list.ToArray();
         }
 
         public static byte[] ExportRenderWareFile(RWSection[] RWFile, int version)

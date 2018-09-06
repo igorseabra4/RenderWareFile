@@ -20,7 +20,7 @@ namespace RenderWareFile.Sections
             filterMode = (TextureFilterMode)binaryReader.ReadByte();
 
             byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)(addressMode & 0xF0);
+            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
             addressModeV = (TextureAddressMode)(addressMode & 0x0F);
 
             useMipLevels = binaryReader.ReadUInt16();
@@ -33,7 +33,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
 
             listBytes.Add((byte)filterMode);
-            listBytes.Add((byte)((byte)addressModeV + 16 * (byte)addressModeU));
+            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
             listBytes.AddRange(BitConverter.GetBytes(useMipLevels));            
         }
     }

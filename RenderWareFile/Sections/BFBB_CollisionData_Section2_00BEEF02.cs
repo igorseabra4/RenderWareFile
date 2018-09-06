@@ -28,23 +28,27 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            JSP_ = new string(binaryReader.ReadChars(4).Reverse().ToArray());
+            long startSectionPosition = binaryReader.BaseStream.Position;
 
-            unknownAmount1 = Switch(binaryReader.ReadInt32());
-            unknownAmount2 = Switch(binaryReader.ReadInt32());
-            null1 = Switch(binaryReader.ReadInt32());
-            null2 = Switch(binaryReader.ReadInt32());
-            null3 = Switch(binaryReader.ReadInt32());
+            JSP_ = new string(binaryReader.ReadChars(4).ToArray());
+            
+            unknownAmount1 = SwitchToggleable(binaryReader.ReadInt32());
+            unknownAmount2 = SwitchToggleable(binaryReader.ReadInt32());
+            null1 = SwitchToggleable(binaryReader.ReadInt32());
+            null2 = SwitchToggleable(binaryReader.ReadInt32());
+            null3 = SwitchToggleable(binaryReader.ReadInt32());
 
             list3 = new List<Struct3>(unknownAmount2);
             for (int i = 0; i < unknownAmount2; i++)
             {
                 list3.Add(new Struct3()
                 {
-                    unknown1 = Switch(binaryReader.ReadInt32()),
-                    unknown2 = Switch(binaryReader.ReadInt32())
+                    unknown1 = SwitchToggleable(binaryReader.ReadInt32()),
+                    unknown2 = SwitchToggleable(binaryReader.ReadInt32())
                 });
             }
+
+            binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 
             return this;
         }
@@ -53,17 +57,18 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section2;
 
-            listBytes.AddRange(JSP_.Cast<Byte>().Reverse());
-            listBytes.AddRange(BitConverter.GetBytes(Switch(unknownAmount1)));
-            listBytes.AddRange(BitConverter.GetBytes(Switch(unknownAmount2)));
-            listBytes.AddRange(BitConverter.GetBytes(Switch(null1)));
-            listBytes.AddRange(BitConverter.GetBytes(Switch(null2)));
-            listBytes.AddRange(BitConverter.GetBytes(Switch(null3)));
+            listBytes.AddRange(JSP_.Cast<Byte>());
+            
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(unknownAmount1)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(unknownAmount2)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(null1)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(null2)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(null3)));
             
             for (int i = 0; i < unknownAmount2; i++)
             {
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list3[i].unknown1)));
-                listBytes.AddRange(BitConverter.GetBytes(Switch(list3[i].unknown2)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list3[i].unknown1)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list3[i].unknown2)));
             }
         }
     }

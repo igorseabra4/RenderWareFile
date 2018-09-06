@@ -45,6 +45,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.TextureDictionary;
 
             listBytes.AddRange(textureDictionaryStruct.GetBytes(fileVersion));
+
             foreach (TextureNative_0015 i in textureNativeList)
                 listBytes.AddRange(i.GetBytes(fileVersion));
 

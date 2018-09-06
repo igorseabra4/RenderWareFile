@@ -16,6 +16,11 @@ namespace RenderWareFile.Sections
         hasTextCoords2 = 0x0080
     }
 
+    public enum GeometryFlags2
+    {
+        isNativeGeometry = 0x0100
+    }
+
     public class Geometry_000F : RWSection
     {
         public GeometryStruct_0001 geometryStruct;

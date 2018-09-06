@@ -26,6 +26,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
 
             listBytes.AddRange(BitConverter.GetBytes(textureCount));
+            listBytes.AddRange(BitConverter.GetBytes(unknown));
         }
     }
 }
