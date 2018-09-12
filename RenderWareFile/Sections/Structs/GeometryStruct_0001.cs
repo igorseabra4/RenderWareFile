@@ -46,11 +46,11 @@ namespace RenderWareFile.Sections
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
 
-            ambient = binaryReader.ReadSingle();
-            specular = binaryReader.ReadSingle();
-            diffuse = binaryReader.ReadSingle();
+            //ambient = binaryReader.ReadSingle();
+            //specular = binaryReader.ReadSingle();
+            //diffuse = binaryReader.ReadSingle();
 
-            if (ambient != 1f | specular != 1f | diffuse != 1f) binaryReader.BaseStream.Position -= 3 * 4;
+            //if (ambient != 1f | specular != 1f | diffuse != 1f) binaryReader.BaseStream.Position -= 3 * 4;
 
             if ((geometryFlags2 & (int)GeometryFlags2.isNativeGeometry) != 0)
             {
