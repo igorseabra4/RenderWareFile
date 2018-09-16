@@ -57,7 +57,8 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section2;
 
-            listBytes.AddRange(JSP_.Cast<Byte>());
+            foreach (byte b in JSP_)
+                listBytes.Add(b);
             
             listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(unknownAmount1)));
             listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(unknownAmount2)));
