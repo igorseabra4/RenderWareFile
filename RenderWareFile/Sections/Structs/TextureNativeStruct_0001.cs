@@ -152,8 +152,8 @@ namespace RenderWareFile.Sections
             }
 
             rasterFormatFlags = (TextureRasterFormat)Shared.Switch(binaryReader.ReadInt32());
-            width = binaryReader.ReadInt16();
-            height = binaryReader.ReadInt16();
+            width = Shared.Switch(binaryReader.ReadInt16());
+            height = Shared.Switch(binaryReader.ReadInt16());
 
             bitDepth = binaryReader.ReadByte();
             mipMapCount = binaryReader.ReadByte();
@@ -174,7 +174,7 @@ namespace RenderWareFile.Sections
             mipMaps = new MipMapEntry[mipMapCount];
             for (int i = 0; i < mipMapCount; i++)
             {
-                int dataSize = binaryReader.ReadInt32();
+                int dataSize = Shared.Switch(binaryReader.ReadInt32());
                 byte[] data = binaryReader.ReadBytes(dataSize);
 
                 mipMaps[i] = new MipMapEntry(dataSize, data);

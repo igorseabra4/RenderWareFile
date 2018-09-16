@@ -17,8 +17,8 @@ namespace RenderWareFile.Sections
 
     public class GeometryStruct_0001 : RWSection
     {
-        public short geometryFlags;
-        public short geometryFlags2;
+        public GeometryFlags geometryFlags;
+        public GeometryFlags2 geometryFlags2;
         public int numTriangles;
         public int numVertices;
         public int numMorphTargets;
@@ -40,8 +40,8 @@ namespace RenderWareFile.Sections
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            geometryFlags = binaryReader.ReadInt16();
-            geometryFlags2 = binaryReader.ReadInt16();
+            geometryFlags = (GeometryFlags)binaryReader.ReadInt16();
+            geometryFlags2 = (GeometryFlags2)binaryReader.ReadInt16();
             numTriangles = binaryReader.ReadInt32();
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
@@ -52,13 +52,13 @@ namespace RenderWareFile.Sections
 
             //if (ambient != 1f | specular != 1f | diffuse != 1f) binaryReader.BaseStream.Position -= 3 * 4;
 
-            if ((geometryFlags2 & (int)GeometryFlags2.isNativeGeometry) != 0)
+            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
             {
                 binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
                 return this;
             }
 
-            if ((geometryFlags & (int)GeometryFlags.hasVertexColors) != 0)
+            if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
             {
                 vertexColors = new Color[numVertices];
                 for (int i = 0; i < numVertices; i++)
@@ -73,10 +73,25 @@ namespace RenderWareFile.Sections
                 }
             }
 
-            if ((geometryFlags & (int)GeometryFlags.hasTextCoords) != 0)
+            if ((geometryFlags & GeometryFlags.hasTextCoords) != 0)
             {
                 textCoords = new Vertex2[numVertices];
                 for (int i = 0; i < numVertices; i++)
+                {
+                    textCoords[i] = new Vertex2()
+                    {
+                        X = binaryReader.ReadSingle(),
+                        Y = binaryReader.ReadSingle()
+                    };
+                }
+
+                if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
+                    binaryReader.BaseStream.Position += numVertices * 8;
+            }
+            else if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
+            {
+                textCoords = new Vertex2[numVertices * 2];
+                for (int i = 0; i < numVertices * 2; i++)
                 {
                     textCoords[i] = new Vertex2()
                     {
@@ -124,7 +139,8 @@ namespace RenderWareFile.Sections
                     }
                 }
 
-                if (m.vertices == null) throw new Exception();
+                if (m.vertices == null)
+                    throw new Exception();
 
                 if (m.hasNormals != 0)
                 {
@@ -150,8 +166,8 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.AddRange(BitConverter.GetBytes(geometryFlags));
-            listBytes.AddRange(BitConverter.GetBytes(geometryFlags2));
+            listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags));
+            listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags2));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
@@ -163,9 +179,9 @@ namespace RenderWareFile.Sections
                 listBytes.AddRange(BitConverter.GetBytes(diffuse));
             }
 
-            if (geometryFlags2 != 0x0101)
+            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) == 0)
             {
-                if ((geometryFlags & (int)GeometryFlags.hasVertexColors) != 0)
+                if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {
@@ -176,7 +192,7 @@ namespace RenderWareFile.Sections
                     }
                 }
 
-                if ((geometryFlags & (int)GeometryFlags.hasTextCoords) != 0)
+                if ((geometryFlags & GeometryFlags.hasTextCoords) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {

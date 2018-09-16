@@ -4,8 +4,9 @@ using System.IO;
 
 namespace RenderWareFile.Sections
 {
-    public enum GeometryFlags
+    public enum GeometryFlags : short
     {
+        none = 0x0000,
         isTristrip = 0x0001,
         hasVertexPositions = 0x0002,
         hasTextCoords = 0x0004,
@@ -16,8 +17,9 @@ namespace RenderWareFile.Sections
         hasTextCoords2 = 0x0080
     }
 
-    public enum GeometryFlags2
+    public enum GeometryFlags2 : short
     {
+        none = 0x0000,
         isNativeGeometry = 0x0100
     }
 
