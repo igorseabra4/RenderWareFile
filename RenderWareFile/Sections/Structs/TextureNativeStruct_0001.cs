@@ -8,7 +8,7 @@ namespace RenderWareFile.Sections
     {
         public int dataSize;
         public byte[] data;
-        
+
         public MipMapEntry(int dataSize, byte[] data)
         {
             this.dataSize = dataSize;
@@ -50,7 +50,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             startSectionPosition = binaryReader.BaseStream.Position;
 
             platformType = binaryReader.ReadInt32();
@@ -64,7 +64,7 @@ namespace RenderWareFile.Sections
                 ReadGameCubeData(binaryReader);
             }
             else throw new InvalidDataException("Unsupported texture format: " + platformType.ToString());
-            
+
             if (binaryReader.BaseStream.Position != startSectionPosition + sectionSize)
                 throw new Exception(binaryReader.BaseStream.Position.ToString());
 
@@ -81,7 +81,7 @@ namespace RenderWareFile.Sections
 
             textureName = ReadString(binaryReader);
             alphaName = ReadString(binaryReader);
-            
+
             rasterFormatFlags = (TextureRasterFormat)binaryReader.ReadInt32();
             hasAlpha = binaryReader.ReadInt32() != 0;
             width = binaryReader.ReadInt16();
@@ -116,7 +116,7 @@ namespace RenderWareFile.Sections
                     dataSize = binaryReader.ReadInt32();
                 else if (platformType == 5)
                     dataSize = BiggestPowerOfTwoUnder(totalMipMapDataSize - passedSize);
-                
+
                 byte[] data = binaryReader.ReadBytes(dataSize);
                 mipMaps[i] = new MipMapEntry(dataSize, data);
 
@@ -201,7 +201,7 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
-            
+
             listBytes.AddRange(BitConverter.GetBytes(platformType));
 
             if (platformType == 8 | platformType == 5)
