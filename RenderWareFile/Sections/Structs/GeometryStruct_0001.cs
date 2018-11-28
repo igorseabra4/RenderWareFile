@@ -46,11 +46,12 @@ namespace RenderWareFile.Sections
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
 
-            //ambient = binaryReader.ReadSingle();
-            //specular = binaryReader.ReadSingle();
-            //diffuse = binaryReader.ReadSingle();
-
-            //if (ambient != 1f | specular != 1f | diffuse != 1f) binaryReader.BaseStream.Position -= 3 * 4;
+            if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
+            {
+                ambient = binaryReader.ReadSingle();
+                specular = binaryReader.ReadSingle();
+                diffuse = binaryReader.ReadSingle();
+            }
 
             if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
             {
@@ -172,7 +173,7 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
 
-            if (ambient == 1f | specular == 1f | diffuse == 1f)
+            if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
             {
                 listBytes.AddRange(BitConverter.GetBytes(ambient));
                 listBytes.AddRange(BitConverter.GetBytes(specular));

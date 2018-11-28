@@ -7,6 +7,14 @@ namespace RenderWareFile
 {
     public static class Shared
     {
+        public static int UnpackLibraryVersion(int libid)
+        {
+            if ((libid & 0xFFFF0000) != 0)
+                return (libid >> 14 & 0x3FF00) + 0x30000 |
+                       (libid >> 16 & 0x3F);
+            return libid << 8;
+        }
+
         public static bool DoNotSwitch = false;
 
         public static float Switch(float f)
