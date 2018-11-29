@@ -139,7 +139,7 @@ namespace RenderWareFile.Sections
                 }
             }
             
-            for (int d = 0; d < declarations.Count(); d++) //each (Declaration d in declarations)
+            for (int d = 0; d < declarations.Count(); d++)
             {
                 binaryReader.BaseStream.Position = headerEndPosition + declarations[d].startOffset;
 
@@ -230,6 +230,16 @@ namespace RenderWareFile.Sections
             {
                 d.startOffset = listData.Count();
                 if (d.declarationType == Declarations.Vertex)
+                {
+                    foreach (Vertex3 v in d.entryList)
+                    {
+                        listData.AddRange(BitConverter.GetBytes(v.X).Reverse());
+                        listData.AddRange(BitConverter.GetBytes(v.Y).Reverse());
+                        listData.AddRange(BitConverter.GetBytes(v.Z).Reverse());
+                    }
+                    d.sizeOfEntry = 0xC;
+                }
+                else if (d.declarationType == Declarations.Normal)
                 {
                     foreach (Vertex3 v in d.entryList)
                     {

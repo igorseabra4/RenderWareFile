@@ -21,9 +21,7 @@ namespace RenderWareFile
 
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
-            //listBytes.AddRange(data);
-            sectionIdentifier = Section.None;
-            throw new NotImplementedException();
+            listBytes.AddRange(data);
         }
     }
 }
