@@ -9,12 +9,20 @@ namespace RenderWareFile.Sections
     {
         public NativeDataType nativeDataType;
         public NativeDataGC nativeData;
+
+        public byte[] nativeDataData;
         
         public NativeDataStruct_0001 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
+
+            if (ReadFileMethods.treatStuffAsByteArray)
+            {
+                nativeDataData = binaryReader.ReadBytes(sectionSize);
+                return this;
+            }
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
@@ -44,6 +52,12 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
+
+            if (ReadFileMethods.treatStuffAsByteArray)
+            {
+                listBytes.AddRange(nativeDataData);
+                return;
+            }
 
             listBytes.AddRange(BitConverter.GetBytes((int)nativeDataType));
 

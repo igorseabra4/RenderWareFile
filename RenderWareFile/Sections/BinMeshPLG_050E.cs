@@ -74,8 +74,9 @@ namespace RenderWareFile.Sections
                 listBytes.AddRange(BitConverter.GetBytes(binMeshList[i].indexCount));
                 listBytes.AddRange(BitConverter.GetBytes(binMeshList[i].materialIndex));
 
-                for (int j = 0; j < binMeshList[i].vertexIndices.Count(); j++)
-                    listBytes.AddRange(BitConverter.GetBytes(binMeshList[i].vertexIndices[j]));
+                if (!isNativeData)
+                    for (int j = 0; j < binMeshList[i].vertexIndices.Count(); j++)
+                        listBytes.AddRange(BitConverter.GetBytes(binMeshList[i].vertexIndices[j]));
             }
         }
     }

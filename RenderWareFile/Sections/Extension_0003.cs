@@ -22,7 +22,7 @@ namespace RenderWareFile.Sections
                 Section currentSection = (Section)binaryReader.ReadInt32();
                 if (currentSection == Section.BinMeshPLG) extensionSectionList.Add(new BinMeshPLG_050E().Read(binaryReader));
                 else if (currentSection == Section.NativeDataPLG) extensionSectionList.Add(new NativeDataPLG_0510().Read(binaryReader));
-                else if (currentSection == Section.CollisionPLG) extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
+                else if (currentSection == Section.CollisionPLG && ReadFileMethods.isShadow) extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
                 else if (currentSection == Section.UserDataPLG) extensionSectionList.Add(new UserDataPLG_011F().Read(binaryReader));
                 else extensionSectionList.Add(new GenericSection().Read(binaryReader, currentSection));
             }

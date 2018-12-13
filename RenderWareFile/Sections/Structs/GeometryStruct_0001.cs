@@ -209,34 +209,34 @@ namespace RenderWareFile.Sections
                     listBytes.AddRange(BitConverter.GetBytes(triangles[i].materialIndex));
                     listBytes.AddRange(BitConverter.GetBytes(triangles[i].vertex3));
                 }
-            }
 
-            for (int i = 0; i < numMorphTargets; i++)
-            {
-                listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].sphereCenter.X));
-                listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].sphereCenter.Y));
-                listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].sphereCenter.Z));
-                listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].radius));
-                listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].hasVertices));
-                listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].hasNormals));
-
-                if (morphTargets[i].hasVertices != 0)
+                for (int i = 0; i < numMorphTargets; i++)
                 {
-                    for (int j = 0; j < numVertices; j++)
+                    listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].sphereCenter.X));
+                    listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].sphereCenter.Y));
+                    listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].sphereCenter.Z));
+                    listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].radius));
+                    listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].hasVertices));
+                    listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].hasNormals));
+
+                    if (morphTargets[i].hasVertices != 0)
                     {
-                        listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].vertices[j].X));
-                        listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].vertices[j].Y));
-                        listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].vertices[j].Z));
+                        for (int j = 0; j < numVertices; j++)
+                        {
+                            listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].vertices[j].X));
+                            listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].vertices[j].Y));
+                            listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].vertices[j].Z));
+                        }
                     }
-                }
 
-                if (morphTargets[i].hasNormals != 0)
-                {
-                    for (int j = 0; j < numVertices; j++)
+                    if (morphTargets[i].hasNormals != 0)
                     {
-                        listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].normals[j].X));
-                        listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].normals[j].Y));
-                        listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].normals[j].Z));
+                        for (int j = 0; j < numVertices; j++)
+                        {
+                            listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].normals[j].X));
+                            listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].normals[j].Y));
+                            listBytes.AddRange(BitConverter.GetBytes(morphTargets[i].normals[j].Z));
+                        }
                     }
                 }
             }

@@ -8,7 +8,7 @@ namespace RenderWareFile
     {
         public static bool isShadow = false;
         public static bool isCollision = false;
-        public static bool treatTexturesAsByteArray = false;
+        public static bool treatStuffAsByteArray = false;
 
         public static RWSection[] ReadRenderWareFile(string fileName)
         {

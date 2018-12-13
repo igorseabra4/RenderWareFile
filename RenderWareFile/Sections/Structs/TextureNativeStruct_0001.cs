@@ -145,7 +145,7 @@ namespace RenderWareFile.Sections
             textureName = ReadString(binaryReader);
             alphaName = ReadString(binaryReader);
 
-            if (ReadFileMethods.treatTexturesAsByteArray)
+            if (ReadFileMethods.treatStuffAsByteArray)
             {
                 sectionData = binaryReader.ReadBytes((int)(sectionSize - (binaryReader.BaseStream.Position - startSectionPosition)));
                 return;
@@ -293,7 +293,7 @@ namespace RenderWareFile.Sections
             for (int i = alphaName.Length; i < 32; i++)
                 listBytes.Add(0);
 
-            if (ReadFileMethods.treatTexturesAsByteArray)
+            if (ReadFileMethods.treatStuffAsByteArray)
             {
                 listBytes.AddRange(sectionData);
                 return;
