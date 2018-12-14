@@ -32,11 +32,19 @@ namespace RenderWareFile.Sections
         public Triangle[] triangles;
         public MorphTarget[] morphTargets;
 
+        public byte[] sectionData;
+
         public GeometryStruct_0001 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
+
+            if (ReadFileMethods.treatStuffAsByteArray)
+            {
+                sectionData = binaryReader.ReadBytes(sectionSize);
+                return this;
+            }
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
@@ -166,6 +174,12 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
+
+            if (ReadFileMethods.treatStuffAsByteArray)
+            {
+                listBytes.AddRange(sectionData);
+                return;
+            }
 
             listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags));
             listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags2));
