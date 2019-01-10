@@ -68,7 +68,7 @@ namespace RenderWareFile.Sections
                     break;
                 default:
                     throw new Exception();
-            }            
+            }
         }
     }
 }

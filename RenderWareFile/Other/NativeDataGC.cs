@@ -305,5 +305,10 @@ namespace RenderWareFile.Sections
             list.AddRange(listData);
             return list;
         }
+
+        internal void ApplyScale(Vertex3 vertex3)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
