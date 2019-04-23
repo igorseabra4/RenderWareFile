@@ -26,6 +26,7 @@
         SkyMipmapVal = 0x110,
         CollisionPLG = 0x11D,
         UserDataPLG = 0x11F,
+        MaterialEffectsPLG = 0x120,
         BinMeshPLG = 0x50E,
         NativeDataPLG = 0x510,
         BFBB_CollisionData_Section1 = 0x00BEEF01,

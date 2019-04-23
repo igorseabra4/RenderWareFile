@@ -32,7 +32,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
 
             listBytes.AddRange(BitConverter.GetBytes(atomicCount));
-            if (renderWareVersion == 0x0310)
+            if (fileVersion == 0x0310)
                 return;
             listBytes.AddRange(BitConverter.GetBytes(lightCount));
             listBytes.AddRange(BitConverter.GetBytes(cameraCount));

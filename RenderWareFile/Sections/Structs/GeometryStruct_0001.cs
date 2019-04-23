@@ -187,7 +187,7 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
 
-            if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
+            if (Shared.UnpackLibraryVersion(fileVersion) < 0x34000)
             {
                 listBytes.AddRange(BitConverter.GetBytes(ambient));
                 listBytes.AddRange(BitConverter.GetBytes(specular));
