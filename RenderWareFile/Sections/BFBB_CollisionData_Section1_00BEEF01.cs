@@ -6,32 +6,29 @@ using static RenderWareFile.Shared;
 
 namespace RenderWareFile.Sections
 {
-    public struct Struct1
+    public struct xClumpCollBSPBranchNode
     {
-        public int unknown1;
-        public int unknown2;
-        public float unknown3;
-        public float unknown4;
+        public int leftInfo { get; set; }      
+        public int rightInfo { get; set; } 
+        public float leftValue { get; set; } 
+        public float rightValue { get; set; } 
     }
 
-    public struct Struct2
+    public struct xClumpCollBSPTriangle
     {
-        public short unknown1;
-        public short unknown2;
-        public byte unknown3;
-        public byte unknown4;
-        public short unknown5;
+        public short atomIndex { get; set; } 
+        public short meshVertIndex { get; set; } 
+        public byte flags { get; set; } 
+        public byte platData { get; set; } 
+        public short matIndex { get; set; } 
     }
 
     public class BFBB_CollisionData_Section1_00BEEF01 : RWSection
     {
-        public string CCOL;
-        public int amountOf1;
-        public int amountOf2;
+        public string CCOL { get; set; }
+        public xClumpCollBSPBranchNode[] branchNodes { get; set; }
+        public xClumpCollBSPTriangle[] triangles { get; set; }
 
-        public List<Struct1> list1;
-        public List<Struct2> list2;
-        
         public BFBB_CollisionData_Section1_00BEEF01 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section1;
@@ -45,32 +42,32 @@ namespace RenderWareFile.Sections
             else
                 DoNotSwitch = false;
 
-            amountOf1 = SwitchToggleable(binaryReader.ReadInt32());
-            amountOf2 = SwitchToggleable(binaryReader.ReadInt32());
+            int numBranchNodes = SwitchToggleable(binaryReader.ReadInt32());
+            int numTriangles = SwitchToggleable(binaryReader.ReadInt32());
 
-            list1 = new List<Struct1>();
-            for (int i = 0; i < amountOf1; i++)
+            branchNodes = new xClumpCollBSPBranchNode[numBranchNodes];
+            for (int i = 0; i < numBranchNodes; i++)
             {
-                list1.Add(new Struct1()
+                branchNodes[i] = new xClumpCollBSPBranchNode()
                 {
-                    unknown1 = SwitchToggleable(binaryReader.ReadInt32()),
-                    unknown2 = SwitchToggleable(binaryReader.ReadInt32()),
-                    unknown3 = SwitchToggleable(binaryReader.ReadSingle()),
-                    unknown4 = SwitchToggleable(binaryReader.ReadSingle())
-                });
+                    leftInfo = SwitchToggleable(binaryReader.ReadInt32()),
+                    rightInfo = SwitchToggleable(binaryReader.ReadInt32()),
+                    leftValue = SwitchToggleable(binaryReader.ReadSingle()),
+                    rightValue = SwitchToggleable(binaryReader.ReadSingle())
+                };
             }
 
-            list2 = new List<Struct2>();
-            for (int i = 0; i < amountOf2; i++)
+            triangles = new xClumpCollBSPTriangle[numTriangles];
+            for (int i = 0; i < numTriangles; i++)
             {
-                list2.Add(new Struct2()
+                triangles[i] = new xClumpCollBSPTriangle()
                 {
-                    unknown1 = SwitchToggleable(binaryReader.ReadInt16()),
-                    unknown2 = SwitchToggleable(binaryReader.ReadInt16()),
-                    unknown3 = binaryReader.ReadByte(),
-                    unknown4 = binaryReader.ReadByte(),
-                    unknown5 = SwitchToggleable(binaryReader.ReadInt16())
-                });
+                    atomIndex = SwitchToggleable(binaryReader.ReadInt16()),
+                    meshVertIndex = SwitchToggleable(binaryReader.ReadInt16()),
+                    flags = binaryReader.ReadByte(),
+                    platData = binaryReader.ReadByte(),
+                    matIndex = SwitchToggleable(binaryReader.ReadInt16())
+                };
             }
 
             return this;
@@ -80,31 +77,32 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section1;
 
-            listBytes.AddRange(CCOL.Cast<Byte>());
+            foreach (char c in CCOL)
+                listBytes.Add((byte)c);
 
             if (CCOL == "CCOL")
                 DoNotSwitch = true;
             else
                 DoNotSwitch = false;
 
-            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(amountOf1)));
-            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(amountOf2)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes.Length)));
+            listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(triangles.Length)));
 
-            for (int i = 0; i < amountOf1; i++)
+            for (int i = 0; i < branchNodes.Length; i++)
             {
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown1)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown2)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown3)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list1[i].unknown4)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].leftInfo)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].rightInfo)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].leftValue)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].rightValue)));
             }
 
-            for (int i = 0; i < amountOf2; i++)
+            for (int i = 0; i < triangles.Length; i++)
             {
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list2[i].unknown1)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list2[i].unknown2)));
-                listBytes.Add(list2[i].unknown3);
-                listBytes.Add(list2[i].unknown4);
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(list2[i].unknown5)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(triangles[i].atomIndex)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(triangles[i].meshVertIndex)));
+                listBytes.Add(triangles[i].flags);
+                listBytes.Add(triangles[i].platData);
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(triangles[i].matIndex)));
             }
         }
     }

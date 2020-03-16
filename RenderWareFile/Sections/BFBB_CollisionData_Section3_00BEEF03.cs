@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using static RenderWareFile.Shared;
 
 namespace RenderWareFile.Sections
 {
     public class BFBB_CollisionData_Section3_00BEEF03 : RWSection
     {
-        public List<Vertex3> vertexList;
-                
+        public Vertex3 [] vertexList { get; set; }
+
         public BFBB_CollisionData_Section3_00BEEF03 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section3;
@@ -17,9 +16,9 @@ namespace RenderWareFile.Sections
             renderWareVersion = binaryReader.ReadInt32();
 
             int vCount = Switch(binaryReader.ReadInt32());
-            vertexList = new List<Vertex3>(vCount);
+            vertexList = new Vertex3[vCount];
             for (int i = 0; i < vCount; i++)
-                vertexList.Add(new Vertex3(Switch(binaryReader.ReadSingle()), Switch(binaryReader.ReadSingle()), Switch(binaryReader.ReadSingle())));
+                vertexList[i] = new Vertex3(Switch(binaryReader.ReadSingle()), Switch(binaryReader.ReadSingle()), Switch(binaryReader.ReadSingle()));
 
             return this;
         }
@@ -28,7 +27,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.BFBB_CollisionData_Section3;
 
-            listBytes.AddRange(BitConverter.GetBytes(Switch(vertexList.Count)));
+            listBytes.AddRange(BitConverter.GetBytes(Switch(vertexList.Length)));
             foreach (Vertex3 v in vertexList)
             {
                 listBytes.AddRange(BitConverter.GetBytes(Switch(v.X)));
