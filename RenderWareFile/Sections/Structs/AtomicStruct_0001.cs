@@ -4,12 +4,20 @@ using System.IO;
 
 namespace RenderWareFile.Sections
 {
+    public enum AtomicFlags : int
+    {
+        None = 0,
+        CollisionTest = 1,
+        Render = 4,
+        Both = 5
+    }
+
     public class AtomicStruct_0001 : RWSection
     {
         public int frameIndex;
         public int geometryIndex;
-        public int unknown1;
-        public int unknown2;
+        public AtomicFlags flags;
+        public int unused;
 
         public AtomicStruct_0001 Read(BinaryReader binaryReader)
         {
@@ -19,8 +27,8 @@ namespace RenderWareFile.Sections
             
             frameIndex = binaryReader.ReadInt32();
             geometryIndex = binaryReader.ReadInt32();
-            unknown1 = binaryReader.ReadInt32();
-            unknown2 = binaryReader.ReadInt32();
+            flags = (AtomicFlags)binaryReader.ReadInt32();
+            unused = binaryReader.ReadInt32();
 
             return this;
         }
@@ -31,8 +39,8 @@ namespace RenderWareFile.Sections
 
             listBytes.AddRange(BitConverter.GetBytes(frameIndex));
             listBytes.AddRange(BitConverter.GetBytes(geometryIndex));
-            listBytes.AddRange(BitConverter.GetBytes(unknown1));
-            listBytes.AddRange(BitConverter.GetBytes(unknown2));
+            listBytes.AddRange(BitConverter.GetBytes((int)flags));
+            listBytes.AddRange(BitConverter.GetBytes(unused));
         }
     }
 }
