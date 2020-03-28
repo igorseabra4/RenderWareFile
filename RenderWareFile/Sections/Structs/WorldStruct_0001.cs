@@ -81,10 +81,24 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
-
-            sectionSize = 0x40;
-
-            if (sectionSize == 0x40)
+            
+            if (fileVersion == 0x0310)
+            {
+                listBytes.AddRange(BitConverter.GetBytes(rootIsWorldSector));
+                listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.X));
+                listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.Y));
+                listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.Z));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum.X));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Y));
+                listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Z));
+                listBytes.AddRange(BitConverter.GetBytes(numTriangles));
+                listBytes.AddRange(BitConverter.GetBytes(numVertices));
+                listBytes.AddRange(BitConverter.GetBytes(numPlaneSectors));
+                listBytes.AddRange(BitConverter.GetBytes(numAtomicSectors));
+                listBytes.AddRange(BitConverter.GetBytes(colSectorSize));
+                listBytes.AddRange(BitConverter.GetBytes((int)worldFlags));
+            }
+            else
             {
                 listBytes.AddRange(BitConverter.GetBytes(rootIsWorldSector));
                 listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.X));
@@ -102,22 +116,6 @@ namespace RenderWareFile.Sections
                 listBytes.AddRange(BitConverter.GetBytes(boxMinimum.X));
                 listBytes.AddRange(BitConverter.GetBytes(boxMinimum.Y));
                 listBytes.AddRange(BitConverter.GetBytes(boxMinimum.Z));
-            }
-            else if (sectionSize == 0x34)
-            {
-                listBytes.AddRange(BitConverter.GetBytes(rootIsWorldSector));
-                listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.X));
-                listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.Y));
-                listBytes.AddRange(BitConverter.GetBytes(inverseOrigin.Z));
-                listBytes.AddRange(BitConverter.GetBytes(boxMaximum.X));
-                listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Y));
-                listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Z));
-                listBytes.AddRange(BitConverter.GetBytes(numTriangles));
-                listBytes.AddRange(BitConverter.GetBytes(numVertices));
-                listBytes.AddRange(BitConverter.GetBytes(numPlaneSectors));
-                listBytes.AddRange(BitConverter.GetBytes(numAtomicSectors));
-                listBytes.AddRange(BitConverter.GetBytes(colSectorSize));
-                listBytes.AddRange(BitConverter.GetBytes((int)worldFlags));
             }
         }
     }

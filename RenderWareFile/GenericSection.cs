@@ -6,7 +6,7 @@ namespace RenderWareFile
 {
     public class GenericSection : RWSection
     {
-        byte[] data;
+        public byte[] data;
 
         public GenericSection Read(BinaryReader binaryReader, Section section)
         {
