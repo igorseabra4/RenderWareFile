@@ -47,6 +47,7 @@
     <Compile Include="Sections\BFBB_CollisionData_Section1_00BEEF01.cs" />
     <Compile Include="Sections\BFBB_CollisionData_Section2_00BEEF02.cs" />
     <Compile Include="Sections\BFBB_CollisionData_Section3_00BEEF03.cs" />
+    <Compile Include="Sections\CollisionPLG_011D_Scooby.cs" />
     <Compile Include="Sections\MaterialEffectsPLG_0120.cs" />
     <Compile Include="Sections\Structs\FrameListStruct_0001.cs" />
     <Compile Include="Sections\FrameList_000E.cs" />
