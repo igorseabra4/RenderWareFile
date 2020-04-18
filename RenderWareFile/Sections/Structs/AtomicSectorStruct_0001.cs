@@ -38,10 +38,11 @@ namespace RenderWareFile.Sections
             unused = binaryReader.ReadInt32();
 
             if (binaryReader.BaseStream.Position == startSectionPosition + sectionSize)
-            {
-                isNativeData = true;
-                return this;
-            }
+                if (numVertices != 0 && numTriangles != 0)
+                {
+                    isNativeData = true;
+                    return this;
+                }
 
             binaryReader.BaseStream.Position = startSectionPosition + 11 * 4;
 
