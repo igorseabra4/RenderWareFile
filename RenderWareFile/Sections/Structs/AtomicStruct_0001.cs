@@ -9,7 +9,7 @@ namespace RenderWareFile.Sections
         None = 0,
         CollisionTest = 1,
         Render = 4,
-        Both = 5
+        CollisionTestAndRender = 5
     }
 
     public class AtomicStruct_0001 : RWSection
