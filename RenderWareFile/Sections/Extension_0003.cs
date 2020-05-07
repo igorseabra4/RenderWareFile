@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.ComponentModel;
 
 namespace RenderWareFile.Sections
 {
     public class Extension_0003 : RWSection
     {
-        public List<RWSection> extensionSectionList;
+        public List<RWSection> extensionSectionList { get; set; }
 
         public Extension_0003 Read(BinaryReader binaryReader)
         {
@@ -24,6 +25,7 @@ namespace RenderWareFile.Sections
                 else if (currentSection == Section.NativeDataPLG) extensionSectionList.Add(new NativeDataPLG_0510().Read(binaryReader));
                 else if (currentSection == Section.CollisionPLG && ReadFileMethods.isShadow) extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
                 else if (currentSection == Section.UserDataPLG) extensionSectionList.Add(new UserDataPLG_011F().Read(binaryReader));
+                else if (currentSection == Section.MaterialEffectsPLG) extensionSectionList.Add(new MaterialEffectsPLG_0120().Read(binaryReader));
                 else extensionSectionList.Add(new GenericSection().Read(binaryReader, currentSection));
             }
 

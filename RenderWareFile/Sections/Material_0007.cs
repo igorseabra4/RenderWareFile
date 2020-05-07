@@ -6,9 +6,28 @@ namespace RenderWareFile.Sections
 {
     public class Material_0007 : RWSection
     {
-        public MaterialStruct_0001 materialStruct;
-        public Texture_0006 texture;
-        public Extension_0003 materialExtension;
+        public MaterialStruct_0001 materialStruct { get; set; }
+        public Texture_0006 texture { get; set; }
+        public Extension_0003 materialExtension { get; set; }
+
+        public bool IsTextured
+        {
+            get => materialStruct.isTextured != 0;
+            set
+            {
+                if (value)
+                {
+                    materialStruct.isTextured = 1;
+                    if (texture == null)
+                        texture = new Texture_0006();
+                }
+                else
+                {
+                    materialStruct.isTextured = 0;
+                    texture = null;
+                }
+            }
+        }
 
         public Material_0007 Read(BinaryReader binaryReader)
         {
@@ -42,6 +61,13 @@ namespace RenderWareFile.Sections
             if (materialStruct.isTextured != 0)
                 listBytes.AddRange(texture.GetBytes(fileVersion));
             listBytes.AddRange(materialExtension.GetBytes(fileVersion));
+        }
+
+        public override string ToString()
+        {
+            if (texture != null)
+                return texture.diffuseTextureName.stringString;
+            return "Diffuse Color: " + materialStruct.color.ToString();
         }
     }
 }

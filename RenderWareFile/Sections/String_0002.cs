@@ -1,11 +1,22 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace RenderWareFile.Sections
 {
     public class String_0002 : RWSection
     {
-        public string stringString;
+        public String_0002()
+        {
+            stringString = "";
+        }
+
+        public String_0002(string value)
+        {
+            stringString = value;
+        }
+
+        public string stringString { get; private set; }
 
         public String_0002 Read(BinaryReader binaryReader)
         {

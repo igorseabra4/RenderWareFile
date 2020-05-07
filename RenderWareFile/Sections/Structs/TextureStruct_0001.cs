@@ -1,15 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace RenderWareFile.Sections
 {
     public class TextureStruct_0001 : RWSection
     {
-        public TextureFilterMode filterMode;
-        public TextureAddressMode addressModeU; // half a byte
-        public TextureAddressMode addressModeV; // half a byte
-        public ushort useMipLevels;
+        public TextureFilterMode FilterMode { get; set; }
+        public TextureAddressMode AddressModeU { get; set; } // half a byte
+        public TextureAddressMode AddressModeV { get; set; } // half a byte
+        public ushort UseMipLevels { get; set; }
+
+        public TextureStruct_0001()
+        {
+            sectionIdentifier = Section.Struct;
+            FilterMode = TextureFilterMode.FILTERLINEARMIPLINEAR;
+
+            AddressModeU = TextureAddressMode.TEXTUREADDRESSWRAP;
+            AddressModeV = TextureAddressMode.TEXTUREADDRESSWRAP;
+
+            UseMipLevels = 1;
+        }
 
         public TextureStruct_0001 Read(BinaryReader binaryReader)
         {
@@ -17,13 +29,13 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            filterMode = (TextureFilterMode)binaryReader.ReadByte();
+            FilterMode = (TextureFilterMode)binaryReader.ReadByte();
 
             byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
-            addressModeV = (TextureAddressMode)(addressMode & 0x0F);
+            AddressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
+            AddressModeV = (TextureAddressMode)(addressMode & 0x0F);
 
-            useMipLevels = binaryReader.ReadUInt16();
+            UseMipLevels = binaryReader.ReadUInt16();
 
             return this;
         }
@@ -32,9 +44,9 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.Add((byte)filterMode);
-            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
-            listBytes.AddRange(BitConverter.GetBytes(useMipLevels));            
+            listBytes.Add((byte)FilterMode);
+            listBytes.Add((byte)((byte)AddressModeV + ((byte)AddressModeU << 4)));
+            listBytes.AddRange(BitConverter.GetBytes(UseMipLevels));            
         }
     }
 }

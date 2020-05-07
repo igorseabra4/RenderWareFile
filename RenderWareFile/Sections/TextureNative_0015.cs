@@ -52,7 +52,8 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.TextureNative;
 
             listBytes.AddRange(textureNativeStruct.GetBytes(fileVersion));
-            listBytes.AddRange(textureNativeExtension.GetBytes(fileVersion));
+            if (textureNativeExtension != null)
+                listBytes.AddRange(textureNativeExtension.GetBytes(fileVersion));
         }
     }
 }

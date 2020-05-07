@@ -40,6 +40,9 @@ namespace RenderWareFile.Sections
         public int gcnUnknown3;
         public int gcnUnknown4;
 
+        public String_0002 ps2TextureNameString;
+        public String_0002 ps2AlphaNameString;
+
         private int totalMipMapDataSize;
 
         private byte[] sectionData;
@@ -50,7 +53,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-
+            
             startSectionPosition = binaryReader.BaseStream.Position;
 
             platformType = binaryReader.ReadInt32();
@@ -62,6 +65,11 @@ namespace RenderWareFile.Sections
             else if (platformType == 100663296)
             {
                 ReadGameCubeData(binaryReader);
+            }
+            else if (platformType == 3298128)
+            {
+                ReadPS2Data(binaryReader);
+                return this;
             }
             else throw new InvalidDataException("Unsupported texture format: " + platformType.ToString());
 
@@ -122,6 +130,26 @@ namespace RenderWareFile.Sections
 
                 passedSize += dataSize;
             }
+        }
+
+        private void ReadPS2Data(BinaryReader binaryReader)
+        {
+            filterMode = (TextureFilterMode)binaryReader.ReadByte();
+            byte addressMode = binaryReader.ReadByte();
+            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
+            addressModeV = (TextureAddressMode)(addressMode & 0x0F);
+            binaryReader.BaseStream.Position += 2;
+
+            binaryReader.ReadInt32();
+            textureName = new String_0002().Read(binaryReader).stringString;
+            binaryReader.ReadInt32();
+            alphaName = new String_0002().Read(binaryReader).stringString;
+            
+            binaryReader.ReadInt32();
+            int sizeOfdata = binaryReader.ReadInt32();
+            binaryReader.ReadInt32();
+
+            sectionData = binaryReader.ReadBytes(sizeOfdata);
         }
 
         private int BiggestPowerOfTwoUnder(int number)
@@ -201,7 +229,7 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
-
+            
             listBytes.AddRange(BitConverter.GetBytes(platformType));
 
             if (platformType == 8 | platformType == 5)
@@ -211,6 +239,10 @@ namespace RenderWareFile.Sections
             else if (platformType == 100663296)
             {
                 SetGameCubeListBytes(fileVersion, ref listBytes);
+            }
+            else if (platformType == 3298128)
+            {
+                SetPS2ListBytes(fileVersion, ref listBytes);
             }
             else throw new NotImplementedException("Unsupported writing of this platform type");
         }
@@ -270,6 +302,25 @@ namespace RenderWareFile.Sections
                 foreach (byte j in i.data)
                     listBytes.Add(j);
             }
+        }
+
+        private void SetPS2ListBytes(int fileVersion, ref List<byte> listBytes)
+        {
+            listBytes.Add((byte)filterMode);
+            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
+            listBytes.Add(0);
+            listBytes.Add(0);
+
+            listBytes.AddRange(new String_0002(textureName).GetBytes(fileVersion));
+            listBytes.AddRange(new String_0002(alphaName).GetBytes(fileVersion));
+
+            listBytes.Add(1);
+            listBytes.Add(0);
+            listBytes.Add(0);
+            listBytes.Add(0);
+            listBytes.AddRange(BitConverter.GetBytes(sectionData.Length));
+            listBytes.AddRange(BitConverter.GetBytes(renderWareVersion));
+            listBytes.AddRange(sectionData);
         }
 
         private void SetGameCubeListBytes(int fileVersion, ref List<byte> listBytes)

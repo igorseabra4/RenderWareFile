@@ -1,14 +1,15 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace RenderWareFile
 {
     public struct Color
     {
-        public byte R;
-        public byte G;
-        public byte B;
-        public byte A;
-
+        public byte R { get; set; }
+        public byte G { get; set; }
+        public byte B { get; set; }
+        public byte A { get; set; }
+        
         public Color(byte r, byte g, byte b, byte a)
         {
             R = r;
@@ -34,11 +35,13 @@ namespace RenderWareFile
         {
             if (s.Length != 8) throw new ArgumentException();
 
-            Color c;
-            c.R = Convert.ToByte(new string(new char[] { s[0], s[1] }), 16);
-            c.G = Convert.ToByte(new string(new char[] { s[2], s[3] }), 16);
-            c.B = Convert.ToByte(new string(new char[] { s[4], s[5] }), 16);
-            c.A = Convert.ToByte(new string(new char[] { s[6], s[7] }), 16);
+            Color c = new Color
+            {
+                R = Convert.ToByte(new string(new char[] { s[0], s[1] }), 16),
+                G = Convert.ToByte(new string(new char[] { s[2], s[3] }), 16),
+                B = Convert.ToByte(new string(new char[] { s[4], s[5] }), 16),
+                A = Convert.ToByte(new string(new char[] { s[6], s[7] }), 16)
+            };
             return c;
         }
 
