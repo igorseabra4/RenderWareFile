@@ -35,8 +35,6 @@ namespace RenderWareFile.Sections
         
         public MaterialEffectBumpMap Read(BinaryReader binaryReader)
         {
-            binaryReader.ReadInt32(); // discard value
-
             Intensity = binaryReader.ReadSingle();
 
             bool ContainsBumpMap = binaryReader.ReadInt32() != 0;
@@ -83,8 +81,6 @@ namespace RenderWareFile.Sections
 
         public MaterialEffectEnvironmentMap Read(BinaryReader binaryReader)
         {
-            binaryReader.ReadInt32(); // discard value
-
             ReflectionCoefficient = binaryReader.ReadSingle();
             UseFrameBufferAlphaChannel = binaryReader.ReadInt32() != 0;
             bool ContainsEnvironmentMap = binaryReader.ReadInt32() != 0;
@@ -138,8 +134,6 @@ namespace RenderWareFile.Sections
         
         public MaterialEffectDualTextures Read(BinaryReader binaryReader)
         {
-            binaryReader.ReadInt32(); // discard value
-
             SourceBlendMode = (BlendFactorType)binaryReader.ReadInt32();
             DestBlendMode = (BlendFactorType)binaryReader.ReadInt32();
 
@@ -172,9 +166,8 @@ namespace RenderWareFile.Sections
 
     public class MaterialEffectUvTransformation : MaterialEffect
     {
-        public MaterialEffectUvTransformation Read(BinaryReader binaryReader)
+        public MaterialEffectUvTransformation Read()
         {
-            binaryReader.ReadInt32(); // discard value
             return this;
         }
 
@@ -251,23 +244,36 @@ namespace RenderWareFile.Sections
                 isAtomicExtension = true;
                 return this;
             }
-            if (value == MaterialEffectType.BumpMap || value == MaterialEffectType.BumpEnvironmentMap)
-                materialEffect1 = new MaterialEffectBumpMap().Read(binaryReader);
-            else if (value == MaterialEffectType.EnvironmentMap)
-                materialEffect1 = new MaterialEffectEnvironmentMap().Read(binaryReader);
-            else if (value == MaterialEffectType.DualTextures || value == MaterialEffectType.DualTexturesUvTransformation)
-                materialEffect1 = new MaterialEffectDualTextures().Read(binaryReader);
-            else if (value == MaterialEffectType.UvTransformation)
-                materialEffect1 = new MaterialEffectUvTransformation().Read(binaryReader);
-            else
-                binaryReader.ReadInt32();
 
-            if (value == MaterialEffectType.BumpEnvironmentMap)
-                materialEffect2 = new MaterialEffectEnvironmentMap().Read(binaryReader);
-            else if (value == MaterialEffectType.DualTexturesUvTransformation)
-                materialEffect2 = new MaterialEffectUvTransformation().Read(binaryReader);
-            else
-                binaryReader.ReadInt32();
+            for (int i = 0; i < 2; i++)
+            {
+                MaterialEffect mEffect;
+                value = (MaterialEffectType)binaryReader.ReadInt32();
+                switch (value)
+                {
+                    case MaterialEffectType.BumpMap:
+                        mEffect = new MaterialEffectBumpMap().Read(binaryReader); break;
+                    case MaterialEffectType.EnvironmentMap:
+                        mEffect = new MaterialEffectEnvironmentMap().Read(binaryReader); break;
+                    case MaterialEffectType.DualTextures:
+                        mEffect = new MaterialEffectDualTextures().Read(binaryReader); break;
+                    case MaterialEffectType.UvTransformation:
+                        mEffect = new MaterialEffectUvTransformation().Read(); break;
+                    case MaterialEffectType.NoEffect:
+                        mEffect = null; break;
+                    default:
+                        throw new Exception();
+                }
+                switch (i)
+                {
+                    case 0:
+                        materialEffect1 = mEffect; 
+                        break;
+                    case 1:
+                        materialEffect2 = mEffect; 
+                        break;
+                }
+            }
 
             return this;
         }
