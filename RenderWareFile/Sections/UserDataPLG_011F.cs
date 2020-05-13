@@ -61,6 +61,12 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.UserDataPLG;
 
+            if (!ReadFileMethods.isCollision)
+            { 
+                listBytes.AddRange(data);
+                return;
+            }
+
             listBytes.AddRange(BitConverter.GetBytes(userDataType));
             listBytes.AddRange(BitConverter.GetBytes(unknown2));
             foreach (char i in attribute)

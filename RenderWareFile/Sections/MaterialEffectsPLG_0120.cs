@@ -248,8 +248,8 @@ namespace RenderWareFile.Sections
             for (int i = 0; i < 2; i++)
             {
                 MaterialEffect mEffect;
-                value = (MaterialEffectType)binaryReader.ReadInt32();
-                switch (value)
+                MaterialEffectType locValue = (MaterialEffectType)binaryReader.ReadInt32();
+                switch (locValue)
                 {
                     case MaterialEffectType.BumpMap:
                         mEffect = new MaterialEffectBumpMap().Read(binaryReader); break;
