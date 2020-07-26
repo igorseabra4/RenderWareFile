@@ -17,7 +17,8 @@ namespace RenderWareFile.Sections
         public SectorType splitDirection;
         public byte padding;
 
-        public short positiveIndex;
+        // index of startIndex_amountOfTriangles entry in list if leaf node, index of split in split list for branch node
+        public short positiveIndex; 
         public short negativeIndex;
 
         public float negativeSplitPos;
@@ -36,12 +37,12 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            int numSplits = binaryReader.ReadInt32();
+            int numLeafNodes = binaryReader.ReadInt32();
             int numTriangles = binaryReader.ReadInt32();
 
-            splits = new Split_Scooby[numSplits - 1];
+            splits = new Split_Scooby[numLeafNodes - 1];
             
-            for (int i = 0; i < numSplits - 1; i++)
+            for (int i = 0; i < numLeafNodes - 1; i++)
                 splits[i] = new Split_Scooby
                 {
                     positiveType = (ScoobySectorType)binaryReader.ReadByte(),
@@ -56,9 +57,9 @@ namespace RenderWareFile.Sections
                     negativeSplitPos = binaryReader.ReadSingle()
                 };
 
-            startIndex_amountOfTriangles = new short[numSplits][];
+            startIndex_amountOfTriangles = new short[numLeafNodes][];
 
-            for (int i = 0; i < numSplits; i++)
+            for (int i = 0; i < numLeafNodes; i++)
                 startIndex_amountOfTriangles[i] = new short[]
                 {
                     binaryReader.ReadInt16(),
