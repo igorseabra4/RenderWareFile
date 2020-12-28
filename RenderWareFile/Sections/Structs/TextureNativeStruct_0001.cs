@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace RenderWareFile.Sections
 {
@@ -330,10 +331,10 @@ namespace RenderWareFile.Sections
             listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
             listBytes.Add((byte)filterMode);
 
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown1));
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown2));
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown3));
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown4));
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown1).Reverse().ToArray());
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown2).Reverse().ToArray());
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown3).Reverse().ToArray());
+            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown4).Reverse().ToArray());
 
             foreach (char i in textureName)
                 listBytes.Add((byte)i);
