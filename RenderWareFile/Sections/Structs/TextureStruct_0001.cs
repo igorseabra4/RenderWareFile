@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace RenderWareFile.Sections
@@ -46,7 +45,7 @@ namespace RenderWareFile.Sections
 
             listBytes.Add((byte)FilterMode);
             listBytes.Add((byte)((byte)AddressModeV + ((byte)AddressModeU << 4)));
-            listBytes.AddRange(BitConverter.GetBytes(UseMipLevels));            
+            listBytes.AddRange(BitConverter.GetBytes(UseMipLevels));
         }
     }
 }

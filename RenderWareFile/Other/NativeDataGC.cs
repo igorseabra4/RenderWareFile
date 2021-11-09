@@ -84,21 +84,22 @@ namespace RenderWareFile.Sections
                     unknown2 = binaryReader.ReadByte()
                 };
             }
-            
+
             List<TriangleDeclaration> list = new List<TriangleDeclaration>();
-            
+
             foreach (int i in MaterialList)
             {
-                list.Add(new TriangleDeclaration() {
+                list.Add(new TriangleDeclaration()
+                {
                     startOffset = Switch(binaryReader.ReadInt32()),
                     size = Switch(binaryReader.ReadInt32()),
                     MaterialIndex = i,
-                    TriangleListList = new List<TriangleList>()                    
+                    TriangleListList = new List<TriangleList>()
                 });
             }
 
             triangleDeclarations = list.ToArray();
-            
+
             long headerEndPosition = binaryReader.BaseStream.Position;
 
             for (int i = 0; i < triangleDeclarations.Length; i++)
@@ -138,7 +139,7 @@ namespace RenderWareFile.Sections
                     triangleDeclarations[i].TriangleListList.Add(new TriangleList() { setting = setting, setting2 = setting2, entryAmount = entryAmount, entries = entries });
                 }
             }
-            
+
             for (int d = 0; d < declarations.Count(); d++)
             {
                 binaryReader.BaseStream.Position = headerEndPosition + declarations[d].startOffset;
@@ -177,7 +178,7 @@ namespace RenderWareFile.Sections
                 {
                     for (int i = 0; i < data.Count(); i += 0x4)
                     {
-                        Color v = new Color(new byte[]{ data[i], data[i + 1], data[i + 2], data[i + 3] });
+                        Color v = new Color(new byte[] { data[i], data[i + 1], data[i + 2], data[i + 3] });
                         declarations[d].entryList.Add(v);
                     }
                 }
@@ -225,7 +226,7 @@ namespace RenderWareFile.Sections
 
                 td.size = listData.Count() - td.startOffset;
             }
-            
+
             foreach (Declaration d in declarations)
             {
                 d.startOffset = listData.Count();
@@ -273,7 +274,7 @@ namespace RenderWareFile.Sections
                 while (listData.Count() % 0x20 != 0)
                     listData.Add(0);
             }
-            
+
             dataLenght = listData.Count();
             declarationAmount = declarations.Count();
             headerLenght = 12 + 8 * declarationAmount + 8 * triangleDeclarations.Length;
@@ -301,7 +302,7 @@ namespace RenderWareFile.Sections
                 list.AddRange(BitConverter.GetBytes(triangleDeclarations[i].startOffset).Reverse());
                 list.AddRange(BitConverter.GetBytes(triangleDeclarations[i].size).Reverse());
             }
-            
+
             list.AddRange(listData);
             return list;
         }

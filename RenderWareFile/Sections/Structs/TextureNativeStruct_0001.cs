@@ -54,7 +54,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             startSectionPosition = binaryReader.BaseStream.Position;
 
             platformType = binaryReader.ReadInt32();
@@ -145,7 +145,7 @@ namespace RenderWareFile.Sections
             textureName = new String_0002().Read(binaryReader).stringString;
             binaryReader.ReadInt32();
             alphaName = new String_0002().Read(binaryReader).stringString;
-            
+
             binaryReader.ReadInt32();
             int sizeOfdata = binaryReader.ReadInt32();
             binaryReader.ReadInt32();
@@ -230,7 +230,7 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
-            
+
             listBytes.AddRange(BitConverter.GetBytes(platformType));
 
             if (platformType == 8 | platformType == 5)

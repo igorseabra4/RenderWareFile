@@ -11,7 +11,7 @@ namespace RenderWareFile.Sections
         public NativeDataGC nativeData;
 
         public byte[] nativeDataData;
-        
+
         public NativeDataStruct_0001 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
@@ -43,7 +43,7 @@ namespace RenderWareFile.Sections
                 default:
                     throw new Exception();
             }
-            
+
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
 
             return this;

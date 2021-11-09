@@ -13,7 +13,7 @@ namespace RenderWareFile.Sections
         public Vertex3 boxMinimum;
         public int collSectorPresent;
         public int unused;
-                
+
         public Vertex3[] vertexArray;
         public Color[] colorArray;
         public Vertex2[] uvArray;
@@ -135,7 +135,7 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(boxMinimum.Z));
             listBytes.AddRange(BitConverter.GetBytes(collSectorPresent));
             listBytes.AddRange(BitConverter.GetBytes(unused));
-            
+
             for (int i = 0; i < vertexArray.Length; i++)
             {
                 listBytes.AddRange(BitConverter.GetBytes(vertexArray[i].X));

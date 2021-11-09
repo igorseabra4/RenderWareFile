@@ -87,7 +87,7 @@ namespace RenderWareFile.Sections
                     splitPosition = binaryReader.ReadSingle()
                 };
             }
-            
+
             triangleArray = new ushort[numTriangles];
 
             for (int i = 0; i < numTriangles; i++)
@@ -111,7 +111,7 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(boxMaximum.Z));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numSplits));
-            
+
             for (int i = 0; i < numSplits; i++)
             {
                 listBytes.Add((byte)splitArray[i].negativeSector.type);
@@ -126,10 +126,10 @@ namespace RenderWareFile.Sections
             }
 
             if (triangleArray != null)
-            for (int i = 0; i < numTriangles; i++)
-            {
-                listBytes.AddRange(BitConverter.GetBytes(triangleArray[i]));
-            }
+                for (int i = 0; i < numTriangles; i++)
+                {
+                    listBytes.AddRange(BitConverter.GetBytes(triangleArray[i]));
+                }
         }
     }
 }

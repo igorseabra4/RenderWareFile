@@ -167,7 +167,7 @@ namespace RenderWareFile.Sections
 
                 morphTargets[i] = m;
             }
-            
+
             return this;
         }
 

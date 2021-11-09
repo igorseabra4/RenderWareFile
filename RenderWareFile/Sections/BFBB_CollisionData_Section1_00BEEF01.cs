@@ -8,19 +8,19 @@ namespace RenderWareFile.Sections
 {
     public struct xClumpCollBSPBranchNode
     {
-        public int leftInfo { get; set; }      
-        public int rightInfo { get; set; } 
-        public float leftValue { get; set; } 
-        public float rightValue { get; set; } 
+        public int leftInfo { get; set; }
+        public int rightInfo { get; set; }
+        public float leftValue { get; set; }
+        public float rightValue { get; set; }
     }
 
     public struct xClumpCollBSPTriangle
     {
-        public short atomIndex { get; set; } 
-        public short meshVertIndex { get; set; } 
-        public byte flags { get; set; } 
-        public byte platData { get; set; } 
-        public short matIndex { get; set; } 
+        public short atomIndex { get; set; }
+        public short meshVertIndex { get; set; }
+        public byte flags { get; set; }
+        public byte platData { get; set; }
+        public short matIndex { get; set; }
     }
 
     public class BFBB_CollisionData_Section1_00BEEF01 : RWSection
@@ -34,7 +34,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.BFBB_CollisionData_Section1;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             CCOL = new string(binaryReader.ReadChars(4).ToArray());
 
             if (CCOL == "CCOL")

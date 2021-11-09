@@ -23,7 +23,7 @@ namespace RenderWareFile.Sections
             materialListStruct = new MaterialListStruct_0001().Read(binaryReader);
 
 #if DEBUG
-            List< Material_0007> materials = new List<Material_0007>();
+            List<Material_0007> materials = new List<Material_0007>();
             for (int i = 0; binaryReader.BaseStream.Position < startOfSection + sectionSize; i++)
             {
                 Section materialSection = (Section)binaryReader.ReadInt32();
@@ -44,7 +44,7 @@ namespace RenderWareFile.Sections
 
             return this;
         }
-        
+
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.MaterialList;

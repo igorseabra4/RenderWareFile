@@ -7,7 +7,7 @@ namespace RenderWareFile.Sections
 {
     public class BFBB_CollisionData_Section3_00BEEF03 : RWSection
     {
-        public Vertex3 [] vertexList { get; set; }
+        public Vertex3[] vertexList { get; set; }
 
         public BFBB_CollisionData_Section3_00BEEF03 Read(BinaryReader binaryReader)
         {

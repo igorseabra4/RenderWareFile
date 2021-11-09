@@ -14,7 +14,7 @@ namespace RenderWareFile.Sections
 
     public class BinMeshPLG_050E : RWSection
     {
-        public BinMeshHeaderFlags binMeshHeaderFlags; 
+        public BinMeshHeaderFlags binMeshHeaderFlags;
         public int numMeshes; // number of objects/meshes (usually same number of materials)
         public int totalIndexCount; // total number of indices
 

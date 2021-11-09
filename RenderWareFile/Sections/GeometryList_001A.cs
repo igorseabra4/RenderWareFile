@@ -41,6 +41,6 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(geometryListStruct.GetBytes(fileVersion));
             for (int i = 0; i < geometryList.Count; i++)
                 listBytes.AddRange(geometryList[i].GetBytes(fileVersion));
-        }        
+        }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using RenderWareFile.Sections;
+using System.Collections.Generic;
 using System.IO;
-using RenderWareFile.Sections;
 
 namespace RenderWareFile
 {

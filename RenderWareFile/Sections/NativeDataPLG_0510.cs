@@ -7,7 +7,7 @@ namespace RenderWareFile.Sections
     public class NativeDataPLG_0510 : RWSection
     {
         public NativeDataStruct_0001 nativeDataStruct;
-        
+
         public NativeDataPLG_0510 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.NativeDataPLG;

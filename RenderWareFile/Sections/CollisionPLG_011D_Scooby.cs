@@ -18,7 +18,7 @@ namespace RenderWareFile.Sections
         public byte padding;
 
         // index of startIndex_amountOfTriangles entry in list if leaf node, index of split in split list for branch node
-        public short positiveIndex; 
+        public short positiveIndex;
         public short negativeIndex;
 
         public float negativeSplitPos;
@@ -41,7 +41,7 @@ namespace RenderWareFile.Sections
             int numTriangles = binaryReader.ReadInt32();
 
             splits = new Split_Scooby[numLeafNodes - 1];
-            
+
             for (int i = 0; i < numLeafNodes - 1; i++)
                 splits[i] = new Split_Scooby
                 {

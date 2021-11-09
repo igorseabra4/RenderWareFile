@@ -81,7 +81,7 @@ namespace RenderWareFile.Sections
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
-            
+
             if (fileVersion == 0x0310)
             {
                 listBytes.AddRange(BitConverter.GetBytes(rootIsWorldSector));

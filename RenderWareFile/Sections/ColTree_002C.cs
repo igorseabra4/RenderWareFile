@@ -12,13 +12,13 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.ColTree;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             Section colTreeStructSection = (Section)binaryReader.ReadInt32();
 
             if (colTreeStructSection == Section.Struct)
                 colTreeStruct = new ColTreeStruct_0001().Read(binaryReader);
             else throw new System.Exception();
-            
+
             return this;
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace RenderWareFile
 {
@@ -9,7 +8,7 @@ namespace RenderWareFile
         public byte G { get; set; }
         public byte B { get; set; }
         public byte A { get; set; }
-        
+
         public Color(byte r, byte g, byte b, byte a)
         {
             R = r;

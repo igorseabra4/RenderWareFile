@@ -53,7 +53,7 @@ namespace RenderWareFile.Sections
             unknown5 = binaryReader.ReadInt32();
             unknown6 = binaryReader.ReadInt32();
             unknown7 = binaryReader.ReadInt32();
-            
+
             return this;
         }
 
@@ -62,7 +62,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.UserDataPLG;
 
             if (!ReadFileMethods.isCollision)
-            { 
+            {
                 listBytes.AddRange(data);
                 return;
             }

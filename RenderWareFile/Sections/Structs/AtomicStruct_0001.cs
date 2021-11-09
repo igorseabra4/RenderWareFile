@@ -24,7 +24,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Atomic;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             frameIndex = binaryReader.ReadInt32();
             geometryIndex = binaryReader.ReadInt32();
             flags = (AtomicFlags)binaryReader.ReadInt32();

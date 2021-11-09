@@ -30,7 +30,7 @@ namespace RenderWareFile.Sections
                 if (textureNativeSection != Section.TextureNative) throw new Exception(binaryReader.BaseStream.Position.ToString());
                 textureNativeList.Add(new TextureNative_0015().Read(binaryReader));
             }
-            
+
             Section textureDictionaryExtensionSection = (Section)binaryReader.ReadInt32();
             if (textureDictionaryExtensionSection == Section.Extension)
                 textureDictionaryExtension = new Extension_0003().Read(binaryReader);

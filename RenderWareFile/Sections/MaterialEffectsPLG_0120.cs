@@ -32,7 +32,7 @@ namespace RenderWareFile.Sections
 
         public Texture_0006 BumpMapTexture { get; set; }
         public Texture_0006 HeightMapTexture { get; set; }
-        
+
         public MaterialEffectBumpMap Read(BinaryReader binaryReader)
         {
             Intensity = binaryReader.ReadSingle();
@@ -131,7 +131,7 @@ namespace RenderWareFile.Sections
         public BlendFactorType SourceBlendMode { get; set; }
         public BlendFactorType DestBlendMode { get; set; }
         public Texture_0006 Texture { get; set; } = new Texture_0006();
-        
+
         public MaterialEffectDualTextures Read(BinaryReader binaryReader)
         {
             SourceBlendMode = (BlendFactorType)binaryReader.ReadInt32();
@@ -201,7 +201,7 @@ namespace RenderWareFile.Sections
 
         public MaterialEffectType MaterialEffectType
         {
-            get => value; 
+            get => value;
             set
             {
                 if (value == MaterialEffectType.BumpMap || value == MaterialEffectType.BumpEnvironmentMap)
@@ -267,10 +267,10 @@ namespace RenderWareFile.Sections
                 switch (i)
                 {
                     case 0:
-                        materialEffect1 = mEffect; 
+                        materialEffect1 = mEffect;
                         break;
                     case 1:
-                        materialEffect2 = mEffect; 
+                        materialEffect2 = mEffect;
                         break;
                 }
             }

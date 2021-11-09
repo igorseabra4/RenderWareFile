@@ -15,7 +15,7 @@ namespace RenderWareFile.Sections
     public class FrameListStruct_0001 : RWSection
     {
         public List<Frame> frames;
-        
+
         public FrameListStruct_0001 Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
@@ -49,7 +49,7 @@ namespace RenderWareFile.Sections
                     parentFrame = binaryReader.ReadInt32(),
                     unknown = binaryReader.ReadInt32()
                 });
-            
+
             return this;
         }
 

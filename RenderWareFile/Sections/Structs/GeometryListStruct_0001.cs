@@ -18,7 +18,7 @@ namespace RenderWareFile.Sections
 
             return this;
         }
-        
+
         public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;

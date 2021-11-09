@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace RenderWareFile.Sections
@@ -37,10 +36,10 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.String;
 
-            foreach(char i in stringString)
+            foreach (char i in stringString)
                 listBytes.Add((byte)i);
 
-            if (stringString.Length % 4 == 0) listBytes.AddRange(new byte[] { 0, 0, 0, 0});
+            if (stringString.Length % 4 == 0) listBytes.AddRange(new byte[] { 0, 0, 0, 0 });
             if (stringString.Length % 4 == 1) listBytes.AddRange(new byte[] { 0, 0, 0 });
             if (stringString.Length % 4 == 2) listBytes.AddRange(new byte[] { 0, 0 });
             if (stringString.Length % 4 == 3) listBytes.Add(0);

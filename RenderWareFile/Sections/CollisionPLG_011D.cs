@@ -8,13 +8,13 @@ namespace RenderWareFile.Sections
     {
         public int unknownValue;
         public RWSection colTree;
-        
+
         public CollisionPLG_011D Read(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.CollisionPLG;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             if (ReadFileMethods.isShadow & ReadFileMethods.isCollision)
             {
                 unknownValue = binaryReader.ReadInt32();

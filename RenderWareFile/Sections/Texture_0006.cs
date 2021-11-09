@@ -34,9 +34,9 @@ namespace RenderWareFile.Sections
         }
 
         public TextureFilterMode FilterMode
-        { 
-            get => textureStruct.FilterMode; 
-            set => textureStruct.FilterMode = value; 
+        {
+            get => textureStruct.FilterMode;
+            set => textureStruct.FilterMode = value;
         }
         public TextureAddressMode AddressModeU
         {

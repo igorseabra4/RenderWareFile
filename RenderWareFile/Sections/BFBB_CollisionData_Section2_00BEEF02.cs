@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using static RenderWareFile.Shared;
 
 namespace RenderWareFile.Sections
@@ -26,7 +25,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.BFBB_CollisionData_Section2;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
-            
+
             JSP_ = SwitchToggleable(binaryReader.ReadInt32());
 
             version = SwitchToggleable(binaryReader.ReadInt32());
@@ -42,7 +41,7 @@ namespace RenderWareFile.Sections
                     originalMatIndex = SwitchToggleable(binaryReader.ReadInt32()),
                     nodeFlags = SwitchToggleable(binaryReader.ReadInt32())
                 };
-            
+
             return this;
         }
 
