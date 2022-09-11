@@ -27,6 +27,13 @@ namespace RenderWareFile.Sections
         public float specular;
         public float diffuse;
 
+        public float sphereCenterX;
+        public float sphereCenterY;
+        public float sphereCenterZ;
+        public float sphereRadius;
+        public int unknown1;
+        public int unknown2;
+
         public Color[] vertexColors;
         public Vertex2[] textCoords;
         public Triangle[] triangles;
@@ -63,7 +70,13 @@ namespace RenderWareFile.Sections
 
             if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
             {
-                binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
+                sphereCenterX = binaryReader.ReadSingle();
+                sphereCenterY = binaryReader.ReadSingle();
+                sphereCenterZ = binaryReader.ReadSingle();
+                sphereRadius = binaryReader.ReadSingle();
+                unknown1 = binaryReader.ReadInt32();
+                unknown2 = binaryReader.ReadInt32();
+
                 return this;
             }
 
@@ -194,7 +207,16 @@ namespace RenderWareFile.Sections
                 listBytes.AddRange(BitConverter.GetBytes(diffuse));
             }
 
-            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) == 0)
+            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
+            {
+                listBytes.AddRange(BitConverter.GetBytes(sphereCenterX));
+                listBytes.AddRange(BitConverter.GetBytes(sphereCenterY));
+                listBytes.AddRange(BitConverter.GetBytes(sphereCenterZ));
+                listBytes.AddRange(BitConverter.GetBytes(sphereRadius));
+                listBytes.AddRange(BitConverter.GetBytes(unknown1));
+                listBytes.AddRange(BitConverter.GetBytes(unknown2));
+            }
+            else
             {
                 if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
                 {

@@ -20,15 +20,28 @@ namespace RenderWareFile.Sections
         TwoBytes = 0x03
     }
 
-    public class Declaration
+    public abstract class Declaration
     {
         public int startOffset;
         public Declarations declarationType;
         public byte sizeOfEntry;
         public ByteTypes byteType;
         public byte unknown2;
+    }
 
-        public List<object> entryList;
+    public class Vertex3Declaration : Declaration
+    {
+        public List<Vertex3> entryList;
+    }
+
+    public class Vertex2Declaration : Declaration
+    {
+        public List<Vertex2> entryList;
+    }
+
+    public class ColorDeclaration : Declaration
+    {
+        public List<Color> entryList;
     }
 
     public class TriangleDeclaration
@@ -75,14 +88,46 @@ namespace RenderWareFile.Sections
             declarations = new Declaration[declarationAmount];
             for (int i = 0; i < declarationAmount; i++)
             {
-                declarations[i] = new Declaration()
+                var startOffset = Switch(binaryReader.ReadInt32());
+                var declarationType = (Declarations)binaryReader.ReadByte();
+                var sizeOfEntry = binaryReader.ReadByte();
+                var byteType = (ByteTypes)binaryReader.ReadByte();
+                var unknown2 = binaryReader.ReadByte();
+
+                switch (declarationType)
                 {
-                    startOffset = Switch(binaryReader.ReadInt32()),
-                    declarationType = (Declarations)binaryReader.ReadByte(),
-                    sizeOfEntry = binaryReader.ReadByte(),
-                    byteType = (ByteTypes)binaryReader.ReadByte(),
-                    unknown2 = binaryReader.ReadByte()
-                };
+                    case Declarations.Vertex:
+                    case Declarations.Normal:
+                        declarations[i] = new Vertex3Declaration()
+                        {
+                            startOffset = startOffset,
+                            declarationType = declarationType,
+                            sizeOfEntry = sizeOfEntry,
+                            byteType = byteType,
+                            unknown2 = unknown2,
+                        };
+                        break;
+                    case Declarations.TextCoord:
+                        declarations[i] = new Vertex2Declaration()
+                        {
+                            startOffset = startOffset,
+                            declarationType = declarationType,
+                            sizeOfEntry = sizeOfEntry,
+                            byteType = byteType,
+                            unknown2 = unknown2,
+                        };
+                        break;
+                    case Declarations.Color:
+                        declarations[i] = new ColorDeclaration()
+                        {
+                            startOffset = startOffset,
+                            declarationType = declarationType,
+                            sizeOfEntry = sizeOfEntry,
+                            byteType = byteType,
+                            unknown2 = unknown2,
+                        };
+                        break;
+                }
             }
 
             List<TriangleDeclaration> list = new List<TriangleDeclaration>();
@@ -144,52 +189,43 @@ namespace RenderWareFile.Sections
             {
                 binaryReader.BaseStream.Position = headerEndPosition + declarations[d].startOffset;
 
-                byte[] data;
-                if (d + 1 < declarations.Count())
-                    data = binaryReader.ReadBytes(declarations[d + 1].startOffset - declarations[d].startOffset);
-                else
-                    data = binaryReader.ReadBytes(dataLenght - declarations[d].startOffset);
+                byte[] data = d + 1 < declarations.Length ?
+                    binaryReader.ReadBytes(declarations[d + 1].startOffset - declarations[d].startOffset) :
+                    binaryReader.ReadBytes(dataLenght - declarations[d].startOffset);
 
-                declarations[d].entryList = new List<object>();
-
-                if (declarations[d].declarationType == Declarations.Vertex)
+                if (declarations[d].declarationType == Declarations.Vertex || declarations[d].declarationType == Declarations.Normal)
                 {
+                    var dec = (Vertex3Declaration)declarations[d];
+                    dec.entryList = new List<Vertex3>();
                     for (int i = 0; i + 11 < data.Count(); i += 12)
                     {
                         Vertex3 v = new Vertex3(
                             BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
                             BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0),
                             BitConverter.ToSingle(new byte[] { data[i + 11], data[i + 10], data[i + 9], data[i + 8] }, 0));
-                        declarations[d].entryList.Add(v);
-                    }
-                }
-                else if (declarations[d].declarationType == Declarations.Normal)
-                {
-                    for (int i = 0; i + 11 < data.Count(); i += 12)
-                    {
-                        Vertex3 v = new Vertex3(
-                            BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
-                            BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0),
-                            BitConverter.ToSingle(new byte[] { data[i + 11], data[i + 10], data[i + 9], data[i + 8] }, 0));
-                        declarations[d].entryList.Add(v);
+                        dec.entryList.Add(v);
                     }
                 }
                 else if (declarations[d].declarationType == Declarations.Color)
                 {
+                    var dec = (ColorDeclaration)declarations[d];
+                    dec.entryList = new List<Color>();
                     for (int i = 0; i < data.Count(); i += 0x4)
                     {
                         Color v = new Color(new byte[] { data[i], data[i + 1], data[i + 2], data[i + 3] });
-                        declarations[d].entryList.Add(v);
+                        dec.entryList.Add(v);
                     }
                 }
                 else if (declarations[d].declarationType == Declarations.TextCoord)
                 {
+                    var dec = (Vertex2Declaration)declarations[d];
+                    dec.entryList = new List<Vertex2>();
                     for (int i = 0; i < data.Count(); i += 0x8)
                     {
                         Vertex2 v = new Vertex2(
                             BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
                             BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0));
-                        declarations[d].entryList.Add(v);
+                        dec.entryList.Add(v);
                     }
                 }
             }
@@ -227,22 +263,12 @@ namespace RenderWareFile.Sections
                 td.size = listData.Count() - td.startOffset;
             }
 
-            foreach (Declaration d in declarations)
+            foreach (var d in declarations)
             {
                 d.startOffset = listData.Count();
-                if (d.declarationType == Declarations.Vertex)
+                if (d.declarationType == Declarations.Vertex || d.declarationType == Declarations.Normal)
                 {
-                    foreach (Vertex3 v in d.entryList)
-                    {
-                        listData.AddRange(BitConverter.GetBytes(v.X).Reverse());
-                        listData.AddRange(BitConverter.GetBytes(v.Y).Reverse());
-                        listData.AddRange(BitConverter.GetBytes(v.Z).Reverse());
-                    }
-                    d.sizeOfEntry = 0xC;
-                }
-                else if (d.declarationType == Declarations.Normal)
-                {
-                    foreach (Vertex3 v in d.entryList)
+                    foreach (var v in ((Vertex3Declaration)d).entryList)
                     {
                         listData.AddRange(BitConverter.GetBytes(v.X).Reverse());
                         listData.AddRange(BitConverter.GetBytes(v.Y).Reverse());
@@ -252,7 +278,7 @@ namespace RenderWareFile.Sections
                 }
                 else if (d.declarationType == Declarations.Color)
                 {
-                    foreach (Color c in d.entryList)
+                    foreach (var c in ((ColorDeclaration)d).entryList)
                     {
                         listData.Add(c.R);
                         listData.Add(c.G);
@@ -263,7 +289,7 @@ namespace RenderWareFile.Sections
                 }
                 else if (d.declarationType == Declarations.TextCoord)
                 {
-                    foreach (Vertex2 tc in d.entryList)
+                    foreach (var tc in ((Vertex2Declaration)d).entryList)
                     {
                         listData.AddRange(BitConverter.GetBytes(tc.X).Reverse());
                         listData.AddRange(BitConverter.GetBytes(tc.Y).Reverse());
@@ -305,11 +331,6 @@ namespace RenderWareFile.Sections
 
             list.AddRange(listData);
             return list;
-        }
-
-        internal void ApplyScale(Vertex3 vertex3)
-        {
-            throw new NotImplementedException();
         }
     }
 }

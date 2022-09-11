@@ -1,17 +1,81 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using static RenderWareFile.Shared;
 
 namespace RenderWareFile.Sections
 {
+    public enum ClumpCollType
+    {
+        Null = 0,
+        Leaf = 1,
+        Branch = 2
+    }
+
+    public enum ClumpDirection
+    {
+        X = 0,
+        Y = 1,
+        Z = 2,
+        Unknown = 3
+    }
+
     public struct xClumpCollBSPBranchNode
     {
-        public int leftInfo { get; set; }
-        public int rightInfo { get; set; }
-        public float leftValue { get; set; }
-        public float rightValue { get; set; }
+        private static (int, ClumpCollType, ClumpDirection, int) UnpackInfo(int info) =>
+            (info >> 12,
+            (ClumpCollType)(info & 0b11),
+            (ClumpDirection)((info & 0b1100) >> 2),
+            (info & 0b11110000) >> 4);
+
+        private static int PackInfo(int index, ClumpCollType type, ClumpDirection unk1, int unk2) =>
+            (index << 12) |
+            (((int)type) & 0b11) |
+            ((((int)unk1) & 0b11) << 2) |
+            ((unk2 & 0b1111) << 4);
+
+        public int LeftListIndex { get; set; }
+        public ClumpCollType LeftType { get; set; }
+        public ClumpDirection LeftDirection { get; set; }
+        public int LeftUnk { get; set; }
+
+        [Browsable(false)]
+        public int LeftInfo
+        {
+            get => PackInfo(LeftListIndex, LeftType, LeftDirection, LeftUnk);
+            set
+            {
+                var info = UnpackInfo(value);
+                LeftListIndex = info.Item1;
+                LeftType = info.Item2;
+                LeftDirection = info.Item3;
+                LeftUnk = info.Item4;
+            }
+        }
+
+        public int RightListIndex { get; set; }
+        public ClumpCollType RightType { get; set; }
+        public ClumpDirection RightDirection { get; set; }
+        public int RightUnk { get; set; }
+
+        [Browsable(false)]
+        public int RightInfo
+        {
+            get => PackInfo(RightListIndex, RightType, RightDirection, RightUnk);
+            set
+            {
+                var info = UnpackInfo(value);
+                RightListIndex = info.Item1;
+                RightType = info.Item2;
+                RightDirection = info.Item3;
+                RightUnk = info.Item4;
+            }
+        }
+
+        public float LeftValue { get; set; }
+        public float RightValue { get; set; }
     }
 
     public struct xClumpCollBSPTriangle
@@ -50,10 +114,10 @@ namespace RenderWareFile.Sections
             {
                 branchNodes[i] = new xClumpCollBSPBranchNode()
                 {
-                    leftInfo = SwitchToggleable(binaryReader.ReadInt32()),
-                    rightInfo = SwitchToggleable(binaryReader.ReadInt32()),
-                    leftValue = SwitchToggleable(binaryReader.ReadSingle()),
-                    rightValue = SwitchToggleable(binaryReader.ReadSingle())
+                    LeftInfo = SwitchToggleable(binaryReader.ReadInt32()),
+                    RightInfo = SwitchToggleable(binaryReader.ReadInt32()),
+                    LeftValue = SwitchToggleable(binaryReader.ReadSingle()),
+                    RightValue = SwitchToggleable(binaryReader.ReadSingle())
                 };
             }
 
@@ -90,10 +154,10 @@ namespace RenderWareFile.Sections
 
             for (int i = 0; i < branchNodes.Length; i++)
             {
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].leftInfo)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].rightInfo)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].leftValue)));
-                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].rightValue)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].LeftInfo)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].RightInfo)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].LeftValue)));
+                listBytes.AddRange(BitConverter.GetBytes(SwitchToggleable(branchNodes[i].RightValue)));
             }
 
             for (int i = 0; i < triangles.Length; i++)
