@@ -11,7 +11,8 @@ namespace RenderWareFile.Sections
         Vertex = 0x09,
         Normal = 0x0A,
         Color = 0x0B,
-        TextCoord = 0x0D
+        TextCoord = 0x0D,
+        TextCoord2 = 0x0E
     }
 
     public enum ByteTypes : byte
@@ -64,26 +65,23 @@ namespace RenderWareFile.Sections
 
     public class NativeDataGC
     {
-        public int headerLenght;
-        public int dataLenght;
         public short unknown1;
         public short meshIndex;
         public int unknown2;
-        public int declarationAmount;
         public Declaration[] declarations;
         public TriangleDeclaration[] triangleDeclarations;
 
         public NativeDataGC(BinaryReader binaryReader, bool fixFlag)
         {
-            headerLenght = binaryReader.ReadInt32(); // counting from after dataLenght
-            dataLenght = binaryReader.ReadInt32(); // counting from after headerEndPosition
+            int headerLenght = binaryReader.ReadInt32(); // counting from after dataLenght
+            int dataLenght = binaryReader.ReadInt32(); // counting from after headerEndPosition
 
             long nativeDataStart = binaryReader.BaseStream.Position; // from here the file is little endian
 
             unknown1 = Switch(binaryReader.ReadInt16());
             meshIndex = Switch(binaryReader.ReadInt16());
             unknown2 = Switch(binaryReader.ReadInt32());
-            declarationAmount = Switch(binaryReader.ReadInt32());
+            var declarationAmount = Switch(binaryReader.ReadInt32());
 
             declarations = new Declaration[declarationAmount];
             for (int i = 0; i < declarationAmount; i++)
@@ -108,6 +106,7 @@ namespace RenderWareFile.Sections
                         };
                         break;
                     case Declarations.TextCoord:
+                    case Declarations.TextCoord2:
                         declarations[i] = new Vertex2Declaration()
                         {
                             startOffset = startOffset,
@@ -127,6 +126,8 @@ namespace RenderWareFile.Sections
                             unknown2 = unknown2,
                         };
                         break;
+                    default:
+                        throw new NotSupportedException($"Unknown declaration type: {declarationType} at {binaryReader.BaseStream.Position}");
                 }
             }
 
@@ -228,6 +229,18 @@ namespace RenderWareFile.Sections
                         dec.entryList.Add(v);
                     }
                 }
+                else if (declarations[d].declarationType == Declarations.TextCoord2)
+                {
+                    var dec = (Vertex2Declaration)declarations[d];
+                    dec.entryList = new List<Vertex2>();
+                    for (int i = 0; i < data.Count(); i += 0x8)
+                    {
+                        Vertex2 v = new Vertex2(
+                            BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
+                            BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0));
+                        dec.entryList.Add(v);
+                    }
+                }
             }
         }
 
@@ -287,7 +300,7 @@ namespace RenderWareFile.Sections
                     }
                     d.sizeOfEntry = 0x4;
                 }
-                else if (d.declarationType == Declarations.TextCoord)
+                else if (d.declarationType == Declarations.TextCoord || d.declarationType == Declarations.TextCoord2)
                 {
                     foreach (var tc in ((Vertex2Declaration)d).entryList)
                     {
@@ -301,9 +314,8 @@ namespace RenderWareFile.Sections
                     listData.Add(0);
             }
 
-            dataLenght = listData.Count();
-            declarationAmount = declarations.Count();
-            headerLenght = 12 + 8 * declarationAmount + 8 * triangleDeclarations.Length;
+            int dataLenght = listData.Count();
+            int headerLenght = 12 + 8 * declarations.Length + 8 * triangleDeclarations.Length;
 
             List<byte> list = new List<byte>();
             list.AddRange(BitConverter.GetBytes(headerLenght));
@@ -312,9 +324,9 @@ namespace RenderWareFile.Sections
             list.AddRange(BitConverter.GetBytes(unknown1).Reverse());
             list.AddRange(BitConverter.GetBytes(meshIndex).Reverse());
             list.AddRange(BitConverter.GetBytes(unknown2).Reverse());
-            list.AddRange(BitConverter.GetBytes(declarationAmount).Reverse());
+            list.AddRange(BitConverter.GetBytes(declarations.Length).Reverse());
 
-            for (int i = 0; i < declarationAmount; i++)
+            for (int i = 0; i < declarations.Length; i++)
             {
                 list.AddRange(BitConverter.GetBytes(declarations[i].startOffset).Reverse());
                 list.Add((byte)declarations[i].declarationType);
