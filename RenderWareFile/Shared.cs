@@ -19,44 +19,35 @@ namespace RenderWareFile
 
         public static float Switch(float f)
         {
-            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
-            return BitConverter.ToSingle(a, 0);
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToSingle(new byte[] { a[3], a[2], a[1], a[0] }, 0);
         }
 
         public static int Switch(int f)
         {
-            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
-            return BitConverter.ToInt32(a, 0);
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToInt32(new byte[] { a[3], a[2], a[1], a[0] }, 0);
         }
 
         public static short Switch(short f)
         {
-            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
-            return BitConverter.ToInt16(a, 0);
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToInt16(new byte[] { a[1], a[0] }, 0);
         }
 
         public static float SwitchToggleable(float f)
         {
-            if (DoNotSwitch) return f;
-
-            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
-            return BitConverter.ToSingle(a, 0);
+            return DoNotSwitch ? f : Switch(f);
         }
 
         public static int SwitchToggleable(int f)
         {
-            if (DoNotSwitch) return f;
-
-            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
-            return BitConverter.ToInt32(a, 0);
+            return DoNotSwitch ? f : Switch(f);
         }
 
         public static short SwitchToggleable(short f)
         {
-            if (DoNotSwitch) return f;
-
-            byte[] a = BitConverter.GetBytes(f).Reverse().ToArray();
-            return BitConverter.ToInt16(a, 0);
+            return DoNotSwitch ? f : Switch(f);
         }
 
         public static string ReadFromZeroTerminatedString(BinaryReader binaryReader)
