@@ -25,6 +25,7 @@
         MorphPLG = 0x105,
         SkyMipmapVal = 0x110,
         CollisionPLG = 0x11D,
+        HAnimPLG = 0x11E,
         UserDataPLG = 0x11F,
         MaterialEffectsPLG = 0x120,
         BinMeshPLG = 0x50E,
