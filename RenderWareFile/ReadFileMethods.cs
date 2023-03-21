@@ -22,24 +22,30 @@ namespace RenderWareFile
 
         public static RWSection[] ReadRenderWareFile(Stream File)
         {
-            BinaryReader binaryReader = new BinaryReader(File);
-            List<RWSection> renderWareFile = new List<RWSection>();
-
-            while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+            using (BinaryReader binaryReader = new BinaryReader(File))
             {
-                Section currentSection = (Section)binaryReader.ReadInt32();
-                if (currentSection == Section.World) renderWareFile.Add(new World_000B().Read(binaryReader));
-                else if (currentSection == Section.Clump) renderWareFile.Add(new Clump_0010().Read(binaryReader));
-                else if (currentSection == Section.TextureDictionary) renderWareFile.Add(new TextureDictionary_0016().Read(binaryReader));
-                else if (currentSection == Section.BFBB_CollisionData_Section1) renderWareFile.Add(new BFBB_CollisionData_Section1_00BEEF01().Read(binaryReader));
-                else if (currentSection == Section.BFBB_CollisionData_Section2) renderWareFile.Add(new BFBB_CollisionData_Section2_00BEEF02().Read(binaryReader));
-                else if (currentSection == Section.BFBB_CollisionData_Section3) renderWareFile.Add(new BFBB_CollisionData_Section3_00BEEF03().Read(binaryReader));
-                else renderWareFile.Add(new GenericSection().Read(binaryReader, currentSection));
+                List<RWSection> renderWareFile = new List<RWSection>();
+
+                while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+                {
+                    Section currentSection = (Section)binaryReader.ReadInt32();
+                    if (currentSection == Section.World)
+                        renderWareFile.Add(new World_000B().Read(binaryReader));
+                    else if (currentSection == Section.Clump)
+                        renderWareFile.Add(new Clump_0010().Read(binaryReader));
+                    else if (currentSection == Section.TextureDictionary)
+                        renderWareFile.Add(new TextureDictionary_0016().Read(binaryReader));
+                    else if (currentSection == Section.BFBB_CollisionData_Section1)
+                        renderWareFile.Add(new BFBB_CollisionData_Section1_00BEEF01().Read(binaryReader));
+                    else if (currentSection == Section.BFBB_CollisionData_Section2)
+                        renderWareFile.Add(new BFBB_CollisionData_Section2_00BEEF02().Read(binaryReader));
+                    else if (currentSection == Section.BFBB_CollisionData_Section3)
+                        renderWareFile.Add(new BFBB_CollisionData_Section3_00BEEF03().Read(binaryReader));
+                    else
+                        renderWareFile.Add(new GenericSection().Read(binaryReader, currentSection));
+                }
+                return renderWareFile.ToArray();
             }
-
-            binaryReader.Close();
-
-            return renderWareFile.ToArray();
         }
 
         public static byte[] ExportRenderWareFile(RWSection RWFile, int version)

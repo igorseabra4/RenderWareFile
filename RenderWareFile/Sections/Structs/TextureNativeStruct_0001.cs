@@ -336,14 +336,21 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(gcnUnknown3).Reverse().ToArray());
             listBytes.AddRange(BitConverter.GetBytes(gcnUnknown4).Reverse().ToArray());
 
-            foreach (char i in textureName)
-                listBytes.Add((byte)i);
-            for (int i = textureName.Length; i < 32; i++)
-                listBytes.Add(0);
-            foreach (char i in alphaName)
-                listBytes.Add((byte)i);
-            for (int i = alphaName.Length; i < 32; i++)
-                listBytes.Add(0);
+            for (int i = 0; i < 32; i++)
+            {
+                if (i < textureName.Length)
+                    listBytes.Add((byte)textureName[i]);
+                else
+                    listBytes.Add(0);
+            }
+
+            for (int i = 0; i < 32; i++)
+            {
+                if (i < alphaName.Length)
+                    listBytes.Add((byte)alphaName[i]);
+                else
+                    listBytes.Add(0);
+            }
 
             if (ReadFileMethods.treatStuffAsByteArray)
             {

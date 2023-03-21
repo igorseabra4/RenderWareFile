@@ -15,9 +15,18 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            Section textureNativeStructSection = (Section)binaryReader.ReadInt32();
-            if (textureNativeStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            textureNativeStruct = new TextureNativeStruct_0001().Read(binaryReader);
+            try
+            {
+                Section textureNativeStructSection = (Section)binaryReader.ReadInt32();
+                if (textureNativeStructSection != Section.Struct)
+                    throw new Exception(binaryReader.BaseStream.Position.ToString());
+                textureNativeStruct = new TextureNativeStruct_0001();
+                textureNativeStruct.Read(binaryReader);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(textureNativeStruct.textureName + ": " + ex.Message, ex);
+            }
 
             Section textureNativeExtensionSection = (Section)binaryReader.ReadInt32();
             if (textureNativeExtensionSection == Section.Extension)
