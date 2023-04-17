@@ -1,3 +1,4 @@
+using RenderWareFile.Enums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,19 +8,12 @@ namespace RenderWareFile.Sections
     public struct UserData
     {
         public string attribute;
-        public int dataType;
         public List<object> data;
     }
+
     public class UserDataPLG_011F : RWSection
     {
-        public enum DataTypes
-        {
-            Null,
-            Int,
-            Float,
-            String
-        }
-
+        public UserDataType userDataType;
 
         public UserData[] dataList;
 
@@ -29,39 +23,34 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            var numData = binaryReader.ReadInt32();
+            dataList = new UserData[binaryReader.ReadInt32()];
 
-            dataList = new UserData[numData];
-
-            for (int i = 0; i < numData; i++)
+            for (int i = 0; i < dataList.Length; i++)
             {
-                var attributeLength = binaryReader.ReadInt32() - 1;
+                int attribLength = binaryReader.ReadInt32();
 
-                dataList[i].attribute = new string(binaryReader.ReadChars(attributeLength));
+                dataList[i].attribute = new string(binaryReader.ReadChars(attribLength));
                 binaryReader.BaseStream.Position++;
 
-                dataList[i].dataType = binaryReader.ReadInt32();
+                UserDataType dataType = (UserDataType)binaryReader.ReadInt32();
+                int dataCount = binaryReader.ReadInt32();
 
-                var dataCount = binaryReader.ReadInt32();
-
-                dataList[i].data = new List<object>();
-
-                switch ((DataTypes)dataList[i].dataType)
+                switch (dataType)
                 {
-                    case DataTypes.Int:
+                    case UserDataType.Int:
                         for (int j = 0; j < dataCount; j++)
                             dataList[i].data.Add(binaryReader.ReadInt32());
                         break;
 
-                    case DataTypes.Float:
+                    case UserDataType.Float:
                         for (int j = 0; j < dataCount; j++)
                             dataList[i].data.Add(binaryReader.ReadSingle());
                         break;
 
-                    case DataTypes.String:
+                    case UserDataType.String:
                         for (int j = 0; j < dataCount; j++)
                         {
-                            var dataAttribLength = binaryReader.ReadInt32() - 1;
+                            int dataAttribLength = binaryReader.ReadInt32();
                             dataList[i].data.Add(binaryReader.ReadChars(dataAttribLength));
 
                             binaryReader.BaseStream.Position++;
@@ -84,49 +73,53 @@ namespace RenderWareFile.Sections
 
             foreach (var d in dataList)
             {
-                listBytes.AddRange(BitConverter.GetBytes(d.attribute.Length + 1));
-                for (int i = 0; i <= d.attribute.Length; i++)
+                int attribLength = d.attribute.Length;
+
+                listBytes.AddRange(BitConverter.GetBytes(attribLength + 1));
+
+                for (int i = 0; i < attribLength; i++)
                 {
-                    if (i >= d.attribute.Length)
+                    char[] attribute = d.attribute.ToCharArray();
+                    
+                    foreach (char j in attribute)
+                        listBytes.Add((byte)j);
+                    listBytes.Add(0);
+                }
+
+                int dataType = Convert.ToInt32(d.data.GetType());
+                listBytes.AddRange(BitConverter.GetBytes(dataType));
+
+                if ((UserDataType)dataType == UserDataType.Null)
+                    for (int i = 0; i < 4; i++)
                         listBytes.Add(0);
-                    else
-                        listBytes.Add((byte)d.attribute[i]);
-                }
 
-                listBytes.AddRange(BitConverter.GetBytes(d.dataType));
-                listBytes.AddRange(BitConverter.GetBytes(d.data.Count));
-
-                foreach (var v in d.data)
-                {
-                    switch ((DataTypes)d.dataType)
+                else
+                    foreach (var v in d.data)
                     {
-                        case DataTypes.Int:
-                            listBytes.AddRange(BitConverter.GetBytes(Convert.ToInt32(v)));
-                            break;
+                        switch ((UserDataType)dataType)
+                        {
+                            case UserDataType.Float:
+                                listBytes.AddRange(BitConverter.GetBytes(Convert.ToSingle(v)));
+                                break;
 
-                        case DataTypes.Float:
-                            listBytes.AddRange(BitConverter.GetBytes(Convert.ToSingle(v)));
-                            break;
+                            case UserDataType.String:
+                                string dataAttrib = Convert.ToString(v);
+                                listBytes.AddRange(BitConverter.GetBytes(dataAttrib.Length + 1));
 
-                        case DataTypes.String:
-                            var dataString = Convert.ToString(v);
-                            char[] dataChars = dataString.ToCharArray();
+                                char[] dataAttribChars = dataAttrib.ToCharArray();
 
-                            listBytes.AddRange(BitConverter.GetBytes(dataChars.Length + 1));
+                                foreach (char i in dataAttribChars)
+                                    listBytes.Add((byte)i);
 
-                            foreach (char i in dataChars)
-                                listBytes.Add((byte)i);
-                            listBytes.Add(0);
-                            break;
-
-                        default:
-                            for (int i = 0; i < 4; i++)
                                 listBytes.Add(0);
-                            break;
+                                break;
+
+                            default:
+                                listBytes.AddRange(BitConverter.GetBytes(Convert.ToInt32(v)));
+                                break;
+                        }
                     }
-                }
             }
-            return;
         }
     }
 }
