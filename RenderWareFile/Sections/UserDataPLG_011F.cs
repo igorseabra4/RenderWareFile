@@ -1,24 +1,27 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 namespace RenderWareFile.Sections
 {
+    public struct UserData
+    {
+        public string attribute;
+        public int dataType;
+        public List<object> data;
+    }
     public class UserDataPLG_011F : RWSection
     {
-        public byte[] data;
+        public enum DataTypes
+        {
+            Null,
+            Int,
+            Float,
+            String
+        }
 
-        public int userDataType;
-        public int unknown2;
-        public string attribute;
-        public int unknown3;
-        public int numTriangles;
-        public Color[] collisionFlags;
-        public int unknown4;
-        public string userData;
-        public int unknown5;
-        public int unknown6;
-        public int unknown7;
+
+        public UserData[] dataList;
 
         public UserDataPLG_011F Read(BinaryReader binaryReader)
         {
@@ -26,33 +29,49 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = binaryReader.ReadInt32();
 
-            data = binaryReader.ReadBytes(sectionSize);
+            var numData = binaryReader.ReadInt32();
 
-            if (!ReadFileMethods.isCollision)
-                return this;
+            dataList = new UserData[numData];
 
-            binaryReader.BaseStream.Position -= sectionSize;
-
-            userDataType = binaryReader.ReadInt32();
-
-            if (userDataType == 0x02)
+            for (int i = 0; i < numData; i++)
             {
-                unknown2 = binaryReader.ReadInt32();
-                attribute = Shared.ReadFromZeroTerminatedString(binaryReader);
-                unknown3 = binaryReader.ReadInt32();
-                numTriangles = binaryReader.ReadInt32();
-                collisionFlags = new Color[numTriangles];
-                for (int i = 0; i < numTriangles; i++)
-                {
-                    collisionFlags[i] = new Color(binaryReader.ReadInt32());
-                }
-                unknown4 = binaryReader.ReadInt32();
-            }
+                var attributeLength = binaryReader.ReadInt32() - 1;
 
-            userData = Shared.ReadFromZeroTerminatedString(binaryReader);
-            unknown5 = binaryReader.ReadInt32();
-            unknown6 = binaryReader.ReadInt32();
-            unknown7 = binaryReader.ReadInt32();
+                dataList[i].attribute = new string(binaryReader.ReadChars(attributeLength));
+                binaryReader.BaseStream.Position++;
+
+                dataList[i].dataType = binaryReader.ReadInt32();
+
+                var dataCount = binaryReader.ReadInt32();
+
+                dataList[i].data = new List<object>();
+
+                switch ((DataTypes)dataList[i].dataType)
+                {
+                    case DataTypes.Int:
+                        for (int j = 0; j < dataCount; j++)
+                            dataList[i].data.Add(binaryReader.ReadInt32());
+                        break;
+
+                    case DataTypes.Float:
+                        for (int j = 0; j < dataCount; j++)
+                            dataList[i].data.Add(binaryReader.ReadSingle());
+                        break;
+
+                    case DataTypes.String:
+                        for (int j = 0; j < dataCount; j++)
+                        {
+                            var dataAttribLength = binaryReader.ReadInt32() - 1;
+                            dataList[i].data.Add(binaryReader.ReadChars(dataAttribLength));
+
+                            binaryReader.BaseStream.Position++;
+                        }
+                        break;
+
+                    default:
+                        throw new Exception();
+                }
+            }
 
             return this;
         }
@@ -61,33 +80,53 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.UserDataPLG;
 
-            if (!ReadFileMethods.isCollision)
-            {
-                listBytes.AddRange(data);
-                return;
-            }
+            listBytes.AddRange(BitConverter.GetBytes(dataList.Length + 1));
 
-            listBytes.AddRange(BitConverter.GetBytes(userDataType));
-            listBytes.AddRange(BitConverter.GetBytes(unknown2));
-            foreach (char i in attribute)
-                listBytes.Add((byte)i);
-            listBytes.Add(0);
-            listBytes.AddRange(BitConverter.GetBytes(unknown3));
-            listBytes.AddRange(BitConverter.GetBytes(numTriangles));
-            for (int i = 0; i < numTriangles; i++)
+            foreach (var d in dataList)
             {
-                listBytes.Add(collisionFlags[i].R);
-                listBytes.Add(collisionFlags[i].G);
-                listBytes.Add(collisionFlags[i].B);
-                listBytes.Add(collisionFlags[i].A);
+                listBytes.AddRange(BitConverter.GetBytes(d.attribute.Length + 1));
+                for (int i = 0; i <= d.attribute.Length; i++)
+                {
+                    if (i >= d.attribute.Length)
+                        listBytes.Add(0);
+                    else
+                        listBytes.Add((byte)d.attribute[i]);
+                }
+
+                listBytes.AddRange(BitConverter.GetBytes(d.dataType));
+                listBytes.AddRange(BitConverter.GetBytes(d.data.Count));
+
+                foreach (var v in d.data)
+                {
+                    switch ((DataTypes)d.dataType)
+                    {
+                        case DataTypes.Int:
+                            listBytes.AddRange(BitConverter.GetBytes(Convert.ToInt32(v)));
+                            break;
+
+                        case DataTypes.Float:
+                            listBytes.AddRange(BitConverter.GetBytes(Convert.ToSingle(v)));
+                            break;
+
+                        case DataTypes.String:
+                            var dataString = Convert.ToString(v);
+                            char[] dataChars = dataString.ToCharArray();
+
+                            listBytes.AddRange(BitConverter.GetBytes(dataChars.Length + 1));
+
+                            foreach (char i in dataChars)
+                                listBytes.Add((byte)i);
+                            listBytes.Add(0);
+                            break;
+
+                        default:
+                            for (int i = 0; i < 4; i++)
+                                listBytes.Add(0);
+                            break;
+                    }
+                }
             }
-            listBytes.AddRange(BitConverter.GetBytes(unknown4));
-            foreach (char i in userData)
-                listBytes.Add((byte)i);
-            listBytes.Add(0);
-            listBytes.AddRange(BitConverter.GetBytes(unknown5));
-            listBytes.AddRange(BitConverter.GetBytes(unknown6));
-            listBytes.AddRange(BitConverter.GetBytes(unknown7));
+            return;
         }
     }
 }
