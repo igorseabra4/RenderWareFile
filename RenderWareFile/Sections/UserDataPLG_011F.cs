@@ -29,11 +29,13 @@ namespace RenderWareFile.Sections
             {
                 int attribLength = binaryReader.ReadInt32();
 
-                dataList[i].attribute = new string(binaryReader.ReadChars(attribLength));
+                dataList[i].attribute = new string(binaryReader.ReadChars(attribLength - 1));
                 binaryReader.BaseStream.Position++;
 
                 UserDataType dataType = (UserDataType)binaryReader.ReadInt32();
                 int dataCount = binaryReader.ReadInt32();
+                
+                dataList[i].data = new List<object>();
 
                 switch (dataType)
                 {
@@ -51,7 +53,7 @@ namespace RenderWareFile.Sections
                         for (int j = 0; j < dataCount; j++)
                         {
                             int dataAttribLength = binaryReader.ReadInt32();
-                            dataList[i].data.Add(binaryReader.ReadChars(dataAttribLength));
+                            dataList[i].data.Add(binaryReader.ReadChars(dataAttribLength - 1));
 
                             binaryReader.BaseStream.Position++;
                         }
