@@ -35,12 +35,6 @@ namespace RenderWareFile
                         renderWareFile.Add(new Clump_0010().Read(binaryReader));
                     else if (currentSection == Section.TextureDictionary)
                         renderWareFile.Add(new TextureDictionary_0016().Read(binaryReader));
-                    else if (currentSection == Section.BFBB_CollisionData_Section1)
-                        renderWareFile.Add(new BFBB_CollisionData_Section1_00BEEF01().Read(binaryReader));
-                    else if (currentSection == Section.BFBB_CollisionData_Section2)
-                        renderWareFile.Add(new BFBB_CollisionData_Section2_00BEEF02().Read(binaryReader));
-                    else if (currentSection == Section.BFBB_CollisionData_Section3)
-                        renderWareFile.Add(new BFBB_CollisionData_Section3_00BEEF03().Read(binaryReader));
                     else
                         renderWareFile.Add(new GenericSection().Read(binaryReader, currentSection));
                 }
