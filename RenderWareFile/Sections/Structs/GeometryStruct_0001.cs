@@ -36,6 +36,7 @@ namespace RenderWareFile.Sections
 
         public Color[] vertexColors;
         public Vertex2[] textCoords;
+        public Vertex2[] textCoords2;
         public Triangle[] triangles;
         public MorphTarget[] morphTargets;
 
@@ -60,6 +61,8 @@ namespace RenderWareFile.Sections
             numTriangles = binaryReader.ReadInt32();
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
+
+            int numTexCoords = (geometryFlags & GeometryFlags.hasTextCoords) != 0 ? 1 : (geometryFlags & GeometryFlags.hasTextCoords2) != 0 ? 2 : (int)geometryFlags2 & 0xFF;
 
             if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
             {
@@ -95,32 +98,28 @@ namespace RenderWareFile.Sections
                 }
             }
 
-            if ((geometryFlags & GeometryFlags.hasTextCoords) != 0)
+            if (numTexCoords >= 1)
             {
                 textCoords = new Vertex2[numVertices];
                 for (int i = 0; i < numVertices; i++)
-                {
                     textCoords[i] = new Vertex2()
                     {
                         X = binaryReader.ReadSingle(),
                         Y = binaryReader.ReadSingle()
                     };
-                }
-
-                if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
-                    binaryReader.BaseStream.Position += numVertices * 8;
             }
-            else if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
+
+            if (numTexCoords >= 2)
             {
-                textCoords = new Vertex2[numVertices * 2];
-                for (int i = 0; i < numVertices * 2; i++)
-                {
-                    textCoords[i] = new Vertex2()
+                textCoords2 = new Vertex2[numVertices];
+                for (int i = 0; i < numVertices; i++)
+                    textCoords2[i] = new Vertex2()
                     {
                         X = binaryReader.ReadSingle(),
                         Y = binaryReader.ReadSingle()
                     };
-                }
+
+                binaryReader.BaseStream.Position += (numVertices * 8) * (numTexCoords - 2);
             }
 
             triangles = new Triangle[numTriangles];
@@ -229,12 +228,21 @@ namespace RenderWareFile.Sections
                     }
                 }
 
-                if ((geometryFlags & GeometryFlags.hasTextCoords) != 0)
+                if ((geometryFlags & (GeometryFlags.hasTextCoords | GeometryFlags.hasTextCoords2)) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {
                         listBytes.AddRange(BitConverter.GetBytes(textCoords[i].X));
                         listBytes.AddRange(BitConverter.GetBytes(textCoords[i].Y));
+                    }
+                }
+
+                if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
+                {
+                    for (int i = 0; i < numVertices; i++)
+                    {
+                        listBytes.AddRange(BitConverter.GetBytes(textCoords2[i].X));
+                        listBytes.AddRange(BitConverter.GetBytes(textCoords2[i].Y));
                     }
                 }
 
