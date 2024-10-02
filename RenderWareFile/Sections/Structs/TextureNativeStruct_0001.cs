@@ -41,8 +41,6 @@ namespace RenderWareFile.Sections
         public int gcnUnknown3;
         public int gcnUnknown4;
 
-        public String_0002 ps2TextureNameString;
-        public String_0002 ps2AlphaNameString;
 
         private int totalMipMapDataSize;
 
@@ -140,17 +138,6 @@ namespace RenderWareFile.Sections
             addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
             addressModeV = (TextureAddressMode)(addressMode & 0x0F);
             binaryReader.BaseStream.Position += 2;
-
-            binaryReader.ReadInt32();
-            textureName = new String_0002().Read(binaryReader).stringString;
-            binaryReader.ReadInt32();
-            alphaName = new String_0002().Read(binaryReader).stringString;
-
-            binaryReader.ReadInt32();
-            int sizeOfdata = binaryReader.ReadInt32();
-            binaryReader.ReadInt32();
-
-            sectionData = binaryReader.ReadBytes(sizeOfdata);
         }
 
         private int BiggestPowerOfTwoUnder(int number)
@@ -311,17 +298,6 @@ namespace RenderWareFile.Sections
             listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
             listBytes.Add(0);
             listBytes.Add(0);
-
-            listBytes.AddRange(new String_0002(textureName).GetBytes(fileVersion));
-            listBytes.AddRange(new String_0002(alphaName).GetBytes(fileVersion));
-
-            listBytes.Add(1);
-            listBytes.Add(0);
-            listBytes.Add(0);
-            listBytes.Add(0);
-            listBytes.AddRange(BitConverter.GetBytes(sectionData.Length));
-            listBytes.AddRange(BitConverter.GetBytes(renderWareVersion));
-            listBytes.AddRange(sectionData);
         }
 
         private void SetGameCubeListBytes(int fileVersion, ref List<byte> listBytes)
