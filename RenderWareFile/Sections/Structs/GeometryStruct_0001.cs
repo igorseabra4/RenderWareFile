@@ -18,7 +18,6 @@ namespace RenderWareFile.Sections
     public class GeometryStruct_0001 : RWSection
     {
         public GeometryFlags geometryFlags;
-        public GeometryFlags2 geometryFlags2;
         public int numTriangles;
         public int numVertices;
         public int numMorphTargets;
@@ -56,13 +55,12 @@ namespace RenderWareFile.Sections
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            geometryFlags = (GeometryFlags)binaryReader.ReadInt16();
-            geometryFlags2 = (GeometryFlags2)binaryReader.ReadInt16();
+            geometryFlags = (GeometryFlags)binaryReader.ReadInt32();
             numTriangles = binaryReader.ReadInt32();
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
 
-            int numTexCoords = (geometryFlags & GeometryFlags.hasTextCoords) != 0 ? 1 : (geometryFlags & GeometryFlags.hasTextCoords2) != 0 ? 2 : (int)geometryFlags2 & 0xFF;
+            int numTexCoords = (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED) != 0 ? 1 : (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0 ? 2 : ((int)geometryFlags >> 16) & 0xFF;
 
             if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
             {
@@ -71,7 +69,7 @@ namespace RenderWareFile.Sections
                 diffuse = binaryReader.ReadSingle();
             }
 
-            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
+            if ((geometryFlags & GeometryFlags.rpGEOMETRYNATIVE) != 0)
             {
                 sphereCenterX = binaryReader.ReadSingle();
                 sphereCenterY = binaryReader.ReadSingle();
@@ -83,7 +81,7 @@ namespace RenderWareFile.Sections
                 return this;
             }
 
-            if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
+            if ((geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0)
             {
                 vertexColors = new Color[numVertices];
                 for (int i = 0; i < numVertices; i++)
@@ -193,8 +191,7 @@ namespace RenderWareFile.Sections
                 return;
             }
 
-            listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags));
-            listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags2));
+            listBytes.AddRange(BitConverter.GetBytes((int)geometryFlags));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
@@ -206,7 +203,7 @@ namespace RenderWareFile.Sections
                 listBytes.AddRange(BitConverter.GetBytes(diffuse));
             }
 
-            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
+            if ((geometryFlags & GeometryFlags.rpGEOMETRYNATIVE) != 0)
             {
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterX));
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterY));
@@ -217,7 +214,7 @@ namespace RenderWareFile.Sections
             }
             else
             {
-                if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
+                if ((geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {
@@ -228,7 +225,7 @@ namespace RenderWareFile.Sections
                     }
                 }
 
-                if ((geometryFlags & (GeometryFlags.hasTextCoords | GeometryFlags.hasTextCoords2)) != 0)
+                if ((geometryFlags & (GeometryFlags.rpGEOMETRYTEXTURED | GeometryFlags.rpGEOMETRYTEXTURED2)) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {
@@ -237,7 +234,7 @@ namespace RenderWareFile.Sections
                     }
                 }
 
-                if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
+                if ((geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {

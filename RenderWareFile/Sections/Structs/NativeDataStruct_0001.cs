@@ -9,6 +9,7 @@ namespace RenderWareFile.Sections
     {
         public NativeDataType nativeDataType;
         public NativeDataGC nativeData;
+        public NativeDataPS2 nativeDataPs2;
 
         public byte[] nativeDataData;
 
@@ -40,6 +41,9 @@ namespace RenderWareFile.Sections
                         nativeData = new NativeDataGC(binaryReader, true);
                     }
                     break;
+                case NativeDataType.PS2:
+                    nativeDataPs2 = new NativeDataPS2(binaryReader);
+                    break;
                 default:
                     throw new Exception();
             }
@@ -65,6 +69,9 @@ namespace RenderWareFile.Sections
             {
                 case NativeDataType.GameCube:
                     listBytes.AddRange(nativeData.GetBytes());
+                    break;
+                case NativeDataType.PS2:
+                    listBytes.AddRange(nativeDataPs2.GetBytes());
                     break;
                 default:
                     throw new Exception();

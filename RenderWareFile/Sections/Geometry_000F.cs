@@ -4,23 +4,18 @@ using System.IO;
 
 namespace RenderWareFile.Sections
 {
-    public enum GeometryFlags : short
+    public enum GeometryFlags : int
     {
         none = 0x0000,
-        isTristrip = 0x0001,
-        hasVertexPositions = 0x0002,
-        hasTextCoords = 0x0004,
-        hasVertexColors = 0x0008,
-        hasNormals = 0x0010,
-        hasLights = 0x0020,
-        modeulateMaterialColor = 0x00040,
-        hasTextCoords2 = 0x0080
-    }
-
-    public enum GeometryFlags2 : short
-    {
-        none = 0x0000,
-        isNativeGeometry = 0x0100
+        rpGEOMETRYTRISTRIP = 0x0001,
+        rpGEOMETRYPOSITIONS = 0x0002,
+        rpGEOMETRYTEXTURED = 0x0004,
+        rpGEOMETRYPRELIT = 0x0008,
+        rpGEOMETRYNORMALS = 0x0010,
+        rpGEOMETRYLIGHTS = 0x0020,
+        rpGEOMETRYMODULATEMATERIALCOLOR = 0x00040,
+        rpGEOMETRYTEXTURED2 = 0x0080,
+        rpGEOMETRYNATIVE = 0x01000000
     }
 
     public class Geometry_000F : RWSection

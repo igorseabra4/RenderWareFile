@@ -1,4 +1,6 @@
-﻿namespace RenderWareFile
+﻿using System.IO;
+
+namespace RenderWareFile
 {
     public struct Vertex2
     {
@@ -9,6 +11,12 @@
         {
             X = a;
             Y = b;
+        }
+
+        public Vertex2(BinaryReader reader)
+        {
+            X = reader.ReadSingle();
+            Y = reader.ReadSingle();
         }
     }
 }
