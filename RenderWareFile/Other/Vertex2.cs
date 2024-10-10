@@ -13,6 +13,8 @@ namespace RenderWareFile
             Y = b;
         }
 
+        public Vertex2(double x, double y) : this((float)x, (float)y) { }
+
         public Vertex2(BinaryReader reader)
         {
             X = reader.ReadSingle();

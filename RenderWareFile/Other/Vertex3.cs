@@ -15,6 +15,8 @@ namespace RenderWareFile
             Z = c;
         }
 
+        public Vertex3(double x, double y, double z) : this((float)x, (float)y, (float)z) { }
+
         public Vertex3(BinaryReader reader)
         {
             X = reader.ReadSingle();
