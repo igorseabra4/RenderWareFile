@@ -43,10 +43,10 @@ namespace RenderWareFile.Sections.Structs.PS2
             Height = reader.ReadUInt32();
             Depth = reader.ReadUInt32();
 
+            ushort rasterFormat = reader.ReadUInt16();
+            RasterFormat = (TextureRasterFormat)(rasterFormat >> 8);
+            PrivateFlags = (byte)(rasterFormat & 0xff);
             SkyRasterVersion = reader.ReadUInt16();
-            short rasterFormat = reader.ReadInt16();
-            RasterFormat = (TextureRasterFormat)(rasterFormat & 0xFF);
-            PrivateFlags = (byte)(rasterFormat >> 8);
             TEX0 = reader.ReadUInt64();
             TEX1 = reader.ReadUInt64();
             MipTbp1 = reader.ReadUInt64();
@@ -72,9 +72,9 @@ namespace RenderWareFile.Sections.Structs.PS2
             listBytes.AddRange(BitConverter.GetBytes(Width));
             listBytes.AddRange(BitConverter.GetBytes(Height));
             listBytes.AddRange(BitConverter.GetBytes(Depth));
-            listBytes.AddRange(BitConverter.GetBytes(SkyRasterVersion));
-            listBytes.Add((byte)RasterFormat);
             listBytes.Add(PrivateFlags);
+            listBytes.Add((byte)RasterFormat);
+            listBytes.AddRange(BitConverter.GetBytes(SkyRasterVersion));
             listBytes.AddRange(BitConverter.GetBytes(TEX0));
             listBytes.AddRange(BitConverter.GetBytes(TEX1));
             listBytes.AddRange(BitConverter.GetBytes(MipTbp1));

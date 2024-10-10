@@ -30,7 +30,7 @@ namespace RenderWareFile.Sections
                 throw new Exception(textureNativeStruct.textureName + ": " + ex.Message, ex);
             }
 
-            if (textureNativeStruct.platformType == 0x325350)
+            if (textureNativeStruct.platformType == TexturePlatformID.PS2)
             {
                 binaryReader.ReadInt32();
                 textureNativeStruct.textureName = new String_0002().Read(binaryReader).stringString;
@@ -75,7 +75,7 @@ namespace RenderWareFile.Sections
 
             listBytes.AddRange(textureNativeStruct.GetBytes(fileVersion));
 
-            if (textureNativeStruct.platformType == 0x325350)
+            if (textureNativeStruct.platformType == TexturePlatformID.PS2)
             {
                 listBytes.AddRange(new String_0002(textureNativeStruct.textureName).GetBytes(fileVersion));
                 listBytes.AddRange(new String_0002(textureNativeStruct.alphaName).GetBytes(fileVersion));

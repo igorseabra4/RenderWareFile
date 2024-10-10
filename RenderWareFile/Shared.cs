@@ -29,6 +29,12 @@ namespace RenderWareFile
             return BitConverter.ToInt32(new byte[] { a[3], a[2], a[1], a[0] }, 0);
         }
 
+        public static uint Switch(uint f)
+        {
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToUInt32(new byte[] { a[3], a[2], a[1], a[0] }, 0);
+        }
+
         public static short Switch(short f)
         {
             byte[] a = BitConverter.GetBytes(f);
