@@ -33,16 +33,46 @@ namespace RenderWareFile.Sections
     public class Vertex3Declaration : Declaration
     {
         public List<Vertex3> entryList;
+
+        public Vertex3Declaration() { }
+        public Vertex3Declaration(Vertex3[] entries, bool isVertices)
+        {
+            declarationType = isVertices ? Declarations.Vertex : Declarations.Normal;
+            sizeOfEntry = 0xC;
+            byteType = entries.Length > 254 ? ByteTypes.TwoBytes : ByteTypes.OneByte;
+            unknown2 = 0;
+            this.entryList = entries.ToList();
+        }
     }
 
     public class Vertex2Declaration : Declaration
     {
         public List<Vertex2> entryList;
+
+        public Vertex2Declaration() { }
+        public Vertex2Declaration(Vertex2[] entries, bool isTex2)
+        {
+            declarationType = isTex2 ? Declarations.TextCoord2 : Declarations.TextCoord;
+            sizeOfEntry = 0x8;
+            byteType = entries.Length > 254 ? ByteTypes.TwoBytes : ByteTypes.OneByte;
+            unknown2 = 0;
+            this.entryList = entries.ToList();
+        }
     }
 
     public class ColorDeclaration : Declaration
     {
         public List<Color> entryList;
+
+        public ColorDeclaration() { }
+        public ColorDeclaration(Color[] entries)
+        {
+            declarationType = Declarations.Color;
+            sizeOfEntry = 0x4;
+            byteType = entries.Length > 254 ? ByteTypes.TwoBytes : ByteTypes.OneByte;
+            unknown2 = 0;
+            this.entryList = entries.ToList();
+        }
     }
 
     public class TriangleDeclaration
@@ -70,6 +100,8 @@ namespace RenderWareFile.Sections
         public int unknown2;
         public Declaration[] declarations;
         public TriangleDeclaration[] triangleDeclarations;
+
+        public NativeDataGC() { }
 
         public NativeDataGC(BinaryReader binaryReader, bool fixFlag)
         {
