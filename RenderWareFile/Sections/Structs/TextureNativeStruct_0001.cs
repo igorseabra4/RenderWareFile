@@ -29,13 +29,13 @@ namespace RenderWareFile.Sections
         }
         public TextureAddressMode addressModeU
         {
-            get => (TextureAddressMode)(id & 0xF000);
-            set { id = (id & ~0xF000) | ((int)value & 0xF000); }
+            get => (TextureAddressMode)((id & 0xF000) >> 12);
+            set { id = (id & ~0xF000) | ((int)value << 12); }
         }
         public TextureAddressMode addressModeV
         {
-            get => (TextureAddressMode)(id & 0xF00);
-            set { id = (id & ~0xF00) | ((int)value & 0xF00); }
+            get => (TextureAddressMode)((id & 0xF00) >> 8);
+            set { id = (id & ~0xF00) | ((int)value << 8); }
         }
         public string textureName;
         public string alphaName;
@@ -215,7 +215,7 @@ namespace RenderWareFile.Sections
             sectionIdentifier = Section.Struct;
 
             listBytes.AddRange(BitConverter.GetBytes((int)platformType));
-            listBytes.AddRange(BitConverter.GetBytes(id));
+            listBytes.AddRange(platformType == TexturePlatformID.GameCube ? BitConverter.GetBytes(id).Reverse() : BitConverter.GetBytes(id));
 
             switch (platformType)
             {
