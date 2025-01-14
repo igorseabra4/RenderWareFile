@@ -30,8 +30,8 @@ namespace RenderWareFile.Sections
         public float sphereCenterY;
         public float sphereCenterZ;
         public float sphereRadius;
-        public int unknown1;
-        public int unknown2;
+        public int hasVertices;
+        public int hasNormals;
 
         public Color[] vertexColors;
         public Vertex2[] textCoords;
@@ -75,8 +75,8 @@ namespace RenderWareFile.Sections
                 sphereCenterY = binaryReader.ReadSingle();
                 sphereCenterZ = binaryReader.ReadSingle();
                 sphereRadius = binaryReader.ReadSingle();
-                unknown1 = binaryReader.ReadInt32();
-                unknown2 = binaryReader.ReadInt32();
+                hasVertices = binaryReader.ReadInt32();
+                hasNormals = binaryReader.ReadInt32();
 
                 return this;
             }
@@ -209,8 +209,8 @@ namespace RenderWareFile.Sections
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterY));
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterZ));
                 listBytes.AddRange(BitConverter.GetBytes(sphereRadius));
-                listBytes.AddRange(BitConverter.GetBytes(unknown1));
-                listBytes.AddRange(BitConverter.GetBytes(unknown2));
+                listBytes.AddRange(BitConverter.GetBytes(hasVertices));
+                listBytes.AddRange(BitConverter.GetBytes(hasNormals));
             }
             else
             {

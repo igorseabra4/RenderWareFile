@@ -291,20 +291,22 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(edgeLod).Reverse());
             listBytes.AddRange(BitConverter.GetBytes(lodBias).Reverse());
 
+            textureName += "\0";
             for (int i = 0; i < 32; i++)
             {
                 if (i < textureName.Length)
                     listBytes.Add((byte)textureName[i]);
                 else
-                    listBytes.Add(0);
+                    listBytes.Add(0xdd);
             }
 
+            alphaName += "\0";
             for (int i = 0; i < 32; i++)
             {
                 if (i < alphaName.Length)
                     listBytes.Add((byte)alphaName[i]);
                 else
-                    listBytes.Add(0);
+                    listBytes.Add(0xdd);
             }
 
             listBytes.AddRange(BitConverter.GetBytes((int)rasterFormatFlags).Reverse());
