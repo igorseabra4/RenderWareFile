@@ -16,7 +16,7 @@ namespace RenderWareFile.Sections
         }
     }
 
-    public enum SectorType : byte
+    public enum SectorAxis : byte
     {
         PositiveX = 0x00,
         NegativeX = 0x01,
@@ -28,7 +28,7 @@ namespace RenderWareFile.Sections
 
     public class Sector
     {
-        public SectorType type;
+        public SectorAxis type;
         public byte triangleAmount;
         public ushort referenceIndex;
         public float splitPosition;
@@ -73,7 +73,7 @@ namespace RenderWareFile.Sections
                 splitArray[i] = new Split();
                 splitArray[i].negativeSector = new Sector
                 {
-                    type = (SectorType)binaryReader.ReadByte(),
+                    type = (SectorAxis)binaryReader.ReadByte(),
                     triangleAmount = binaryReader.ReadByte(),
                     referenceIndex = binaryReader.ReadUInt16(),
                     splitPosition = binaryReader.ReadSingle()
@@ -81,7 +81,7 @@ namespace RenderWareFile.Sections
 
                 splitArray[i].positiveSector = new Sector
                 {
-                    type = (SectorType)binaryReader.ReadByte(),
+                    type = (SectorAxis)binaryReader.ReadByte(),
                     triangleAmount = binaryReader.ReadByte(),
                     referenceIndex = binaryReader.ReadUInt16(),
                     splitPosition = binaryReader.ReadSingle()

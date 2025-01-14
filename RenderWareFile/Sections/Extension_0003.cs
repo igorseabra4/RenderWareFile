@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -22,7 +23,17 @@ namespace RenderWareFile.Sections
                 Section currentSection = (Section)binaryReader.ReadInt32();
                 if (currentSection == Section.BinMeshPLG) extensionSectionList.Add(new BinMeshPLG_050E().Read(binaryReader));
                 else if (currentSection == Section.NativeDataPLG) extensionSectionList.Add(new NativeDataPLG_0510().Read(binaryReader));
-                else if (currentSection == Section.CollisionPLG && ReadFileMethods.isShadow) extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
+                else if (currentSection == Section.CollisionPLG)
+                {
+                    binaryReader.BaseStream.Position += 8;
+                    int version = binaryReader.ReadInt32();
+                    binaryReader.BaseStream.Position -= 12;
+
+                    if (version >= 0x36001)
+                        extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
+                    else
+                        extensionSectionList.Add(new CollisionPLG_011D_Pre36001().Read(binaryReader));
+                }
                 else if (currentSection == Section.UserDataPLG) extensionSectionList.Add(new UserDataPLG_011F().Read(binaryReader));
                 else if (currentSection == Section.MaterialEffectsPLG) extensionSectionList.Add(new MaterialEffectsPLG_0120().Read(binaryReader));
                 else extensionSectionList.Add(new GenericSection().Read(binaryReader, currentSection));
