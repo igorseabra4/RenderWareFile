@@ -6,72 +6,96 @@ using static RenderWareFile.Shared;
 
 namespace RenderWareFile.Sections
 {
-    public enum Declarations : byte
+    public enum rwGCNVertexAttribute : byte
     {
-        Vertex = 0x09,
-        Normal = 0x0A,
-        Color = 0x0B,
-        TextCoord = 0x0D,
-        TextCoord2 = 0x0E
+        rwGCNVA_PNMTXIDX = 0x0,
+        rwGCNVA_TEX0MTXIDX = 0x1,
+        rwGCNVA_TEX1MTXIDX = 0x2,
+        rwGCNVA_TEX2MTXIDX = 0x3,
+        rwGCNVA_TEX3MTXIDX = 0x4,
+        rwGCNVA_TEX4MTXIDX = 0x5,
+        rwGCNVA_TEX5MTXIDX = 0x6,
+        rwGCNVA_TEX6MTXIDX = 0x7,
+        rwGCNVA_TEX7MTXIDX = 0x8,
+        rwGCNVA_POS = 0x09,
+        rwGCNVA_NRM = 0x0A,
+        rwGCNVA_CLR0 = 0x0B,
+        rwGCNVA_CLR1 = 0x0C,
+        rwGCNVA_TEX0 = 0x0D,
+        rwGCNVA_TEX1 = 0x0E,
+        rwGCNVA_TEX2 = 0xF,
+        rwGCNVA_TEX3 = 0x10,
+        rwGCNVA_TEX4 = 0x11,
+        rwGCNVA_TEX5 = 0x12,
+        rwGCNVA_TEX6 = 0x13,
+        rwGCNVA_TEX7 = 0x14,
+        rwGCNVA_NBT = 0x19,
+        rwGCNVA_MAX_ATTR = 0x1A,
+        rwGCNVA_NULL = 0xFF,
     }
 
-    public enum ByteTypes : byte
+    public enum rwGCNAttrType : byte
     {
-        OneByte = 0x02,
-        TwoBytes = 0x03
+        NONE = 0x0,
+        DIRECT = 0x01,
+        INDEX8 = 0x02,
+        INDEX16 = 0x03
     }
 
-    public abstract class Declaration
+    public enum GXPrimitive : byte
+    {
+        GX_POINTS = 0xB8,
+        GX_LINES = 0xA8,
+        GX_LINESTRIP = 0xB0,
+        GX_TRIANGLES = 0x90,
+        GX_TRIANGLESTRIP = 0x98,
+        GX_TRIANGLEFAN = 0xA0,
+        GX_QUADS = 0x80
+    }
+
+    public abstract class VertexAttribute
     {
         public int startOffset;
-        public Declarations declarationType;
-        public byte sizeOfEntry;
-        public ByteTypes byteType;
-        public byte unknown2;
+        public rwGCNVertexAttribute attr;
+        public byte stride;
+        public rwGCNAttrType indexType;
+        public byte pad;
     }
 
-    public class Vertex3Declaration : Declaration
+    public class VertexAttribute<T> : VertexAttribute
     {
-        public List<Vertex3> entryList;
+        public List<T> entries { get; set; }
 
-        public Vertex3Declaration() { }
-        public Vertex3Declaration(Vertex3[] entries, bool isVertices)
+        public VertexAttribute(int startOffset, rwGCNVertexAttribute attr, byte stride, rwGCNAttrType indexType, byte pad = 0)
         {
-            declarationType = isVertices ? Declarations.Vertex : Declarations.Normal;
-            sizeOfEntry = 0xC;
-            byteType = entries.Length > 254 ? ByteTypes.TwoBytes : ByteTypes.OneByte;
-            unknown2 = 0;
-            this.entryList = entries.ToList();
+            this.startOffset = startOffset;
+            this.attr = attr;
+            this.stride = stride;
+            this.indexType = indexType;
+            this.pad = pad;
         }
-    }
 
-    public class Vertex2Declaration : Declaration
-    {
-        public List<Vertex2> entryList;
-
-        public Vertex2Declaration() { }
-        public Vertex2Declaration(Vertex2[] entries, bool isTex2)
+        public VertexAttribute(T[] entries, rwGCNVertexAttribute attr)
         {
-            declarationType = isTex2 ? Declarations.TextCoord2 : Declarations.TextCoord;
-            sizeOfEntry = 0x8;
-            byteType = entries.Length > 254 ? ByteTypes.TwoBytes : ByteTypes.OneByte;
-            unknown2 = 0;
-            this.entryList = entries.ToList();
-        }
-    }
+            this.entries = entries.ToList();
+            this.attr = attr;
 
-    public class ColorDeclaration : Declaration
-    {
-        public List<Color> entryList;
-
-        public ColorDeclaration() { }
-        public ColorDeclaration(Color[] entries)
-        {
-            declarationType = Declarations.Color;
-            sizeOfEntry = 0x4;
-            byteType = entries.Length > 254 ? ByteTypes.TwoBytes : ByteTypes.OneByte;
-            unknown2 = 0;
-            this.entryList = entries.ToList();
+            switch (attr)
+            {
+                case rwGCNVertexAttribute.rwGCNVA_POS:
+                case rwGCNVertexAttribute.rwGCNVA_NRM:
+                    this.stride = 0xC;
+                    break;
+                case rwGCNVertexAttribute.rwGCNVA_CLR0:
+                case rwGCNVertexAttribute.rwGCNVA_CLR1:
+                    this.stride = 0x4;
+                    break;
+                case rwGCNVertexAttribute.rwGCNVA_TEX0:
+                case rwGCNVertexAttribute.rwGCNVA_TEX1:
+                    this.stride = 0x8;
+                    break;
+            }
+            this.indexType = entries.Length <= 255 ? rwGCNAttrType.INDEX8 : rwGCNAttrType.INDEX16;
         }
     }
 
@@ -79,87 +103,63 @@ namespace RenderWareFile.Sections
     {
         public int startOffset;
         public int size;
-        public List<TriangleList> TriangleListList;
-
+        public List<TriangleStrip> strips;
         public int MaterialIndex;
     }
 
-    public class TriangleList
+    public class TriangleStrip
     {
-        public byte setting;
-        public byte setting2;
-        public byte entryAmount;
-
-        public List<int[]> entries;
+        public GXPrimitive primitive;
+        public short numIndices;
+        public List<ushort[]> indices;
     }
 
     public class NativeDataGC
     {
-        public short unknown1;
-        public short meshIndex;
-        public int unknown2;
-        public Declaration[] declarations;
-        public TriangleDeclaration[] triangleDeclarations;
+        public short token;
+        public short serialNumber;
+        public int flags;
+        public VertexAttribute[] attr;
+        public TriangleDeclaration[] displayList;
 
         public NativeDataGC() { }
 
         public NativeDataGC(BinaryReader binaryReader, bool fixFlag)
         {
-            int headerLenght = binaryReader.ReadInt32(); // counting from after dataLenght
-            int dataLenght = binaryReader.ReadInt32(); // counting from after headerEndPosition
+            int headerLength = binaryReader.ReadInt32();
+            int dataLength = binaryReader.ReadInt32();
 
             long nativeDataStart = binaryReader.BaseStream.Position; // from here the file is little endian
 
-            unknown1 = Switch(binaryReader.ReadInt16());
-            meshIndex = Switch(binaryReader.ReadInt16());
-            unknown2 = Switch(binaryReader.ReadInt32());
-            var declarationAmount = Switch(binaryReader.ReadInt32());
+            token = Switch(binaryReader.ReadInt16());
+            serialNumber = Switch(binaryReader.ReadInt16());
+            flags = Switch(binaryReader.ReadInt32());
+            var numAttrArrays = Switch(binaryReader.ReadInt32());
 
-            declarations = new Declaration[declarationAmount];
-            for (int i = 0; i < declarationAmount; i++)
+            attr = new VertexAttribute[numAttrArrays];
+            for (int i = 0; i < numAttrArrays; i++)
             {
                 var startOffset = Switch(binaryReader.ReadInt32());
-                var declarationType = (Declarations)binaryReader.ReadByte();
-                var sizeOfEntry = binaryReader.ReadByte();
-                var byteType = (ByteTypes)binaryReader.ReadByte();
-                var unknown2 = binaryReader.ReadByte();
+                var attr = (rwGCNVertexAttribute)binaryReader.ReadByte();
+                var stride = binaryReader.ReadByte();
+                var indexType = (rwGCNAttrType)binaryReader.ReadByte();
+                var pad = binaryReader.ReadByte();
 
-                switch (declarationType)
+                switch (attr)
                 {
-                    case Declarations.Vertex:
-                    case Declarations.Normal:
-                        declarations[i] = new Vertex3Declaration()
-                        {
-                            startOffset = startOffset,
-                            declarationType = declarationType,
-                            sizeOfEntry = sizeOfEntry,
-                            byteType = byteType,
-                            unknown2 = unknown2,
-                        };
+                    case rwGCNVertexAttribute.rwGCNVA_POS:
+                    case rwGCNVertexAttribute.rwGCNVA_NRM:
+                        this.attr[i] = new VertexAttribute<Vertex3>(startOffset, attr, stride, indexType, pad);
                         break;
-                    case Declarations.TextCoord:
-                    case Declarations.TextCoord2:
-                        declarations[i] = new Vertex2Declaration()
-                        {
-                            startOffset = startOffset,
-                            declarationType = declarationType,
-                            sizeOfEntry = sizeOfEntry,
-                            byteType = byteType,
-                            unknown2 = unknown2,
-                        };
+                    case rwGCNVertexAttribute.rwGCNVA_TEX0:
+                    case rwGCNVertexAttribute.rwGCNVA_TEX1:
+                        this.attr[i] = new VertexAttribute<Vertex2>(startOffset, attr, stride, indexType, pad);
                         break;
-                    case Declarations.Color:
-                        declarations[i] = new ColorDeclaration()
-                        {
-                            startOffset = startOffset,
-                            declarationType = declarationType,
-                            sizeOfEntry = sizeOfEntry,
-                            byteType = byteType,
-                            unknown2 = unknown2,
-                        };
+                    case rwGCNVertexAttribute.rwGCNVA_CLR0:
+                        this.attr[i] = new VertexAttribute<Color>(startOffset, attr, stride, indexType, pad);
                         break;
                     default:
-                        throw new NotSupportedException($"Unknown declaration type: {declarationType} at {binaryReader.BaseStream.Position}");
+                        throw new NotSupportedException($"Unknown declaration type: {attr} at {binaryReader.BaseStream.Position}");
                 }
             }
 
@@ -172,106 +172,105 @@ namespace RenderWareFile.Sections
                     startOffset = Switch(binaryReader.ReadInt32()),
                     size = Switch(binaryReader.ReadInt32()),
                     MaterialIndex = i,
-                    TriangleListList = new List<TriangleList>()
+                    strips = new List<TriangleStrip>()
                 });
             }
 
-            triangleDeclarations = list.ToArray();
+            displayList = list.ToArray();
 
             long headerEndPosition = binaryReader.BaseStream.Position;
 
-            for (int i = 0; i < triangleDeclarations.Length; i++)
+            for (int i = 0; i < displayList.Length; i++)
             {
-                binaryReader.BaseStream.Position = headerEndPosition + triangleDeclarations[i].startOffset;
+                binaryReader.BaseStream.Position = headerEndPosition + displayList[i].startOffset;
 
-                while (!(binaryReader.BaseStream.Position == headerEndPosition + triangleDeclarations[i].startOffset + triangleDeclarations[i].size))
+                while (!(binaryReader.BaseStream.Position == headerEndPosition + displayList[i].startOffset + displayList[i].size))
                 {
-                    byte setting = binaryReader.ReadByte();
+                    GXPrimitive prim = (GXPrimitive)binaryReader.ReadByte();
 
-                    if (setting == 0) continue;
-                    else if (setting != 0x98) throw new Exception();
+                    if (prim == 0) continue;
+                    else if (prim != GXPrimitive.GX_TRIANGLESTRIP) throw new Exception();
 
-                    byte setting2 = binaryReader.ReadByte();
+                    short numIndices = Switch(binaryReader.ReadInt16());
+                    List<ushort[]> indices = new List<ushort[]>();
 
-                    byte entryAmount = binaryReader.ReadByte();
-                    List<int[]> entries = new List<int[]>();
-
-                    for (int j = 0; j < entryAmount; j++)
+                    for (int j = 0; j < numIndices; j++)
                     {
-                        List<int> objectList = new List<int>();
+                        List<ushort> vertexAttribute = new List<ushort>();
 
                         if (fixFlag) binaryReader.BaseStream.Position += 1;
 
-                        for (int k = 0; k < declarationAmount; k++)
+                        for (int k = 0; k < numAttrArrays; k++)
                         {
-                            if (declarations[k].byteType == ByteTypes.OneByte)
-                                objectList.Add(binaryReader.ReadByte());
-                            else if (declarations[k].byteType == ByteTypes.TwoBytes)
-                                objectList.Add(Switch(binaryReader.ReadInt16()));
-                            else throw new Exception();
+                            switch (attr[k].indexType)
+                            {
+                                case rwGCNAttrType.INDEX8:
+                                    vertexAttribute.Add(binaryReader.ReadByte());
+                                    break;
+                                case rwGCNAttrType.INDEX16:
+                                    vertexAttribute.Add(Switch(binaryReader.ReadUInt16()));
+                                    break;
+                                default:
+                                    throw new Exception("Unknown index type");
+                            }
                         }
-
-                        entries.Add(objectList.ToArray());
+                        indices.Add(vertexAttribute.ToArray());
                     }
 
-                    triangleDeclarations[i].TriangleListList.Add(new TriangleList() { setting = setting, setting2 = setting2, entryAmount = entryAmount, entries = entries });
+                    displayList[i].strips.Add(new TriangleStrip()
+                    { 
+                        primitive = prim,
+                        numIndices = numIndices, 
+                        indices = indices
+                    });
                 }
             }
 
-            for (int d = 0; d < declarations.Count(); d++)
+            for (int d = 0; d < attr.Count(); d++)
             {
-                binaryReader.BaseStream.Position = headerEndPosition + declarations[d].startOffset;
+                binaryReader.BaseStream.Position = headerEndPosition + attr[d].startOffset;
 
-                byte[] data = d + 1 < declarations.Length ?
-                    binaryReader.ReadBytes(declarations[d + 1].startOffset - declarations[d].startOffset) :
-                    binaryReader.ReadBytes(dataLenght - declarations[d].startOffset);
+                byte[] data = d + 1 < attr.Length ?
+                    binaryReader.ReadBytes(attr[d + 1].startOffset - attr[d].startOffset) :
+                    binaryReader.ReadBytes(dataLength - attr[d].startOffset);
 
-                if (declarations[d].declarationType == Declarations.Vertex || declarations[d].declarationType == Declarations.Normal)
+                switch (attr[d].attr)
                 {
-                    var dec = (Vertex3Declaration)declarations[d];
-                    dec.entryList = new List<Vertex3>();
-                    for (int i = 0; i + 11 < data.Count(); i += 12)
-                    {
-                        Vertex3 v = new Vertex3(
-                            BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
-                            BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0),
-                            BitConverter.ToSingle(new byte[] { data[i + 11], data[i + 10], data[i + 9], data[i + 8] }, 0));
-                        dec.entryList.Add(v);
-                    }
-                }
-                else if (declarations[d].declarationType == Declarations.Color)
-                {
-                    var dec = (ColorDeclaration)declarations[d];
-                    dec.entryList = new List<Color>();
-                    for (int i = 0; i < data.Count(); i += 0x4)
-                    {
-                        Color v = new Color(new byte[] { data[i], data[i + 1], data[i + 2], data[i + 3] });
-                        dec.entryList.Add(v);
-                    }
-                }
-                else if (declarations[d].declarationType == Declarations.TextCoord)
-                {
-                    var dec = (Vertex2Declaration)declarations[d];
-                    dec.entryList = new List<Vertex2>();
-                    for (int i = 0; i < data.Count(); i += 0x8)
-                    {
-                        Vertex2 v = new Vertex2(
-                            BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
-                            BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0));
-                        dec.entryList.Add(v);
-                    }
-                }
-                else if (declarations[d].declarationType == Declarations.TextCoord2)
-                {
-                    var dec = (Vertex2Declaration)declarations[d];
-                    dec.entryList = new List<Vertex2>();
-                    for (int i = 0; i < data.Count(); i += 0x8)
-                    {
-                        Vertex2 v = new Vertex2(
-                            BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
-                            BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0));
-                        dec.entryList.Add(v);
-                    }
+                    case rwGCNVertexAttribute.rwGCNVA_POS:
+                    case rwGCNVertexAttribute.rwGCNVA_NRM:
+                        var ver3 = (VertexAttribute<Vertex3>)attr[d];
+                        ver3.entries = new List<Vertex3>();
+                        for (int i = 0; i + 11 < data.Count(); i += 12)
+                        {
+                            Vertex3 v = new Vertex3(
+                                BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
+                                BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0),
+                                BitConverter.ToSingle(new byte[] { data[i + 11], data[i + 10], data[i + 9], data[i + 8] }, 0));
+                            ver3.entries.Add(v);
+                        }
+                        break;
+                    case rwGCNVertexAttribute.rwGCNVA_CLR0:
+                    case rwGCNVertexAttribute.rwGCNVA_CLR1:
+                        var clr = (VertexAttribute<Color>)attr[d];
+                        clr.entries = new List<Color>();
+                        for (int i = 0; i < data.Count(); i += 0x4)
+                        {
+                            Color v = new Color(new byte[] { data[i], data[i + 1], data[i + 2], data[i + 3] });
+                            clr.entries.Add(v);
+                        }
+                        break;
+                    case rwGCNVertexAttribute.rwGCNVA_TEX0:
+                    case rwGCNVertexAttribute.rwGCNVA_TEX1:
+                        var ver2 = (VertexAttribute<Vertex2>)attr[d];
+                        ver2.entries = new List<Vertex2>();
+                        for (int i = 0; i < data.Count(); i += 0x8)
+                        {
+                            Vertex2 v = new Vertex2(
+                                BitConverter.ToSingle(new byte[] { data[i + 3], data[i + 2], data[i + 1], data[i] }, 0),
+                                BitConverter.ToSingle(new byte[] { data[i + 7], data[i + 6], data[i + 5], data[i + 4] }, 0));
+                            ver2.entries.Add(v);
+                        }
+                        break;
                 }
             }
         }
@@ -280,24 +279,23 @@ namespace RenderWareFile.Sections
         {
             List<byte> listData = new List<byte>();
 
-            foreach (TriangleDeclaration td in triangleDeclarations)
+            foreach (TriangleDeclaration td in displayList)
             {
                 td.startOffset = listData.Count();
-                foreach (TriangleList tl in td.TriangleListList)
+                foreach (TriangleStrip tl in td.strips)
                 {
-                    listData.Add(tl.setting);
-                    listData.Add(tl.setting2);
-                    tl.entryAmount = (byte)tl.entries.Count();
-                    listData.Add(tl.entryAmount);
+                    listData.Add((byte)tl.primitive);
+                    tl.numIndices = (short)tl.indices.Count();
+                    listData.AddRange(BitConverter.GetBytes(tl.numIndices).Reverse());
 
-                    for (int i = 0; i < tl.entryAmount; i++)
+                    for (int i = 0; i < tl.numIndices; i++)
                     {
-                        for (int j = 0; j < tl.entries[i].Length; j++)
+                        for (int j = 0; j < tl.indices[i].Length; j++)
                         {
-                            if (declarations[j].byteType == ByteTypes.OneByte)
-                                listData.Add((byte)tl.entries[i][j]);
-                            else if (declarations[j].byteType == ByteTypes.TwoBytes)
-                                listData.AddRange(BitConverter.GetBytes((short)tl.entries[i][j]).Reverse());
+                            if (attr[j].indexType == rwGCNAttrType.INDEX8)
+                                listData.Add((byte)tl.indices[i][j]);
+                            else if (attr[j].indexType == rwGCNAttrType.INDEX16)
+                                listData.AddRange(BitConverter.GetBytes((short)tl.indices[i][j]).Reverse());
                         }
                     }
                 }
@@ -308,38 +306,41 @@ namespace RenderWareFile.Sections
                 td.size = listData.Count() - td.startOffset;
             }
 
-            foreach (var d in declarations)
+            foreach (var d in attr)
             {
                 d.startOffset = listData.Count();
-                if (d.declarationType == Declarations.Vertex || d.declarationType == Declarations.Normal)
+                switch (d.attr)
                 {
-                    foreach (var v in ((Vertex3Declaration)d).entryList)
-                    {
-                        listData.AddRange(BitConverter.GetBytes(v.X).Reverse());
-                        listData.AddRange(BitConverter.GetBytes(v.Y).Reverse());
-                        listData.AddRange(BitConverter.GetBytes(v.Z).Reverse());
-                    }
-                    d.sizeOfEntry = 0xC;
-                }
-                else if (d.declarationType == Declarations.Color)
-                {
-                    foreach (var c in ((ColorDeclaration)d).entryList)
-                    {
-                        listData.Add(c.R);
-                        listData.Add(c.G);
-                        listData.Add(c.B);
-                        listData.Add(c.A);
-                    }
-                    d.sizeOfEntry = 0x4;
-                }
-                else if (d.declarationType == Declarations.TextCoord || d.declarationType == Declarations.TextCoord2)
-                {
-                    foreach (var tc in ((Vertex2Declaration)d).entryList)
-                    {
-                        listData.AddRange(BitConverter.GetBytes(tc.X).Reverse());
-                        listData.AddRange(BitConverter.GetBytes(tc.Y).Reverse());
-                    }
-                    d.sizeOfEntry = 0x8;
+                    case rwGCNVertexAttribute.rwGCNVA_POS:
+                    case rwGCNVertexAttribute.rwGCNVA_NRM:
+                        foreach (var v in ((VertexAttribute<Vertex3>)d).entries)
+                        {
+                            listData.AddRange(BitConverter.GetBytes(v.X).Reverse());
+                            listData.AddRange(BitConverter.GetBytes(v.Y).Reverse());
+                            listData.AddRange(BitConverter.GetBytes(v.Z).Reverse());
+                        }
+                        d.stride = 0xC;
+                        break;
+                    case rwGCNVertexAttribute.rwGCNVA_CLR0:
+                    case rwGCNVertexAttribute.rwGCNVA_CLR1:
+                        foreach (var c in ((VertexAttribute<Color>)d).entries)
+                        {
+                            listData.Add(c.R);
+                            listData.Add(c.G);
+                            listData.Add(c.B);
+                            listData.Add(c.A);
+                        }
+                        d.stride = 0x4;
+                        break;
+                    case rwGCNVertexAttribute.rwGCNVA_TEX0:
+                    case rwGCNVertexAttribute.rwGCNVA_TEX1:
+                        foreach (var tc in ((VertexAttribute<Vertex2>)d).entries)
+                        {
+                            listData.AddRange(BitConverter.GetBytes(tc.X).Reverse());
+                            listData.AddRange(BitConverter.GetBytes(tc.Y).Reverse());
+                        }
+                        d.stride = 0x8;
+                        break;
                 }
 
                 while (listData.Count() % 0x20 != 0)
@@ -347,34 +348,54 @@ namespace RenderWareFile.Sections
             }
 
             int dataLenght = listData.Count();
-            int headerLenght = 12 + 8 * declarations.Length + 8 * triangleDeclarations.Length;
+            int headerLenght = 12 + 8 * attr.Length + 8 * displayList.Length;
 
             List<byte> list = new List<byte>();
             list.AddRange(BitConverter.GetBytes(headerLenght));
             list.AddRange(BitConverter.GetBytes(dataLenght));
 
-            list.AddRange(BitConverter.GetBytes(unknown1).Reverse());
-            list.AddRange(BitConverter.GetBytes(meshIndex).Reverse());
-            list.AddRange(BitConverter.GetBytes(unknown2).Reverse());
-            list.AddRange(BitConverter.GetBytes(declarations.Length).Reverse());
+            list.AddRange(BitConverter.GetBytes(token).Reverse());
+            list.AddRange(BitConverter.GetBytes(serialNumber).Reverse());
+            list.AddRange(BitConverter.GetBytes(flags).Reverse());
+            list.AddRange(BitConverter.GetBytes(attr.Length).Reverse());
 
-            for (int i = 0; i < declarations.Length; i++)
+            for (int i = 0; i < attr.Length; i++)
             {
-                list.AddRange(BitConverter.GetBytes(declarations[i].startOffset).Reverse());
-                list.Add((byte)declarations[i].declarationType);
-                list.Add(declarations[i].sizeOfEntry);
-                list.Add((byte)declarations[i].byteType);
-                list.Add(declarations[i].unknown2);
+                list.AddRange(BitConverter.GetBytes(attr[i].startOffset).Reverse());
+                list.Add((byte)attr[i].attr);
+                list.Add(attr[i].stride);
+                list.Add((byte)attr[i].indexType);
+                list.Add(attr[i].pad);
             }
 
-            for (int i = 0; i < triangleDeclarations.Length; i++)
+            for (int i = 0; i < displayList.Length; i++)
             {
-                list.AddRange(BitConverter.GetBytes(triangleDeclarations[i].startOffset).Reverse());
-                list.AddRange(BitConverter.GetBytes(triangleDeclarations[i].size).Reverse());
+                list.AddRange(BitConverter.GetBytes(displayList[i].startOffset).Reverse());
+                list.AddRange(BitConverter.GetBytes(displayList[i].size).Reverse());
             }
 
             list.AddRange(listData);
             return list;
+        }
+
+        public List<Vertex3> GetLinearVertices()
+        {
+            return attr.OfType<VertexAttribute<Vertex3>>().Where(a => a.attr == rwGCNVertexAttribute.rwGCNVA_POS).FirstOrDefault()?.entries;
+        }
+
+        public List<Vertex3> GetLinearNormals()
+        {
+            return attr.OfType<VertexAttribute<Vertex3>>().Where(a => a.attr == rwGCNVertexAttribute.rwGCNVA_NRM).FirstOrDefault()?.entries;
+        }
+
+        public List<Vertex2> GetLinearTexCoords()
+        {
+            return attr.OfType<VertexAttribute<Vertex2>>().Where(a => a.attr == rwGCNVertexAttribute.rwGCNVA_TEX0).FirstOrDefault()?.entries;
+        }
+
+        public List<Color> GetLinearVertexColors()
+        {
+            return attr.OfType<VertexAttribute<Color>>().Where(a => a.attr == rwGCNVertexAttribute.rwGCNVA_CLR0).FirstOrDefault()?.entries;
         }
     }
 }
