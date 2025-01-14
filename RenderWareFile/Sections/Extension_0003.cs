@@ -12,7 +12,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.Extension;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             long CurrentPosition = binaryReader.BaseStream.Position;
 
@@ -31,7 +31,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Extension;
 

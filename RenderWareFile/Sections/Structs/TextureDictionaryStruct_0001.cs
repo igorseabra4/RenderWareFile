@@ -13,20 +13,30 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
-            textureCount = binaryReader.ReadInt16();
-            unknown = binaryReader.ReadInt16();
+            if (renderWareVersion > (3,5))
+            {
+                textureCount = binaryReader.ReadInt16();
+                unknown = binaryReader.ReadInt16();
+            }
+            else
+                textureCount = (short)binaryReader.ReadUInt32();
 
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.AddRange(BitConverter.GetBytes(textureCount));
-            listBytes.AddRange(BitConverter.GetBytes(unknown));
+            if (fileVersion > (3,5))
+            {
+                listBytes.AddRange(BitConverter.GetBytes(textureCount));
+                listBytes.AddRange(BitConverter.GetBytes(unknown));
+            }
+            else
+                listBytes.AddRange(BitConverter.GetBytes((int)textureCount));
         }
     }
 }

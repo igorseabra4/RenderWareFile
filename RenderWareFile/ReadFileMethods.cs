@@ -42,19 +42,19 @@ namespace RenderWareFile
             }
         }
 
-        public static byte[] ExportRenderWareFile(RWSection RWFile, int version)
+        public static byte[] ExportRenderWareFile(RWSection RWFile, RWVersion version)
         {
             List<byte> list = new List<byte>();
-            list.AddRange(RWFile.GetBytes(version));
+            list.AddRange(RWFile.GetBytes(version.Write()));
 
             return list.ToArray();
         }
 
-        public static byte[] ExportRenderWareFile(RWSection[] RWFile, int version)
+        public static byte[] ExportRenderWareFile(RWSection[] RWFile, RWVersion version)
         {
             List<byte> list = new List<byte>();
             foreach (RWSection i in RWFile)
-                list.AddRange(i.GetBytes(version));
+                list.AddRange(i.GetBytes(version.Write()));
 
             return list.ToArray();
         }

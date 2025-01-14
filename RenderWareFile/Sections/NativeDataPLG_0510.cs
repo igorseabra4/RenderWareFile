@@ -12,7 +12,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.NativeDataPLG;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             Section nativeStructSection = (Section)binaryReader.ReadInt32();
             if (nativeStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
@@ -21,7 +21,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.NativeDataPLG;
             listBytes.AddRange(nativeDataStruct.GetBytes(fileVersion));

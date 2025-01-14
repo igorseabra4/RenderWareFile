@@ -64,7 +64,7 @@ namespace RenderWareFile.Sections.Structs.PS2
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             listBytes.AddRange(BitConverter.GetBytes(1));
             listBytes.AddRange(BitConverter.GetBytes(0x40));

@@ -15,7 +15,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.TextureNative;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             try
             {
@@ -56,7 +56,7 @@ namespace RenderWareFile.Sections
             if (sectionIdentifier != Section.TextureNative) throw new Exception(binaryReader.BaseStream.Position.ToString());
 
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             Section textureNativeStructSection = (Section)binaryReader.ReadInt32();
             if (textureNativeStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
@@ -69,7 +69,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.TextureNative;
 

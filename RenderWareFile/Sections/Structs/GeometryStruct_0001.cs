@@ -45,7 +45,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             if (ReadFileMethods.treatStuffAsByteArray)
             {
@@ -62,7 +62,7 @@ namespace RenderWareFile.Sections
 
             int numTexCoords = (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED) != 0 ? 1 : (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0 ? 2 : ((int)geometryFlags >> 16) & 0xFF;
 
-            if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
+            if (renderWareVersion < (3,4))
             {
                 ambient = binaryReader.ReadSingle();
                 specular = binaryReader.ReadSingle();
@@ -181,7 +181,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
@@ -196,7 +196,7 @@ namespace RenderWareFile.Sections
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
 
-            if (Shared.UnpackLibraryVersion(fileVersion) < 0x34000)
+            if (fileVersion < (3,4,0,0))
             {
                 listBytes.AddRange(BitConverter.GetBytes(ambient));
                 listBytes.AddRange(BitConverter.GetBytes(specular));

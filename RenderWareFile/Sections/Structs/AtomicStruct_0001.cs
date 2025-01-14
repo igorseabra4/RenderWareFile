@@ -23,7 +23,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.Atomic;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             frameIndex = binaryReader.ReadInt32();
             geometryIndex = binaryReader.ReadInt32();
@@ -33,7 +33,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 

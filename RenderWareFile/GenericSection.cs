@@ -11,14 +11,14 @@ namespace RenderWareFile
         {
             sectionIdentifier = section;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             data = binaryReader.ReadBytes(sectionSize);
 
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             listBytes.AddRange(data);
         }

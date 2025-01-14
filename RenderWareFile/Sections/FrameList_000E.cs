@@ -13,7 +13,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.FrameList;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             Section frameListStructSection = (Section)binaryReader.ReadInt32();
             if (frameListStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.ToString());
@@ -30,7 +30,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.FrameList;
 

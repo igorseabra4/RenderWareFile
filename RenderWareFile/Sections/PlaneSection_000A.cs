@@ -14,7 +14,7 @@ namespace RenderWareFile.Sections
         {
             sectionIdentifier = Section.PlaneSector;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             Section planeStructSection = (Section)binaryReader.ReadInt32();
             if (planeStructSection != Section.Struct) throw new Exception();
@@ -45,7 +45,7 @@ namespace RenderWareFile.Sections
             return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.PlaneSector;
 
