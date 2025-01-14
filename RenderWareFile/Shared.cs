@@ -33,6 +33,12 @@ namespace RenderWareFile
             return BitConverter.ToInt16(new byte[] { a[1], a[0] }, 0);
         }
 
+        public static ushort Switch(ushort f)
+        {
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToUInt16(new byte[] { a[1], a[0] }, 0);
+        }
+
         public static float SwitchToggleable(float f)
         {
             return DoNotSwitch ? f : Switch(f);
