@@ -7,8 +7,8 @@ namespace RenderWareFile.Sections
 {
     public struct MipMapEntry
     {
-        public int dataSize;
-        public byte[] data;
+        public int dataSize { get; set; }
+        public byte[] data { get; set; }
 
         public MipMapEntry(int dataSize, byte[] data)
         {
@@ -19,9 +19,9 @@ namespace RenderWareFile.Sections
 
     public class TextureNativeStruct_0001 : RWSection
     {
-        public TexturePlatformID platformType;
+        public TexturePlatformID platformType { get; set; }
 
-        private int id;
+        private int id { get; set; }
         public TextureFilterMode filterMode
         {
             get => (TextureFilterMode)(id & 0xFF);
@@ -37,32 +37,33 @@ namespace RenderWareFile.Sections
             get => (TextureAddressMode)((id & 0xF00) >> 8);
             set { id = (id & ~0xF00) | ((int)value << 8); }
         }
-        public string textureName;
-        public string alphaName;
-        public TextureRasterFormat rasterFormatFlags;
-        public bool hasAlpha;
-        public short width;
-        public short height;
-        public byte bitDepth;
-        public byte mipMapCount;
-        public byte type;
-        public byte compression;
-        public Color[] palette;
-        public MipMapEntry[] mipMaps;
+        public string textureName { get; set; }
+        public string alphaName { get; set; }
+        public TextureRasterFormat rasterFormatFlags { get; set; }
+        public bool hasAlpha { get; set; }
+        public short width { get; set; }
+        public short height { get; set; }
+        public byte bitDepth { get; set; }
+        public byte mipMapCount { get; set; }
+        public byte type { get; set; }
+        public byte compression { get; set; }
+        public Color[] palette { get; set; }
+        public MipMapEntry[] mipMaps { get; set; }
 
         #region Gamecube
-        public uint maxAniso;
-        public int biasClamp;
-        public int edgeLod;
-        public float lodBias;
+        public uint maxAniso { get; set; }
+        public int biasClamp { get; set; }
+        public int edgeLod { get; set; }
+        public float lodBias { get; set; }
         #endregion
 
-        private int totalMipMapDataSize;
+        private int totalMipMapDataSize { get; set; }
 
-        private byte[] sectionData;
-        private long startSectionPosition;
+        private byte[] sectionData { get; set; }
+        private long startSectionPosition { get; set; }
 
-        public TextureNativeStruct_0001 Read(BinaryReader binaryReader)
+        public TextureNativeStruct_0001() { }
+        public TextureNativeStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -83,7 +84,7 @@ namespace RenderWareFile.Sections
                 case TexturePlatformID.GameCube:
                     ReadGameCubeData(binaryReader); break;
                 case TexturePlatformID.PS2:
-                    return this;
+                    return;
                 default:
                     throw new InvalidDataException("Unsupported texture format: " + platformType.ToString());
 
@@ -92,7 +93,7 @@ namespace RenderWareFile.Sections
             if (binaryReader.BaseStream.Position != startSectionPosition + sectionSize)
                 throw new Exception(binaryReader.BaseStream.Position.ToString());
 
-            return this;
+            return;
         }
 
         private void ReadNormalData(BinaryReader binaryReader, int endOfSectionPosition)

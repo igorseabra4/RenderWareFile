@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace RenderWareFile
 {
+    [TypeConverter(typeof(ExpandableObjectConverter))]
     public abstract class RWSection
     {
-        public Section sectionIdentifier;
-        public int sectionSize;
-        public RWVersion renderWareVersion;
+        public Section sectionIdentifier { get; internal set; }
+        public int sectionSize { get; internal set; }
+        public RWVersion renderWareVersion { get; internal set; }
 
         public byte[] GetBytes(int fileVersion)
         {

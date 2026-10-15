@@ -18,8 +18,7 @@ namespace RenderWareFile.Sections
                 if (value)
                 {
                     materialStruct.isTextured = 1;
-                    if (texture == null)
-                        texture = new Texture_0006();
+                    texture ??= new Texture_0006();
                 }
                 else
                 {
@@ -29,7 +28,14 @@ namespace RenderWareFile.Sections
             }
         }
 
-        public Material_0007 Read(BinaryReader binaryReader)
+        public Material_0007(MaterialStruct_0001 materialStruct, Texture_0006 texture, Extension_0003 materialExtension)
+        {
+            this.materialStruct = materialStruct;
+            this.texture = texture;
+            this.materialExtension = materialExtension;
+        }
+
+        public Material_0007(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Material;
             sectionSize = binaryReader.ReadInt32();
@@ -37,20 +43,18 @@ namespace RenderWareFile.Sections
 
             Section materialListStructSection = (Section)binaryReader.ReadInt32();
             if (materialListStructSection != Section.Struct) throw new Exception();
-            materialStruct = new MaterialStruct_0001().Read(binaryReader);
+            materialStruct = new MaterialStruct_0001(binaryReader);
 
             if (materialStruct.isTextured != 0)
             {
                 Section textureSection = (Section)binaryReader.ReadInt32();
                 if (textureSection != Section.Texture) throw new Exception();
-                texture = new Texture_0006().Read(binaryReader);
+                texture = new Texture_0006(binaryReader);
             }
 
             Section materialExtensionSection = (Section)binaryReader.ReadInt32();
             if (materialExtensionSection != Section.Extension) throw new Exception();
-            materialExtension = new Extension_0003().Read(binaryReader);
-
-            return this;
+            materialExtension = new Extension_0003(binaryReader);
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

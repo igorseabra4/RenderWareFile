@@ -6,14 +6,14 @@ namespace RenderWareFile.Sections
 {
     public class PlaneStruct_0001 : RWSection
     {
-        public int type;
-        public float value;
-        public int leftIsAtomic;
-        public int rightIsAtomic;
-        public float leftValue;
-        public float rightValue;
+        public int type { get; set; }
+        public float value { get; set; }
+        public int leftIsAtomic { get; set; }
+        public int rightIsAtomic { get; set; }
+        public float leftValue { get; set; }
+        public float rightValue { get; set; }
 
-        public PlaneStruct_0001 Read(BinaryReader binaryReader)
+        public PlaneStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -25,8 +25,6 @@ namespace RenderWareFile.Sections
             rightIsAtomic = binaryReader.ReadInt32();
             leftValue = binaryReader.ReadSingle();
             rightValue = binaryReader.ReadSingle();
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

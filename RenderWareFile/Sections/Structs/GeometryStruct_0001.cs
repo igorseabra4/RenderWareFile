@@ -6,42 +6,43 @@ namespace RenderWareFile.Sections
 {
     public struct MorphTarget
     {
-        public Vertex3 sphereCenter;
-        public float radius;
-        public int hasVertices;
-        public int hasNormals;
+        public Vertex3 sphereCenter { get; set; }
+        public float radius { get; set; }
+        public int hasVertices { get; set; }
+        public int hasNormals { get; set; }
 
-        public Vertex3[] vertices;
-        public Vertex3[] normals;
+        public Vertex3[] vertices { get; set; }
+        public Vertex3[] normals { get; set; }
     }
 
     public class GeometryStruct_0001 : RWSection
     {
-        public GeometryFlags geometryFlags;
-        public int numTriangles;
-        public int numVertices;
-        public int numMorphTargets;
+        public GeometryFlags geometryFlags { get; set; }
+        public int numTriangles { get; set; }
+        public int numVertices { get; set; }
+        public int numMorphTargets { get; set; }
 
-        public float ambient;
-        public float specular;
-        public float diffuse;
+        public float ambient { get; set; }
+        public float specular { get; set; }
+        public float diffuse { get; set; }
 
-        public float sphereCenterX;
-        public float sphereCenterY;
-        public float sphereCenterZ;
-        public float sphereRadius;
-        public int hasVertices;
-        public int hasNormals;
+        public float sphereCenterX { get; set; }
+        public float sphereCenterY { get; set; }
+        public float sphereCenterZ { get; set; }
+        public float sphereRadius { get; set; }
+        public int hasVertices { get; set; }
+        public int hasNormals { get; set; }
 
-        public Color[] vertexColors;
-        public Vertex2[] textCoords;
-        public Vertex2[] textCoords2;
-        public Triangle[] triangles;
-        public MorphTarget[] morphTargets;
+        public Color[] vertexColors { get; set; }
+        public Vertex2[] textCoords { get; set; }
+        public Vertex2[] textCoords2 { get; set; }
+        public Triangle[] triangles { get; set; }
+        public MorphTarget[] morphTargets { get; set; }
 
-        public byte[] sectionData;
+        public byte[] sectionData { get; set; }
 
-        public GeometryStruct_0001 Read(BinaryReader binaryReader)
+        public GeometryStruct_0001() { }
+        public GeometryStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -50,7 +51,7 @@ namespace RenderWareFile.Sections
             if (ReadFileMethods.treatStuffAsByteArray)
             {
                 sectionData = binaryReader.ReadBytes(sectionSize);
-                return this;
+                return;
             }
 
             long startSectionPosition = binaryReader.BaseStream.Position;
@@ -78,7 +79,7 @@ namespace RenderWareFile.Sections
                 hasVertices = binaryReader.ReadInt32();
                 hasNormals = binaryReader.ReadInt32();
 
-                return this;
+                return;
             }
 
             if ((geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0)
@@ -135,14 +136,13 @@ namespace RenderWareFile.Sections
             morphTargets = new MorphTarget[numMorphTargets];
             for (int i = 0; i < numMorphTargets; i++)
             {
-                MorphTarget m = new MorphTarget();
-
-                m.sphereCenter.X = binaryReader.ReadSingle();
-                m.sphereCenter.Y = binaryReader.ReadSingle();
-                m.sphereCenter.Z = binaryReader.ReadSingle();
-                m.radius = binaryReader.ReadSingle();
-                m.hasVertices = binaryReader.ReadInt32();
-                m.hasNormals = binaryReader.ReadInt32();
+                MorphTarget m = new MorphTarget
+                {
+                    sphereCenter = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle()),
+                    radius = binaryReader.ReadSingle(),
+                    hasVertices = binaryReader.ReadInt32(),
+                    hasNormals = binaryReader.ReadInt32()
+                };
 
                 if (m.hasVertices != 0)
                 {
@@ -177,8 +177,6 @@ namespace RenderWareFile.Sections
 
                 morphTargets[i] = m;
             }
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

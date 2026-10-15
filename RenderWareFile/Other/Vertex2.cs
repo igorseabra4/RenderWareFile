@@ -4,8 +4,8 @@ namespace RenderWareFile
 {
     public struct Vertex2
     {
-        public float X;
-        public float Y;
+        public float X { get; set; }
+        public float Y { get; set; }
 
         public Vertex2(float a, float b)
         {

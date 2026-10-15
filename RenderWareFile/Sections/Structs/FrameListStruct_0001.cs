@@ -4,29 +4,39 @@ using System.IO;
 
 namespace RenderWareFile.Sections
 {
-    public struct Frame
+    public class Frame
     {
-        public Matrix3x3 rotationMatrix;
-        public Vertex3 position;
-        public int parentFrame;
-        public int unknown;
+        public Matrix3x3 rotationMatrix { get; set; }
+        public Vertex3 position { get; set; }
+        public int parentFrame { get; set; }
+        public int unknown { get; set; }
+
+        public Frame(Matrix3x3? rotationMatrix = null, Vertex3? position = null, int parentFrame = -1, int unknown = 0)
+        {
+            this.rotationMatrix = rotationMatrix ?? Matrix3x3.Identity;
+            this.position = position ?? new Vertex3();
+            this.parentFrame = parentFrame;
+            this.unknown = unknown;
+        }
     }
 
     public class FrameListStruct_0001 : RWSection
     {
-        public List<Frame> frames;
+        public Frame[] frames { get; set; }
 
-        public FrameListStruct_0001 Read(BinaryReader binaryReader)
+        public FrameListStruct_0001(Frame[] frames) 
+        {
+            this.frames = frames;
+        }
+        public FrameListStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
-            int frameCount = binaryReader.ReadInt32();
-            frames = new List<Frame>();
-
-            for (int i = 0; i < frameCount; i++)
-                frames.Add(new Frame()
+            frames = new Frame[binaryReader.ReadInt32()];
+            for (int i = 0; i < frames.Length; i++)
+                frames[i] = new Frame()
                 {
                     rotationMatrix = new Matrix3x3
                     {
@@ -48,16 +58,14 @@ namespace RenderWareFile.Sections
                     },
                     parentFrame = binaryReader.ReadInt32(),
                     unknown = binaryReader.ReadInt32()
-                });
-
-            return this;
+                };
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.AddRange(BitConverter.GetBytes(frames.Count));
+            listBytes.AddRange(BitConverter.GetBytes(frames.Length));
             foreach (Frame i in frames)
             {
                 listBytes.AddRange(BitConverter.GetBytes(i.rotationMatrix.M11));

@@ -7,9 +7,19 @@ namespace RenderWareFile.Sections
 {
     public class Extension_0003 : RWSection
     {
-        public List<RWSection> extensionSectionList { get; set; }
+        public RWSection[] extensionSectionList { get; set; }
 
-        public Extension_0003 Read(BinaryReader binaryReader)
+        public Extension_0003()
+        {
+            extensionSectionList = new RWSection[0];
+        }
+
+        public Extension_0003(RWSection[] extensionSectionList)
+        {
+            this.extensionSectionList = extensionSectionList;
+        }
+
+        public Extension_0003(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Extension;
             sectionSize = binaryReader.ReadInt32();
@@ -17,12 +27,12 @@ namespace RenderWareFile.Sections
 
             long CurrentPosition = binaryReader.BaseStream.Position;
 
-            extensionSectionList = new List<RWSection>();
+            var extensionSectionList = new List<RWSection>();
             while (binaryReader.BaseStream.Position < CurrentPosition + sectionSize)
             {
                 Section currentSection = (Section)binaryReader.ReadInt32();
-                if (currentSection == Section.BinMeshPLG) extensionSectionList.Add(new BinMeshPLG_050E().Read(binaryReader));
-                else if (currentSection == Section.NativeDataPLG) extensionSectionList.Add(new NativeDataPLG_0510().Read(binaryReader));
+                if (currentSection == Section.BinMeshPLG) extensionSectionList.Add(new BinMeshPLG_050E(binaryReader));
+                else if (currentSection == Section.NativeDataPLG) extensionSectionList.Add(new NativeDataPLG_0510(binaryReader));
                 else if (currentSection == Section.CollisionPLG)
                 {
                     binaryReader.BaseStream.Position += 8;
@@ -30,25 +40,37 @@ namespace RenderWareFile.Sections
                     binaryReader.BaseStream.Position -= 12;
 
                     if (version >= 0x36001)
-                        extensionSectionList.Add(new CollisionPLG_011D().Read(binaryReader));
+                        extensionSectionList.Add(new CollisionPLG_011D(binaryReader));
                     else
-                        extensionSectionList.Add(new CollisionPLG_011D_Pre36001().Read(binaryReader));
+                        extensionSectionList.Add(new CollisionPLG_011D_Pre36001(binaryReader));
                 }
-                else if (currentSection == Section.UserDataPLG) extensionSectionList.Add(new UserDataPLG_011F().Read(binaryReader));
-                else if (currentSection == Section.MaterialEffectsPLG) extensionSectionList.Add(new MaterialEffectsPLG_0120().Read(binaryReader));
-                else extensionSectionList.Add(new GenericSection().Read(binaryReader, currentSection));
+                else if (currentSection == Section.UserDataPLG) extensionSectionList.Add(new UserDataPLG_011F(binaryReader));
+                else if (currentSection == Section.MaterialEffectsPLG) extensionSectionList.Add(new MaterialEffectsPLG_0120(binaryReader));
+                else extensionSectionList.Add(new GenericSection(binaryReader, currentSection));
             }
-
-            return this;
+            this.extensionSectionList = extensionSectionList.ToArray();
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Extension;
+            
+            for (int i = 0; i < extensionSectionList.Length; i++)
+                listBytes.AddRange(extensionSectionList[i].GetBytes(fileVersion));
+        }
 
-            if (extensionSectionList != null)
-                for (int i = 0; i < extensionSectionList.Count(); i++)
-                    listBytes.AddRange(extensionSectionList[i].GetBytes(fileVersion));
+        public void Add(RWSection section)
+        {
+            var list = extensionSectionList.ToList();
+            list.Add(section);
+            extensionSectionList = list.ToArray();
+        }
+
+        public void RemoveAll(Predicate<RWSection> predicate)
+        {
+            var list = extensionSectionList.ToList();
+            list.RemoveAll(predicate);
+            extensionSectionList = list.ToArray();
         }
     }
 }

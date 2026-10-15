@@ -6,10 +6,11 @@ namespace RenderWareFile.Sections
 {
     public class Atomic_0014 : RWSection
     {
-        public AtomicStruct_0001 atomicStruct;
-        public Extension_0003 atomicExtension;
+        public AtomicStruct_0001 atomicStruct { get; set; }
+        public Extension_0003 atomicExtension { get; set; }
 
-        public Atomic_0014 Read(BinaryReader binaryReader, Section section)
+        public Atomic_0014() { }
+        public Atomic_0014(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Atomic;
             sectionSize = binaryReader.ReadInt32();
@@ -19,15 +20,13 @@ namespace RenderWareFile.Sections
 
             Section atomicStructSection = (Section)binaryReader.ReadInt32();
             if (atomicStructSection != Section.Struct) throw new Exception();
-            atomicStruct = new AtomicStruct_0001().Read(binaryReader);
+            atomicStruct = new AtomicStruct_0001(binaryReader);
 
             Section atomicExtensionSection = (Section)binaryReader.ReadInt32();
             if (atomicExtensionSection != Section.Extension) throw new Exception();
-            atomicExtension = new Extension_0003().Read(binaryReader);
+            atomicExtension = new Extension_0003(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

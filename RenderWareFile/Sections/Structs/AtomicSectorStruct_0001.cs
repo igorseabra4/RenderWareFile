@@ -6,22 +6,23 @@ namespace RenderWareFile.Sections
 {
     public class AtomicSectorStruct_0001 : RWSection
     {
-        public int matListWindowBase;
-        public int numTriangles;
-        public int numVertices;
-        public Vertex3 boxMaximum;
-        public Vertex3 boxMinimum;
-        public int collSectorPresent;
-        public int unused;
+        public int matListWindowBase { get; set; }
+        public int numTriangles { get; set; }
+        public int numVertices { get; set; }
+        public Vertex3 boxMaximum { get; set; }
+        public Vertex3 boxMinimum { get; set; }
+        public int collSectorPresent { get; set; }
+        public int unused { get; set; }
 
-        public Vertex3[] vertexArray;
-        public Color[] colorArray;
-        public Vertex2[] uvArray;
-        public Triangle[] triangleArray;
+        public Vertex3[] vertexArray { get; set; }
+        public Color[] colorArray { get; set; }
+        public Vertex2[] uvArray { get; set; }
+        public Triangle[] triangleArray { get; set; }
 
-        public bool isNativeData = false;
+        public bool isNativeData { get; internal set; } = false;
 
-        public AtomicSectorStruct_0001 Read(BinaryReader binaryReader)
+        public AtomicSectorStruct_0001() { }
+        public AtomicSectorStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -41,7 +42,7 @@ namespace RenderWareFile.Sections
                 if (numVertices != 0 && numTriangles != 0)
                 {
                     isNativeData = true;
-                    return this;
+                    return;
                 }
 
             binaryReader.BaseStream.Position = startSectionPosition + 11 * 4;
@@ -116,8 +117,6 @@ namespace RenderWareFile.Sections
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

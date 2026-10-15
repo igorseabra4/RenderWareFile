@@ -12,28 +12,35 @@ namespace RenderWareFile.Sections
 
     public struct RpCollBSPBranchNode
     {
-        public SectorAxis type;
-        public SectorType leftType;
-        public SectorType rightType;
-        public ushort leftNode;
-        public ushort rightNode;
-        public float leftValue;
-        public float rightValue;
+        public SectorAxis type { get; set; }
+        public SectorType leftType { get; set; }
+        public SectorType rightType { get; set; }
+        public ushort leftNode { get; set; }
+        public ushort rightNode { get; set; }
+        public float leftValue { get; set; }
+        public float rightValue { get; set; }
     }
 
     public struct RpCollBSPLeafNode
     {
-        public ushort firstPolygon;
-        public ushort numPolygons;
+        public ushort firstPolygon { get; set; }
+        public ushort numPolygons { get; set; }
     }
 
     public class CollisionPLG_011D_Pre36001 : RWSection
     {
-        public RpCollBSPBranchNode[] branchNodes;
-        public RpCollBSPLeafNode[] leafNodes;
-        public int[] triangleMap;
+        public RpCollBSPBranchNode[] branchNodes { get; set; }
+        public RpCollBSPLeafNode[] leafNodes { get; set; }
+        public int[] triangleMap { get; set; }
 
-        public CollisionPLG_011D_Pre36001 Read(BinaryReader binaryReader)
+        public CollisionPLG_011D_Pre36001(RpCollBSPBranchNode[] branchNodes, RpCollBSPLeafNode[] leafNodes, int[] triangleMap)
+        {
+            this.branchNodes = branchNodes;
+            this.leafNodes = leafNodes;
+            this.triangleMap = triangleMap;
+        }
+
+        public CollisionPLG_011D_Pre36001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.CollisionPLG;
             sectionSize = binaryReader.ReadInt32();
@@ -71,8 +78,6 @@ namespace RenderWareFile.Sections
 
             for (int i = 0; i < numTriangles; i++)
                 triangleMap[i] = binaryReader.ReadInt32();
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

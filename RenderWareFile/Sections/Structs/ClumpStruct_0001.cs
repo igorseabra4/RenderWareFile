@@ -6,11 +6,18 @@ namespace RenderWareFile.Sections
 {
     public class ClumpStruct_0001 : RWSection
     {
-        public int atomicCount;
-        public int lightCount;
-        public int cameraCount;
+        public int atomicCount { get; internal set; }
+        public int lightCount { get; internal set; }
+        public int cameraCount { get; internal set; }
 
-        public ClumpStruct_0001 Read(BinaryReader binaryReader)
+        public ClumpStruct_0001(int atomicCount, int lightCount, int cameraCount)
+        {
+            this.atomicCount = atomicCount;
+            this.lightCount = lightCount;
+            this.cameraCount = cameraCount;
+        }
+
+        public ClumpStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -27,8 +34,6 @@ namespace RenderWareFile.Sections
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

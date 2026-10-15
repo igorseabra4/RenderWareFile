@@ -6,11 +6,11 @@ namespace RenderWareFile.Sections
 {
     public class PlaneSector_000A : RWSection
     {
-        public PlaneStruct_0001 planeStruct;
-        public RWSection leftSection;
-        public RWSection rightSection;
+        public PlaneStruct_0001 planeStruct { get; set; }
+        public RWSection leftSection { get; set; }
+        public RWSection rightSection { get; set; }
 
-        public PlaneSector_000A Read(BinaryReader binaryReader)
+        public PlaneSector_000A(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.PlaneSector;
             sectionSize = binaryReader.ReadInt32();
@@ -18,31 +18,29 @@ namespace RenderWareFile.Sections
 
             Section planeStructSection = (Section)binaryReader.ReadInt32();
             if (planeStructSection != Section.Struct) throw new Exception();
-            planeStruct = new PlaneStruct_0001().Read(binaryReader);
+            planeStruct = new PlaneStruct_0001(binaryReader);
 
             Section leftSectionSection = (Section)binaryReader.ReadInt32();
             if (leftSectionSection == Section.AtomicSector & planeStruct.leftIsAtomic == 1)
             {
-                leftSection = new AtomicSector_0009().Read(binaryReader);
+                leftSection = new AtomicSector_0009(binaryReader);
             }
             else if (leftSectionSection == Section.PlaneSector & planeStruct.leftIsAtomic == 0)
             {
-                leftSection = new PlaneSector_000A().Read(binaryReader);
+                leftSection = new PlaneSector_000A(binaryReader);
             }
             else throw new Exception();
 
             Section rightSectionSection = (Section)binaryReader.ReadInt32();
             if (rightSectionSection == Section.AtomicSector & planeStruct.rightIsAtomic == 1)
             {
-                rightSection = new AtomicSector_0009().Read(binaryReader);
+                rightSection = new AtomicSector_0009(binaryReader);
             }
             else if (rightSectionSection == Section.PlaneSector & planeStruct.rightIsAtomic == 0)
             {
-                rightSection = new PlaneSector_000A().Read(binaryReader);
+                rightSection = new PlaneSector_000A(binaryReader);
             }
             else throw new Exception();
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

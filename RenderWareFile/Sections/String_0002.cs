@@ -17,7 +17,7 @@ namespace RenderWareFile.Sections
 
         public string stringString { get; private set; }
 
-        public String_0002 Read(BinaryReader binaryReader)
+        public String_0002(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.String;
             sectionSize = binaryReader.ReadInt32();
@@ -28,8 +28,6 @@ namespace RenderWareFile.Sections
             stringString = Shared.ReadFromZeroTerminatedString(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

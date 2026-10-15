@@ -7,13 +7,13 @@ namespace RenderWareFile.Sections
 
     public class NativeDataStruct_0001 : RWSection
     {
-        public NativeDataType nativeDataType;
-        public NativeDataGC nativeData;
-        public NativeDataPS2 nativeDataPs2;
+        public NativeDataType nativeDataType { get; set; }
+        public NativeDataGC nativeData { get; set; }
+        public NativeDataPS2 nativeDataPs2 { get; set; }
 
-        public byte[] nativeDataData;
+        public byte[] nativeDataData { get; set; }
 
-        public NativeDataStruct_0001 Read(BinaryReader binaryReader)
+        public NativeDataStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -22,7 +22,7 @@ namespace RenderWareFile.Sections
             if (ReadFileMethods.treatStuffAsByteArray)
             {
                 nativeDataData = binaryReader.ReadBytes(sectionSize);
-                return this;
+                return;
             }
 
             long startSectionPosition = binaryReader.BaseStream.Position;
@@ -49,8 +49,6 @@ namespace RenderWareFile.Sections
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

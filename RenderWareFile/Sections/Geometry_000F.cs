@@ -20,11 +20,18 @@ namespace RenderWareFile.Sections
 
     public class Geometry_000F : RWSection
     {
-        public GeometryStruct_0001 geometryStruct;
-        public MaterialList_0008 materialList;
-        public Extension_0003 geometryExtension;
+        public GeometryStruct_0001 geometryStruct { get; set; }
+        public MaterialList_0008 materialList { get; set; }
+        public Extension_0003 geometryExtension { get; set; }
 
-        public Geometry_000F Read(BinaryReader binaryReader)
+        public Geometry_000F(MaterialList_0008 materialList, GeometryStruct_0001 geometryStruct, Extension_0003 geometryExtension)
+        {
+            this.geometryStruct = geometryStruct;
+            this.materialList = materialList;
+            this.geometryExtension = geometryExtension;
+        }
+
+        public Geometry_000F(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Geometry;
             sectionSize = binaryReader.ReadInt32();
@@ -34,19 +41,17 @@ namespace RenderWareFile.Sections
 
             Section geometryStructSection = (Section)binaryReader.ReadInt32();
             if (geometryStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            geometryStruct = new GeometryStruct_0001().Read(binaryReader);
+            geometryStruct = new GeometryStruct_0001(binaryReader);
 
             Section materialListSection = (Section)binaryReader.ReadInt32();
             if (materialListSection != Section.MaterialList) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            materialList = new MaterialList_0008().Read(binaryReader);
+            materialList = new MaterialList_0008(binaryReader);
 
             Section geometryExtensionSection = (Section)binaryReader.ReadInt32();
             if (geometryExtensionSection != Section.Extension) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            geometryExtension = new Extension_0003().Read(binaryReader);
+            geometryExtension = new Extension_0003(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

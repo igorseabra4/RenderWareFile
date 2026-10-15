@@ -30,13 +30,13 @@ namespace RenderWareFile
                 {
                     Section currentSection = (Section)binaryReader.ReadInt32();
                     if (currentSection == Section.World)
-                        renderWareFile.Add(new World_000B().Read(binaryReader));
+                        renderWareFile.Add(new World_000B(binaryReader));
                     else if (currentSection == Section.Clump)
-                        renderWareFile.Add(new Clump_0010().Read(binaryReader));
+                        renderWareFile.Add(new Clump_0010(binaryReader));
                     else if (currentSection == Section.TextureDictionary)
-                        renderWareFile.Add(new TextureDictionary_0016().Read(binaryReader));
+                        renderWareFile.Add(new TextureDictionary_0016(binaryReader));
                     else
-                        renderWareFile.Add(new GenericSection().Read(binaryReader, currentSection));
+                        renderWareFile.Add(new GenericSection(binaryReader, currentSection));
                 }
                 return renderWareFile.ToArray();
             }

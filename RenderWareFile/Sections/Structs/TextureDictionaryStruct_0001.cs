@@ -6,10 +6,16 @@ namespace RenderWareFile.Sections
 {
     public class TextureDictionaryStruct_0001 : RWSection
     {
-        public short textureCount;
-        public short unknown;
+        public short textureCount { get; internal set; }
+        public short unknown { get; set; }
 
-        public TextureDictionaryStruct_0001 Read(BinaryReader binaryReader)
+        public TextureDictionaryStruct_0001(short textureCount, short unknown = 0)
+        {
+            this.textureCount = textureCount;
+            this.unknown = unknown;
+        }
+
+        public TextureDictionaryStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -22,8 +28,6 @@ namespace RenderWareFile.Sections
             }
             else
                 textureCount = (short)binaryReader.ReadUInt32();
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

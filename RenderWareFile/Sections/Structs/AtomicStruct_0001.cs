@@ -14,12 +14,20 @@ namespace RenderWareFile.Sections
 
     public class AtomicStruct_0001 : RWSection
     {
-        public int frameIndex;
-        public int geometryIndex;
-        public AtomicFlags flags;
-        public int unused;
+        public int frameIndex { get; set; }
+        public int geometryIndex { get; set; }
+        public AtomicFlags flags { get; set; }
+        public int unused { get; set; }
 
-        public AtomicStruct_0001 Read(BinaryReader binaryReader)
+        public AtomicStruct_0001(int frameIndex, int geometryIndex, AtomicFlags flags, int unused = 0)
+        {
+            this.frameIndex = frameIndex;
+            this.geometryIndex = geometryIndex;
+            this.flags = flags;
+            this.unused = unused;
+        }
+
+        public AtomicStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Atomic;
             sectionSize = binaryReader.ReadInt32();
@@ -29,8 +37,6 @@ namespace RenderWareFile.Sections
             geometryIndex = binaryReader.ReadInt32();
             flags = (AtomicFlags)binaryReader.ReadInt32();
             unused = binaryReader.ReadInt32();
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

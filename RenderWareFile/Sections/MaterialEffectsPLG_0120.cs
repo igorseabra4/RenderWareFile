@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http.Headers;
 
 namespace RenderWareFile.Sections
 {
@@ -33,7 +34,8 @@ namespace RenderWareFile.Sections
         public Texture_0006 BumpMapTexture { get; set; }
         public Texture_0006 HeightMapTexture { get; set; }
 
-        public MaterialEffectBumpMap Read(BinaryReader binaryReader)
+        public MaterialEffectBumpMap() { }
+        public MaterialEffectBumpMap(BinaryReader binaryReader)
         {
             Intensity = binaryReader.ReadSingle();
 
@@ -42,7 +44,7 @@ namespace RenderWareFile.Sections
             {
                 Section textureSection = (Section)binaryReader.ReadInt32();
                 if (textureSection != Section.Texture) throw new Exception();
-                BumpMapTexture = new Texture_0006().Read(binaryReader);
+                BumpMapTexture = new Texture_0006(binaryReader);
             }
 
             bool ContainsHeightMap = binaryReader.ReadInt32() != 0;
@@ -50,10 +52,8 @@ namespace RenderWareFile.Sections
             {
                 Section textureSection = (Section)binaryReader.ReadInt32();
                 if (textureSection != Section.Texture) throw new Exception();
-                HeightMapTexture = new Texture_0006().Read(binaryReader);
+                HeightMapTexture = new Texture_0006(binaryReader);
             }
-
-            return this;
         }
 
         public override byte[] GetBytes(int fileVersion)
@@ -77,9 +77,14 @@ namespace RenderWareFile.Sections
     {
         public float ReflectionCoefficient { get; set; }
         public bool UseFrameBufferAlphaChannel { get; set; }
-        public Texture_0006 EnvironmentMapTexture { get; set; } = new Texture_0006();
+        public Texture_0006 EnvironmentMapTexture { get; set; }
 
-        public MaterialEffectEnvironmentMap Read(BinaryReader binaryReader)
+        public MaterialEffectEnvironmentMap()
+        {
+            EnvironmentMapTexture = new Texture_0006();
+        }
+
+        public MaterialEffectEnvironmentMap(BinaryReader binaryReader)
         {
             ReflectionCoefficient = binaryReader.ReadSingle();
             UseFrameBufferAlphaChannel = binaryReader.ReadInt32() != 0;
@@ -88,10 +93,8 @@ namespace RenderWareFile.Sections
             {
                 Section textureSection = (Section)binaryReader.ReadInt32();
                 if (textureSection != Section.Texture) throw new Exception();
-                EnvironmentMapTexture = new Texture_0006().Read(binaryReader);
+                EnvironmentMapTexture = new Texture_0006(binaryReader);
             }
-
-            return this;
         }
 
         public override byte[] GetBytes(int fileVersion)
@@ -130,9 +133,25 @@ namespace RenderWareFile.Sections
     {
         public BlendFactorType SourceBlendMode { get; set; }
         public BlendFactorType DestBlendMode { get; set; }
-        public Texture_0006 Texture { get; set; } = new Texture_0006();
+        public bool ContainsTexture
+        {
+            get => Texture != null;
+            set
+            {
+                if (value && Texture == null)
+                    Texture = new Texture_0006();
+                if (!value && Texture != null)
+                    Texture = null;
+            }
+        }
+        public Texture_0006 Texture { get; set; }
 
-        public MaterialEffectDualTextures Read(BinaryReader binaryReader)
+        public MaterialEffectDualTextures()
+        {
+            Texture = new Texture_0006();
+        }
+
+        public MaterialEffectDualTextures(BinaryReader binaryReader)
         {
             SourceBlendMode = (BlendFactorType)binaryReader.ReadInt32();
             DestBlendMode = (BlendFactorType)binaryReader.ReadInt32();
@@ -142,10 +161,8 @@ namespace RenderWareFile.Sections
             {
                 Section textureSection = (Section)binaryReader.ReadInt32();
                 if (textureSection != Section.Texture) throw new Exception();
-                Texture = new Texture_0006().Read(binaryReader);
+                Texture = new Texture_0006(binaryReader);
             }
-
-            return this;
         }
 
         public override byte[] GetBytes(int fileVersion)
@@ -166,9 +183,8 @@ namespace RenderWareFile.Sections
 
     public class MaterialEffectUvTransformation : MaterialEffect
     {
-        public MaterialEffectUvTransformation Read()
+        public MaterialEffectUvTransformation()
         {
-            return this;
         }
 
         public override byte[] GetBytes(int fileVersion)
@@ -197,7 +213,7 @@ namespace RenderWareFile.Sections
 
     public class MaterialEffectsPLG_0120 : RWSection
     {
-        public MaterialEffectType value;
+        public MaterialEffectType value { get; set; }
 
         public MaterialEffectType MaterialEffectType
         {
@@ -225,11 +241,12 @@ namespace RenderWareFile.Sections
                 this.value = value;
             }
         }
-        public MaterialEffect materialEffect1;
-        public MaterialEffect materialEffect2;
-        public bool isAtomicExtension = false;
+        public MaterialEffect materialEffect1 { get; set; }
+        public MaterialEffect materialEffect2 { get; set; }
+        public bool isAtomicExtension { get; set; } = false;
 
-        public MaterialEffectsPLG_0120 Read(BinaryReader binaryReader)
+        public MaterialEffectsPLG_0120() { }
+        public MaterialEffectsPLG_0120(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.MaterialEffectsPLG;
             sectionSize = binaryReader.ReadInt32();
@@ -242,7 +259,7 @@ namespace RenderWareFile.Sections
             if (binaryReader.BaseStream.Position == startSectionPosition + sectionSize)
             {
                 isAtomicExtension = true;
-                return this;
+                return;
             }
 
             for (int i = 0; i < 2; i++)
@@ -252,13 +269,13 @@ namespace RenderWareFile.Sections
                 switch (locValue)
                 {
                     case MaterialEffectType.BumpMap:
-                        mEffect = new MaterialEffectBumpMap().Read(binaryReader); break;
+                        mEffect = new MaterialEffectBumpMap(binaryReader); break;
                     case MaterialEffectType.EnvironmentMap:
-                        mEffect = new MaterialEffectEnvironmentMap().Read(binaryReader); break;
+                        mEffect = new MaterialEffectEnvironmentMap(binaryReader); break;
                     case MaterialEffectType.DualTextures:
-                        mEffect = new MaterialEffectDualTextures().Read(binaryReader); break;
+                        mEffect = new MaterialEffectDualTextures(binaryReader); break;
                     case MaterialEffectType.UvTransformation:
-                        mEffect = new MaterialEffectUvTransformation().Read(); break;
+                        mEffect = new MaterialEffectUvTransformation(); break;
                     case MaterialEffectType.NoEffect:
                         mEffect = null; break;
                     default:
@@ -274,8 +291,6 @@ namespace RenderWareFile.Sections
                         break;
                 }
             }
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

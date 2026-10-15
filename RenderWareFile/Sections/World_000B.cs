@@ -6,12 +6,13 @@ namespace RenderWareFile.Sections
 {
     public class World_000B : RWSection
     {
-        public WorldStruct_0001 worldStruct;
-        public MaterialList_0008 materialList;
-        public RWSection firstWorldChunk;
-        public Extension_0003 worldExtension;
+        public WorldStruct_0001 worldStruct { get; set; }
+        public MaterialList_0008 materialList { get; set; }
+        public RWSection firstWorldChunk { get; set; }
+        public Extension_0003 worldExtension { get; set; }
 
-        public World_000B Read(BinaryReader binaryReader)
+        public World_000B() { }
+        public World_000B(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.World;
             sectionSize = binaryReader.ReadInt32();
@@ -21,30 +22,28 @@ namespace RenderWareFile.Sections
 
             Section worldStructSection = (Section)binaryReader.ReadInt32();
             if (worldStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            worldStruct = new WorldStruct_0001().Read(binaryReader);
+            worldStruct = new WorldStruct_0001(binaryReader);
 
             Section materialListSection = (Section)binaryReader.ReadInt32();
             if (materialListSection != Section.MaterialList) throw new Exception();
-            materialList = new MaterialList_0008().Read(binaryReader);
+            materialList = new MaterialList_0008(binaryReader);
 
             Section firstWorldChunkSection = (Section)binaryReader.ReadInt32();
             if (firstWorldChunkSection == Section.AtomicSector)
             {
-                firstWorldChunk = new AtomicSector_0009().Read(binaryReader);
+                firstWorldChunk = new AtomicSector_0009(binaryReader);
             }
             else if (firstWorldChunkSection == Section.PlaneSector)
             {
-                firstWorldChunk = new PlaneSector_000A().Read(binaryReader);
+                firstWorldChunk = new PlaneSector_000A(binaryReader);
             }
             else throw new Exception();
 
             Section worldExtensionSection = (Section)binaryReader.ReadInt32();
             if (worldExtensionSection == Section.Extension)
-                worldExtension = new Extension_0003().Read(binaryReader);
+                worldExtension = new Extension_0003(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

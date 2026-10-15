@@ -23,18 +23,19 @@ namespace RenderWareFile.Sections
 
     public class WorldStruct_0001 : RWSection
     {
-        public int rootIsWorldSector;
-        public Vertex3 inverseOrigin;
-        public uint numTriangles;
-        public uint numVertices;
-        public uint numPlaneSectors;
-        public uint numAtomicSectors;
-        public uint colSectorSize;
-        public WorldFlags worldFlags;
-        public Vertex3 boxMaximum;
-        public Vertex3 boxMinimum;
+        public int rootIsWorldSector { get; set; }
+        public Vertex3 inverseOrigin { get; set; }
+        public uint numTriangles { get; set; }
+        public uint numVertices { get; set; }
+        public uint numPlaneSectors { get; set; }
+        public uint numAtomicSectors { get; set; }
+        public uint colSectorSize { get; set; }
+        public WorldFlags worldFlags { get; set; }
+        public Vertex3 boxMaximum { get; set; }
+        public Vertex3 boxMinimum { get; set; }
 
-        public WorldStruct_0001 Read(BinaryReader binaryReader)
+        public WorldStruct_0001() { }
+        public WorldStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -45,9 +46,7 @@ namespace RenderWareFile.Sections
             if (sectionSize == 0x40)
             {
                 rootIsWorldSector = binaryReader.ReadInt32();
-                inverseOrigin.X = binaryReader.ReadSingle();
-                inverseOrigin.Y = binaryReader.ReadSingle();
-                inverseOrigin.Z = binaryReader.ReadSingle();
+                inverseOrigin = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
                 numTriangles = binaryReader.ReadUInt32();
                 numVertices = binaryReader.ReadUInt32();
                 numPlaneSectors = binaryReader.ReadUInt32();
@@ -60,9 +59,7 @@ namespace RenderWareFile.Sections
             else if (sectionSize == 0x34)
             {
                 rootIsWorldSector = binaryReader.ReadInt32();
-                inverseOrigin.X = binaryReader.ReadSingle();
-                inverseOrigin.Y = binaryReader.ReadSingle();
-                inverseOrigin.Z = binaryReader.ReadSingle();
+                inverseOrigin = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
                 boxMaximum = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle());
                 boxMinimum = boxMaximum;
                 numTriangles = binaryReader.ReadUInt32();
@@ -74,8 +71,6 @@ namespace RenderWareFile.Sections
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

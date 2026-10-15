@@ -7,36 +7,33 @@ namespace RenderWareFile.Sections.Structs.PS2
 {
     public class TextureRasterFormatStruct_0001 : RWSection
     {
-        public uint Width;
-        public uint Height;
-        public uint Depth;
+        public uint Width { get; set; }
+        public uint Height { get; set; }
+        public uint Depth { get; set; }
 
-        public TextureRasterFormat RasterFormat;
+        public TextureRasterFormat RasterFormat { get; set; }
 
-        public ulong TEX0;
-        public ulong TEX1;
-        public ulong MipTbp1;
-        public ulong MipTbp2;
+        public ulong TEX0 { get; set; }
+        public ulong TEX1 { get; set; }
+        public ulong MipTbp1 { get; set; }
+        public ulong MipTbp2 { get; set; }
 
-        public byte PrivateFlags;
-        public ushort SkyRasterVersion;
+        public byte PrivateFlags { get; set; }
+        public ushort SkyRasterVersion { get; set; }
 
-        public int gsMipmapDataSize;
-        public int gsCLUTDataSize;
-        public int textureMemorySize;
-        public int skyMipmapVal;
+        public int gsMipmapDataSize { get; set; }
+        public int gsCLUTDataSize { get; set; }
+        public int textureMemorySize { get; set; }
+        public int skyMipmapVal { get; set; }
 
-        public byte[] sectionData;
-        private long startSectionPostion;
+        public byte[] sectionData { get; set; }
 
-        public TextureRasterFormatStruct_0001 Read(BinaryReader reader)
+        public TextureRasterFormatStruct_0001(BinaryReader reader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = reader.ReadInt32();
             renderWareVersion = reader.ReadInt32();
 
-            startSectionPostion = reader.BaseStream.Position;
- 
             reader.BaseStream.Position += 12;
 
             Width = reader.ReadUInt32();
@@ -60,8 +57,6 @@ namespace RenderWareFile.Sections.Structs.PS2
             int sizeOfData = reader.ReadInt32();
             reader.ReadInt32();
             sectionData = reader.ReadBytes(sizeOfData);
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

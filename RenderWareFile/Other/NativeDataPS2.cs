@@ -158,7 +158,7 @@ namespace RenderWareFile.Sections
 
     public class Cluster<T> : Cluster
     {
-        public List<T> entryList;
+        public List<T> entryList { get; set; }
 
         public Cluster(Cluster cluster, List<T> entries) : base(cluster)
         {
@@ -168,17 +168,17 @@ namespace RenderWareFile.Sections
 
     public struct Batch
     {
-        public List<Cluster> Clusters;
-        public Cluster EndCluster;
+        public List<Cluster> Clusters { get; set; }
+        public Cluster EndCluster { get; set; }
     }
 
     public class NativeDataPS2
     {
-        public bool NoPointers;
-        public sceDmaTag DMATag;
-        public List<Batch> Batches = new List<Batch>();
+        public bool NoPointers { get; set; }
+        public sceDmaTag DMATag { get; set; }
+        public List<Batch> Batches { get; set; } = new List<Batch>();
 
-        public byte[] UnkBytes;
+        public byte[] UnkBytes { get; set; }
 
         public NativeDataPS2(BinaryReader reader)
         {

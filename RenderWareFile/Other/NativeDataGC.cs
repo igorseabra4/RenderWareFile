@@ -55,11 +55,11 @@ namespace RenderWareFile.Sections
 
     public abstract class VertexAttribute
     {
-        public int startOffset;
-        public rwGCNVertexAttribute attr;
-        public byte stride;
-        public rwGCNAttrType indexType;
-        public byte pad;
+        public int startOffset { get; set; }
+        public rwGCNVertexAttribute attr { get; set; }
+        public byte stride { get; set; }
+        public rwGCNAttrType indexType { get; set; }
+        public byte pad { get; set; }
     }
 
     public class VertexAttribute<T> : VertexAttribute
@@ -101,26 +101,26 @@ namespace RenderWareFile.Sections
 
     public class TriangleDeclaration
     {
-        public int startOffset;
-        public int size;
-        public List<TriangleStrip> strips;
-        public int MaterialIndex;
+        public int startOffset { get; set; }
+        public int size { get; set; }
+        public List<TriangleStrip> strips { get; set; }
+        public int MaterialIndex { get; set; }
     }
 
     public class TriangleStrip
     {
-        public GXPrimitive primitive;
-        public short numIndices;
-        public List<ushort[]> indices;
+        public GXPrimitive primitive { get; set; }
+        public short numIndices { get; set; }
+        public List<ushort[]> indices { get; set; }
     }
 
     public class NativeDataGC
     {
-        public short token;
-        public short serialNumber;
-        public int flags;
-        public VertexAttribute[] attr;
-        public TriangleDeclaration[] displayList;
+        public short token { get; set; }
+        public short serialNumber { get; set; }
+        public int flags { get; set; }
+        public VertexAttribute[] attr { get; set; }
+        public TriangleDeclaration[] displayList { get; set; }
 
         public NativeDataGC() { }
 

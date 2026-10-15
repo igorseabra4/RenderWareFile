@@ -6,8 +6,8 @@ namespace RenderWareFile.Sections
 {
     public class Split
     {
-        public Sector negativeSector;
-        public Sector positiveSector;
+        public Sector negativeSector { get; set; }
+        public Sector positiveSector { get; set; }
 
         public Split()
         {
@@ -28,14 +28,14 @@ namespace RenderWareFile.Sections
 
     public class Sector
     {
-        public SectorAxis type;
-        public byte triangleAmount;
-        public ushort referenceIndex;
-        public float splitPosition;
+        public SectorAxis type { get; set; }
+        public byte triangleAmount { get; set; }
+        public ushort referenceIndex { get; set; }
+        public float splitPosition { get; set; }
 
-        public Vertex3 Min;
-        public Vertex3 Max;
-        public List<ushort> TriangleIndexList;
+        public Vertex3 Min { get; set; }
+        public Vertex3 Max { get; set; }
+        public List<ushort> TriangleIndexList { get; set; }
 
         public Sector()
         {
@@ -45,16 +45,18 @@ namespace RenderWareFile.Sections
 
     public class ColTreeStruct_0001 : RWSection
     {
-        public int useMap;
-        public Vertex3 boxMinimum;
-        public Vertex3 boxMaximum;
-        public int numTriangles;
-        public int numSplits;
+        public int useMap { get; set; }
+        public Vertex3 boxMinimum { get; set; }
+        public Vertex3 boxMaximum { get; set; }
+        public int numTriangles { get; set; }
+        public int numSplits { get; set; }
 
-        public Split[] splitArray;
-        public ushort[] triangleArray;
+        public Split[] splitArray { get; set; }
+        public ushort[] triangleArray { get; set; }
 
-        public ColTreeStruct_0001 Read(BinaryReader binaryReader)
+        public ColTreeStruct_0001() { }
+
+        public ColTreeStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
@@ -94,8 +96,6 @@ namespace RenderWareFile.Sections
             {
                 triangleArray[i] = binaryReader.ReadUInt16();
             }
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

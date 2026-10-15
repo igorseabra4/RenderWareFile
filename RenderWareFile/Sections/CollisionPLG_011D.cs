@@ -6,10 +6,11 @@ namespace RenderWareFile.Sections
 {
     public class CollisionPLG_011D : RWSection
     {
-        public int version;
-        public RWSection colTree;
+        public int version { get; set; }
+        public RWSection colTree { get; set; }
 
-        public CollisionPLG_011D Read(BinaryReader binaryReader)
+        public CollisionPLG_011D() { }
+        public CollisionPLG_011D(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.CollisionPLG;
             sectionSize = binaryReader.ReadInt32();
@@ -19,10 +20,8 @@ namespace RenderWareFile.Sections
 
             Section colTreeSection = (Section)binaryReader.ReadInt32();
             if (colTreeSection == Section.ColTree)
-                colTree = new ColTree_002C().Read(binaryReader);
+                colTree = new ColTree_002C(binaryReader);
             else throw new Exception();
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

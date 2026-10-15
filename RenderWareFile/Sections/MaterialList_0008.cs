@@ -7,10 +7,16 @@ namespace RenderWareFile.Sections
 {
     public class MaterialList_0008 : RWSection
     {
-        public MaterialListStruct_0001 materialListStruct;
-        public Material_0007[] materialList;
+        public MaterialListStruct_0001 materialListStruct { get; internal set; }
+        public Material_0007[] materialList { get; set; }
 
-        public MaterialList_0008 Read(BinaryReader binaryReader)
+        public MaterialList_0008(Material_0007[] materialList)
+        {
+            this.materialListStruct = new MaterialListStruct_0001(materialList.Length);
+            this.materialList = materialList;
+        }
+
+        public MaterialList_0008(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.MaterialList;
             sectionSize = binaryReader.ReadInt32();
@@ -20,7 +26,7 @@ namespace RenderWareFile.Sections
 
             Section materialListStructSection = (Section)binaryReader.ReadInt32();
             if (materialListStructSection != Section.Struct) throw new Exception();
-            materialListStruct = new MaterialListStruct_0001().Read(binaryReader);
+            materialListStruct = new MaterialListStruct_0001(binaryReader);
 
 #if DEBUG
             List<Material_0007> materials = new List<Material_0007>();
@@ -28,7 +34,7 @@ namespace RenderWareFile.Sections
             {
                 Section materialSection = (Section)binaryReader.ReadInt32();
                 if (materialSection != Section.Material) throw new Exception();
-                materials.Add(new Material_0007().Read(binaryReader));
+                materials.Add(new Material_0007(binaryReader));
             }
             materialList = materials.ToArray();
             materialListStruct.materialCount = materialList.Length;
@@ -41,8 +47,6 @@ namespace RenderWareFile.Sections
                 materialList[i] = new Material_0007().Read(binaryReader);
             }
 #endif
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)

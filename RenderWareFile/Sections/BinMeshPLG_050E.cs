@@ -7,22 +7,24 @@ namespace RenderWareFile.Sections
 {
     public struct BinMesh
     {
-        public int indexCount; // number of vertex indices in this mesh
-        public int materialIndex; // material index
-        public int[] vertexIndices; // vertex indices
+        public int indexCount { get; set; } // number of vertex indices in this mesh
+        public int materialIndex { get; set; } // material index
+        public int[] vertexIndices { get; set; } // vertex indices
     }
 
     public class BinMeshPLG_050E : RWSection
     {
-        public BinMeshHeaderFlags binMeshHeaderFlags;
-        public int numMeshes; // number of objects/meshes (usually same number of materials)
-        public int totalIndexCount; // total number of indices
+        public BinMeshHeaderFlags binMeshHeaderFlags { get; set; }
+        public int numMeshes { get; set; } // number of objects/meshes (usually same number of materials)
+        public int totalIndexCount { get; set; } // total number of indices
 
-        public BinMesh[] binMeshList;
+        public BinMesh[] binMeshList { get; set; }
 
-        public bool isNativeData = false;
+        public bool isNativeData { get; internal set; } = false;
 
-        public BinMeshPLG_050E Read(BinaryReader binaryReader)
+        public BinMeshPLG_050E() { }
+
+        public BinMeshPLG_050E(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.BinMeshPLG;
             sectionSize = binaryReader.ReadInt32();
@@ -57,8 +59,6 @@ namespace RenderWareFile.Sections
                     isNativeData = true;
                 }
             }
-
-            return this;
         }
 
         public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
