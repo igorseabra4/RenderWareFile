@@ -44,7 +44,7 @@ namespace RenderWareFile.Sections
             {
                 Section materialSection = (Section)binaryReader.ReadInt32();
                 if (materialSection != Section.Material) throw new Exception();
-                materialList[i] = new Material_0007().Read(binaryReader);
+                materialList[i] = new Material_0007(binaryReader);
             }
 #endif
         }
