@@ -18,6 +18,16 @@ namespace RenderWareFile.Sections
     public class GeometryStruct_0001 : RWSection
     {
         public GeometryFlags geometryFlags { get; set; }
+        public bool GeometryTristrip => (geometryFlags & GeometryFlags.rpGEOMETRYTRISTRIP) != 0;
+        public bool GeometryPositions => (geometryFlags & GeometryFlags.rpGEOMETRYPOSITIONS) != 0;
+        public bool GeometryTextured => (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED) != 0;
+        public bool GeometryPrelit => (geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0;
+        public bool GeometryNormals => (geometryFlags & GeometryFlags.rpGEOMETRYNORMALS) != 0;
+        public bool GeometryLights => (geometryFlags & GeometryFlags.rpGEOMETRYLIGHTS) != 0;
+        public bool GeometryModulateMaterialColor => (geometryFlags & GeometryFlags.rpGEOMETRYMODULATEMATERIALCOLOR) != 0;
+        public bool GeometryTextured2 => (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0;
+        public bool GeometryNative => (geometryFlags & GeometryFlags.rpGEOMETRYNATIVE) != 0;
+
         public int numTriangles { get; set; }
         public int numVertices { get; set; }
         public int numMorphTargets { get; set; }
@@ -61,7 +71,7 @@ namespace RenderWareFile.Sections
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
 
-            int numTexCoords = (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED) != 0 ? 1 : (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0 ? 2 : ((int)geometryFlags >> 16) & 0xFF;
+            int numTexCoords = GeometryTextured ? 1 : GeometryTextured2 ? 2 : ((int)geometryFlags >> 16) & 0xFF;
 
             if (renderWareVersion < (3,4))
             {
@@ -70,7 +80,7 @@ namespace RenderWareFile.Sections
                 diffuse = binaryReader.ReadSingle();
             }
 
-            if ((geometryFlags & GeometryFlags.rpGEOMETRYNATIVE) != 0)
+            if (GeometryNative)
             {
                 sphereCenterX = binaryReader.ReadSingle();
                 sphereCenterY = binaryReader.ReadSingle();
@@ -82,7 +92,7 @@ namespace RenderWareFile.Sections
                 return;
             }
 
-            if ((geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0)
+            if (GeometryPrelit)
             {
                 vertexColors = new Color[numVertices];
                 for (int i = 0; i < numVertices; i++)
