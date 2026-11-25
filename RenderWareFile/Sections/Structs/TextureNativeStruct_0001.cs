@@ -37,8 +37,10 @@ namespace RenderWareFile.Sections
             get => (TextureAddressMode)((id & 0xF00) >> 8);
             set { id = (id & ~0xF00) | ((int)value << 8); }
         }
-        public string textureName { get; set; }
-        public string alphaName { get; set; }
+        private string _textureName;
+        public string textureName { get => _textureName; set { _textureName = value.Length > 32 ? value[..32] : value; } }
+        private string _alphaName;
+        public string alphaName { get => _alphaName; set { _alphaName = value.Length > 32 ? value[..32] : value; } }
         public TextureRasterFormat rasterFormatFlags { get; set; }
         public bool hasAlpha { get; set; }
         public short width { get; set; }
