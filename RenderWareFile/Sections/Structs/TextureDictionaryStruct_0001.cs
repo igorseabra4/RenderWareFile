@@ -7,12 +7,12 @@ namespace RenderWareFile.Sections
     public class TextureDictionaryStruct_0001 : RWSection
     {
         public short textureCount { get; internal set; }
-        public short unknown { get; set; }
+        public short deviceId { get; set; }
 
         public TextureDictionaryStruct_0001(short textureCount, short unknown = 0)
         {
             this.textureCount = textureCount;
-            this.unknown = unknown;
+            this.deviceId = unknown;
         }
 
         public TextureDictionaryStruct_0001(BinaryReader binaryReader)
@@ -24,7 +24,7 @@ namespace RenderWareFile.Sections
             if (renderWareVersion > (3,5))
             {
                 textureCount = binaryReader.ReadInt16();
-                unknown = binaryReader.ReadInt16();
+                deviceId = binaryReader.ReadInt16();
             }
             else
                 textureCount = (short)binaryReader.ReadUInt32();
@@ -37,7 +37,7 @@ namespace RenderWareFile.Sections
             if (fileVersion > (3,5))
             {
                 listBytes.AddRange(BitConverter.GetBytes(textureCount));
-                listBytes.AddRange(BitConverter.GetBytes(unknown));
+                listBytes.AddRange(BitConverter.GetBytes(deviceId));
             }
             else
                 listBytes.AddRange(BitConverter.GetBytes((int)textureCount));

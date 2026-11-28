@@ -12,6 +12,7 @@ namespace RenderWareFile
         public byte Minor { get; set; }
         public byte Revision { get; set; }
         public ushort LibraryBuild { get; set; }
+        public bool LegacyStamp { get; set; }
         public int PackedVersion
         {
             get => Renderware << 16 | (Major & 0xF) << 12 | (Minor & 0xF) << 8 | Revision;
@@ -31,18 +32,20 @@ namespace RenderWareFile
             Minor = minor;
             Revision = revision;
             LibraryBuild = build;
+            LegacyStamp = (renderware << 16 | (major & 0xF) << 12 | (minor & 0xF) << 8 | revision) <= 0x31000;
         }
 
         public RWVersion(byte renderware, byte major) : this(renderware, major, 0, 0) { }
 
         public RWVersion(int ver)
         {
-            int unpackedVer = (ver & 0xFFFF000) != 0 ? (ver >> 14 & 0x3FF00) + 0x30000 | (ver >> 16 & 0x3F) : ver << 8;
+            int unpackedVer = (ver & unchecked((int)0xFFFF0000)) != 0 ? (ver >> 14 & 0x3FF00) + 0x30000 | (ver >> 16 & 0x3F) : ver << 8;
             Renderware = (byte)(unpackedVer >> 16);
             Major = (byte)(unpackedVer >> 12 & 0xF);
             Minor = (byte)(unpackedVer >> 8 & 0xF);
             Revision = (byte)(unpackedVer & 0xFF);
             LibraryBuild = (ushort)(ver & 0xFFFF);
+            LegacyStamp = (ver & unchecked((int)0xFFFF0000)) == 0;
         }
 
         public RWVersion(BinaryReader reader) : this(reader.ReadInt32()) { }
@@ -56,7 +59,7 @@ namespace RenderWareFile
         public int Write()
         {
             int ver = PackedVersion;
-            if (ver <= 0x31000)
+            if (LegacyStamp || ver == 0)
                 return ver >> 8;
             return ((ver - 0x30000) & 0x3FF00) << 14 | (ver & 0x3F) << 16 | LibraryBuild;
         }
