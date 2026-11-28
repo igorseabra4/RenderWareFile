@@ -37,10 +37,14 @@ namespace RenderWareFile.Sections
             foreach (char i in stringString)
                 listBytes.Add((byte)i);
 
-            if (stringString.Length % 4 == 0) listBytes.AddRange(new byte[] { 0, 0, 0, 0 });
-            if (stringString.Length % 4 == 1) listBytes.AddRange(new byte[] { 0, 0, 0 });
-            if (stringString.Length % 4 == 2) listBytes.AddRange(new byte[] { 0, 0 });
-            if (stringString.Length % 4 == 3) listBytes.Add(0);
+            if (stringString.Length % 4 == 0)
+                listBytes.AddRange(new byte[] { 0, 0, 0, 0 });
+            if (stringString.Length % 4 == 1)
+                listBytes.AddRange(new byte[] { 0, 0, 0 });
+            if (stringString.Length % 4 == 2)
+                listBytes.AddRange(new byte[] { 0, 0 });
+            if (stringString.Length % 4 == 3)
+                listBytes.Add(0);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using RenderWareFile.Sections.Structs.PS2;
+﻿using RenderWareFile.Textures;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ namespace RenderWareFile.Sections
     public class TextureNative_0015 : RWSection
     {
         public TextureNativeStruct_0001 textureNativeStruct { get; set; }
-        public TextureRasterFormatStruct_0001 PS2RasterFormat { get; set; }
+        public Ps2TextureRasterFormatStruct_0001 PS2RasterFormat { get; set; }
         public Extension_0003 textureNativeExtension { get; set; }
 
         public TextureNative_0015() { }
@@ -18,28 +18,12 @@ namespace RenderWareFile.Sections
             sectionSize = binaryReader.ReadInt32();
             renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
-            try
-            {
-                Section textureNativeStructSection = (Section)binaryReader.ReadInt32();
-                if (textureNativeStructSection != Section.Struct)
-                    throw new Exception(binaryReader.BaseStream.Position.ToString());
-                textureNativeStruct = new TextureNativeStruct_0001(binaryReader);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(textureNativeStruct.textureName + ": " + ex.Message, ex);
-            }
+            Section textureNativeStructSection = (Section)binaryReader.ReadInt32();
+            if (textureNativeStructSection != Section.Struct)
+                throw new Exception(binaryReader.BaseStream.Position.ToString());
+            textureNativeStruct = new TextureNativeStruct_0001(binaryReader);
 
-            if (textureNativeStruct.platformType == TexturePlatformID.PS2)
-            {
-                binaryReader.ReadInt32();
-                textureNativeStruct.textureName = new String_0002(binaryReader).stringString;
-                binaryReader.ReadInt32();
-                textureNativeStruct.alphaName = new String_0002(binaryReader).stringString;
-
-                binaryReader.ReadInt32();
-                PS2RasterFormat = new TextureRasterFormatStruct_0001(binaryReader);
-            }
+            TexturePlatformHandler.Get(textureNativeStruct.platformType).ReadTrailingSections(binaryReader, this);
 
             Section textureNativeExtensionSection = (Section)binaryReader.ReadInt32();
             if (textureNativeExtensionSection == Section.Extension)
@@ -60,6 +44,8 @@ namespace RenderWareFile.Sections
             if (textureNativeStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
             textureNativeStruct = new TextureNativeStruct_0001(binaryReader);
 
+            TexturePlatformHandler.Get(textureNativeStruct.platformType).ReadTrailingSections(binaryReader, this);
+
             Section textureNativeExtensionSection = (Section)binaryReader.ReadInt32();
             if (textureNativeExtensionSection == Section.Extension)
                 textureNativeExtension = new Extension_0003(binaryReader);
@@ -71,12 +57,7 @@ namespace RenderWareFile.Sections
 
             listBytes.AddRange(textureNativeStruct.GetBytes(fileVersion));
 
-            if (textureNativeStruct.platformType == TexturePlatformID.PS2)
-            {
-                listBytes.AddRange(new String_0002(textureNativeStruct.textureName).GetBytes(fileVersion));
-                listBytes.AddRange(new String_0002(textureNativeStruct.alphaName).GetBytes(fileVersion));
-                listBytes.AddRange(PS2RasterFormat?.GetBytes(fileVersion));
-            }
+            TexturePlatformHandler.Get(textureNativeStruct.platformType).WriteTrailingSections(this, fileVersion, listBytes);
 
             if (textureNativeExtension != null)
                 listBytes.AddRange(textureNativeExtension.GetBytes(fileVersion));

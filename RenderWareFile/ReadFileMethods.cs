@@ -22,24 +22,29 @@ namespace RenderWareFile
 
         public static RWSection[] ReadRenderWareFile(Stream File)
         {
-            using (BinaryReader binaryReader = new BinaryReader(File))
-            {
-                List<RWSection> renderWareFile = new List<RWSection>();
+            using BinaryReader binaryReader = new BinaryReader(File);
+            List<RWSection> renderWareFile = new List<RWSection>();
 
-                while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+            while (binaryReader.BaseStream.Position < binaryReader.BaseStream.Length)
+            {
+                Section currentSection = (Section)binaryReader.ReadInt32();
+                switch (currentSection)
                 {
-                    Section currentSection = (Section)binaryReader.ReadInt32();
-                    if (currentSection == Section.World)
+                    case Section.World:
                         renderWareFile.Add(new World_000B(binaryReader));
-                    else if (currentSection == Section.Clump)
+                        break;
+                    case Section.Clump:
                         renderWareFile.Add(new Clump_0010(binaryReader));
-                    else if (currentSection == Section.TextureDictionary)
+                        break;
+                    case Section.TextureDictionary:
                         renderWareFile.Add(new TextureDictionary_0016(binaryReader));
-                    else
+                        break;
+                    default:
                         renderWareFile.Add(new GenericSection(binaryReader, currentSection));
+                        break;
                 }
-                return renderWareFile.ToArray();
             }
+            return renderWareFile.ToArray();
         }
 
         public static byte[] ExportRenderWareFile(RWSection RWFile, RWVersion version)
