@@ -7,21 +7,22 @@ namespace RenderWareFile.Sections
 
     public class NativeDataStruct_0001 : RWSection
     {
-        public NativeDataType nativeDataType;
-        public NativeDataGC nativeData;
+        public NativeDataType nativeDataType { get; set; }
+        public NativeDataGC nativeData { get; set; }
+        public NativeDataPS2 nativeDataPs2 { get; set; }
 
-        public byte[] nativeDataData;
+        public byte[] nativeDataData { get; set; }
 
-        public NativeDataStruct_0001 Read(BinaryReader binaryReader)
+        public NativeDataStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             if (ReadFileMethods.treatStuffAsByteArray)
             {
                 nativeDataData = binaryReader.ReadBytes(sectionSize);
-                return this;
+                return;
             }
 
             long startSectionPosition = binaryReader.BaseStream.Position;
@@ -40,16 +41,17 @@ namespace RenderWareFile.Sections
                         nativeData = new NativeDataGC(binaryReader, true);
                     }
                     break;
+                case NativeDataType.PS2:
+                    nativeDataPs2 = new NativeDataPS2(binaryReader);
+                    break;
                 default:
                     throw new Exception();
             }
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
@@ -65,6 +67,9 @@ namespace RenderWareFile.Sections
             {
                 case NativeDataType.GameCube:
                     listBytes.AddRange(nativeData.GetBytes());
+                    break;
+                case NativeDataType.PS2:
+                    listBytes.AddRange(nativeDataPs2.GetBytes());
                     break;
                 default:
                     throw new Exception();

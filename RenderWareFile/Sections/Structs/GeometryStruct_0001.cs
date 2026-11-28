@@ -6,81 +6,93 @@ namespace RenderWareFile.Sections
 {
     public struct MorphTarget
     {
-        public Vertex3 sphereCenter;
-        public float radius;
-        public int hasVertices;
-        public int hasNormals;
+        public Vertex3 sphereCenter { get; set; }
+        public float radius { get; set; }
+        public int hasVertices { get; set; }
+        public int hasNormals { get; set; }
 
-        public Vertex3[] vertices;
-        public Vertex3[] normals;
+        public Vertex3[] vertices { get; set; }
+        public Vertex3[] normals { get; set; }
     }
 
     public class GeometryStruct_0001 : RWSection
     {
-        public GeometryFlags geometryFlags;
-        public GeometryFlags2 geometryFlags2;
-        public int numTriangles;
-        public int numVertices;
-        public int numMorphTargets;
+        public GeometryFlags geometryFlags { get; set; }
+        public bool GeometryTristrip => (geometryFlags & GeometryFlags.rpGEOMETRYTRISTRIP) != 0;
+        public bool GeometryPositions => (geometryFlags & GeometryFlags.rpGEOMETRYPOSITIONS) != 0;
+        public bool GeometryTextured => (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED) != 0;
+        public bool GeometryPrelit => (geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0;
+        public bool GeometryNormals => (geometryFlags & GeometryFlags.rpGEOMETRYNORMALS) != 0;
+        public bool GeometryLights => (geometryFlags & GeometryFlags.rpGEOMETRYLIGHTS) != 0;
+        public bool GeometryModulateMaterialColor => (geometryFlags & GeometryFlags.rpGEOMETRYMODULATEMATERIALCOLOR) != 0;
+        public bool GeometryTextured2 => (geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0;
+        public bool GeometryNative => (geometryFlags & GeometryFlags.rpGEOMETRYNATIVE) != 0;
 
-        public float ambient;
-        public float specular;
-        public float diffuse;
+        public int numTriangles { get; set; }
+        public int numVertices { get; set; }
+        public int numMorphTargets { get; set; }
 
-        public float sphereCenterX;
-        public float sphereCenterY;
-        public float sphereCenterZ;
-        public float sphereRadius;
-        public int unknown1;
-        public int unknown2;
+        public float ambient { get; set; }
+        public float specular { get; set; }
+        public float diffuse { get; set; }
 
-        public Color[] vertexColors;
-        public Vertex2[] textCoords;
-        public Triangle[] triangles;
-        public MorphTarget[] morphTargets;
+        public float sphereCenterX { get; set; }
+        public float sphereCenterY { get; set; }
+        public float sphereCenterZ { get; set; }
+        public float sphereRadius { get; set; }
+        public int hasVertices { get; set; }
+        public int hasNormals { get; set; }
 
-        public byte[] sectionData;
+        public Color[] vertexColors { get; set; }
+        public Vertex2[] textCoords { get; set; }
+        public Vertex2[] textCoords2 { get; set; }
+        public Triangle[] triangles { get; set; }
+        public MorphTarget[] morphTargets { get; set; }
 
-        public GeometryStruct_0001 Read(BinaryReader binaryReader)
+        public byte[] sectionData { get; set; }
+
+        public GeometryStruct_0001() { }
+        public GeometryStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             if (ReadFileMethods.treatStuffAsByteArray)
             {
                 sectionData = binaryReader.ReadBytes(sectionSize);
-                return this;
+                return;
             }
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
-            geometryFlags = (GeometryFlags)binaryReader.ReadInt16();
-            geometryFlags2 = (GeometryFlags2)binaryReader.ReadInt16();
+            geometryFlags = (GeometryFlags)binaryReader.ReadInt32();
             numTriangles = binaryReader.ReadInt32();
             numVertices = binaryReader.ReadInt32();
             numMorphTargets = binaryReader.ReadInt32();
 
-            if (Shared.UnpackLibraryVersion(renderWareVersion) < 0x34000)
+            int numTexCoords = GeometryTextured ? 1 : GeometryTextured2 ? 2 : ((int)geometryFlags >> 16) & 0xFF;
+
+            if (renderWareVersion < (3,4))
             {
                 ambient = binaryReader.ReadSingle();
                 specular = binaryReader.ReadSingle();
                 diffuse = binaryReader.ReadSingle();
             }
 
-            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
+            if (GeometryNative)
             {
                 sphereCenterX = binaryReader.ReadSingle();
                 sphereCenterY = binaryReader.ReadSingle();
                 sphereCenterZ = binaryReader.ReadSingle();
                 sphereRadius = binaryReader.ReadSingle();
-                unknown1 = binaryReader.ReadInt32();
-                unknown2 = binaryReader.ReadInt32();
+                hasVertices = binaryReader.ReadInt32();
+                hasNormals = binaryReader.ReadInt32();
 
-                return this;
+                return;
             }
 
-            if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
+            if (GeometryPrelit)
             {
                 vertexColors = new Color[numVertices];
                 for (int i = 0; i < numVertices; i++)
@@ -95,32 +107,28 @@ namespace RenderWareFile.Sections
                 }
             }
 
-            if ((geometryFlags & GeometryFlags.hasTextCoords) != 0)
+            if (numTexCoords >= 1)
             {
                 textCoords = new Vertex2[numVertices];
                 for (int i = 0; i < numVertices; i++)
-                {
                     textCoords[i] = new Vertex2()
                     {
                         X = binaryReader.ReadSingle(),
                         Y = binaryReader.ReadSingle()
                     };
-                }
-
-                if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
-                    binaryReader.BaseStream.Position += numVertices * 8;
             }
-            else if ((geometryFlags & GeometryFlags.hasTextCoords2) != 0)
+
+            if (numTexCoords >= 2)
             {
-                textCoords = new Vertex2[numVertices * 2];
-                for (int i = 0; i < numVertices * 2; i++)
-                {
-                    textCoords[i] = new Vertex2()
+                textCoords2 = new Vertex2[numVertices];
+                for (int i = 0; i < numVertices; i++)
+                    textCoords2[i] = new Vertex2()
                     {
                         X = binaryReader.ReadSingle(),
                         Y = binaryReader.ReadSingle()
                     };
-                }
+
+                binaryReader.BaseStream.Position += (numVertices * 8) * (numTexCoords - 2);
             }
 
             triangles = new Triangle[numTriangles];
@@ -138,14 +146,13 @@ namespace RenderWareFile.Sections
             morphTargets = new MorphTarget[numMorphTargets];
             for (int i = 0; i < numMorphTargets; i++)
             {
-                MorphTarget m = new MorphTarget();
-
-                m.sphereCenter.X = binaryReader.ReadSingle();
-                m.sphereCenter.Y = binaryReader.ReadSingle();
-                m.sphereCenter.Z = binaryReader.ReadSingle();
-                m.radius = binaryReader.ReadSingle();
-                m.hasVertices = binaryReader.ReadInt32();
-                m.hasNormals = binaryReader.ReadInt32();
+                MorphTarget m = new MorphTarget
+                {
+                    sphereCenter = new Vertex3(binaryReader.ReadSingle(), binaryReader.ReadSingle(), binaryReader.ReadSingle()),
+                    radius = binaryReader.ReadSingle(),
+                    hasVertices = binaryReader.ReadInt32(),
+                    hasNormals = binaryReader.ReadInt32()
+                };
 
                 if (m.hasVertices != 0)
                 {
@@ -180,11 +187,9 @@ namespace RenderWareFile.Sections
 
                 morphTargets[i] = m;
             }
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
@@ -194,31 +199,30 @@ namespace RenderWareFile.Sections
                 return;
             }
 
-            listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags));
-            listBytes.AddRange(BitConverter.GetBytes((short)geometryFlags2));
+            listBytes.AddRange(BitConverter.GetBytes((int)geometryFlags));
             listBytes.AddRange(BitConverter.GetBytes(numTriangles));
             listBytes.AddRange(BitConverter.GetBytes(numVertices));
             listBytes.AddRange(BitConverter.GetBytes(numMorphTargets));
 
-            if (Shared.UnpackLibraryVersion(fileVersion) < 0x34000)
+            if (fileVersion < (3,4,0,0))
             {
                 listBytes.AddRange(BitConverter.GetBytes(ambient));
                 listBytes.AddRange(BitConverter.GetBytes(specular));
                 listBytes.AddRange(BitConverter.GetBytes(diffuse));
             }
 
-            if ((geometryFlags2 & GeometryFlags2.isNativeGeometry) != 0)
+            if ((geometryFlags & GeometryFlags.rpGEOMETRYNATIVE) != 0)
             {
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterX));
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterY));
                 listBytes.AddRange(BitConverter.GetBytes(sphereCenterZ));
                 listBytes.AddRange(BitConverter.GetBytes(sphereRadius));
-                listBytes.AddRange(BitConverter.GetBytes(unknown1));
-                listBytes.AddRange(BitConverter.GetBytes(unknown2));
+                listBytes.AddRange(BitConverter.GetBytes(hasVertices));
+                listBytes.AddRange(BitConverter.GetBytes(hasNormals));
             }
             else
             {
-                if ((geometryFlags & GeometryFlags.hasVertexColors) != 0)
+                if ((geometryFlags & GeometryFlags.rpGEOMETRYPRELIT) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {
@@ -229,12 +233,21 @@ namespace RenderWareFile.Sections
                     }
                 }
 
-                if ((geometryFlags & GeometryFlags.hasTextCoords) != 0)
+                if ((geometryFlags & (GeometryFlags.rpGEOMETRYTEXTURED | GeometryFlags.rpGEOMETRYTEXTURED2)) != 0)
                 {
                     for (int i = 0; i < numVertices; i++)
                     {
                         listBytes.AddRange(BitConverter.GetBytes(textCoords[i].X));
                         listBytes.AddRange(BitConverter.GetBytes(textCoords[i].Y));
+                    }
+                }
+
+                if ((geometryFlags & GeometryFlags.rpGEOMETRYTEXTURED2) != 0)
+                {
+                    for (int i = 0; i < numVertices; i++)
+                    {
+                        listBytes.AddRange(BitConverter.GetBytes(textCoords2[i].X));
+                        listBytes.AddRange(BitConverter.GetBytes(textCoords2[i].Y));
                     }
                 }
 

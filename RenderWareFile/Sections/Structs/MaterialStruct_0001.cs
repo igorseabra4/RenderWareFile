@@ -14,11 +14,12 @@ namespace RenderWareFile.Sections
         public float specular;
         public float diffuse;
 
-        public MaterialStruct_0001 Read(BinaryReader binaryReader)
+        public MaterialStruct_0001() { }
+        public MaterialStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             unusedFlags = binaryReader.ReadInt32();
             byte R = binaryReader.ReadByte();
@@ -31,11 +32,9 @@ namespace RenderWareFile.Sections
             ambient = binaryReader.ReadSingle();
             specular = binaryReader.ReadSingle();
             diffuse = binaryReader.ReadSingle();
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 

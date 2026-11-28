@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace RenderWareFile.Sections
 {
-    [TypeConverter(typeof(ExpandableObjectConverter))]
     public class Texture_0006 : RWSection
     {
         public TextureStruct_0001 textureStruct;
@@ -54,32 +52,30 @@ namespace RenderWareFile.Sections
             set => textureStruct.UseMipLevels = value;
         }
 
-        public Texture_0006 Read(BinaryReader binaryReader)
+        public Texture_0006(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Texture;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             Section textureStructSection = (Section)binaryReader.ReadInt32();
             if (textureStructSection != Section.Struct) throw new Exception();
-            textureStruct = new TextureStruct_0001().Read(binaryReader);
+            textureStruct = new TextureStruct_0001(binaryReader);
 
             Section diffuseTextureNameSection = (Section)binaryReader.ReadInt32();
             if (diffuseTextureNameSection != Section.String) throw new Exception();
-            diffuseTextureName = new String_0002().Read(binaryReader);
+            diffuseTextureName = new String_0002(binaryReader);
 
             Section alphaTextureNameSection = (Section)binaryReader.ReadInt32();
             if (alphaTextureNameSection != Section.String) throw new Exception();
-            alphaTextureName = new String_0002().Read(binaryReader);
+            alphaTextureName = new String_0002(binaryReader);
 
             Section textureExtensionSection = (Section)binaryReader.ReadInt32();
             if (textureExtensionSection != Section.Extension) throw new Exception();
-            textureExtension = new Extension_0003().Read(binaryReader);
-
-            return this;
+            textureExtension = new Extension_0003(binaryReader);
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Texture;
 

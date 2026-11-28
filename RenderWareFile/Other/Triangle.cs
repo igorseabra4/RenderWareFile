@@ -2,10 +2,10 @@
 {
     public struct Triangle
     {
-        public ushort materialIndex;
-        public ushort vertex1;
-        public ushort vertex2;
-        public ushort vertex3;
+        public ushort materialIndex { get; set; }
+        public ushort vertex1 { get; set; }
+        public ushort vertex2 { get; set; }
+        public ushort vertex3 { get; set; }
 
         public Triangle(ushort m, ushort v1, ushort v2, ushort v3)
         {

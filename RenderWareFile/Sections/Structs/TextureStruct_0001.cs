@@ -22,11 +22,11 @@ namespace RenderWareFile.Sections
             UseMipLevels = 1;
         }
 
-        public TextureStruct_0001 Read(BinaryReader binaryReader)
+        public TextureStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             FilterMode = (TextureFilterMode)binaryReader.ReadByte();
 
@@ -35,11 +35,9 @@ namespace RenderWareFile.Sections
             AddressModeV = (TextureAddressMode)(addressMode & 0x0F);
 
             UseMipLevels = binaryReader.ReadUInt16();
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 

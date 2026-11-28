@@ -4,57 +4,57 @@ using System.IO;
 
 namespace RenderWareFile.Sections
 {
-    public enum GeometryFlags : short
+    public enum GeometryFlags : int
     {
         none = 0x0000,
-        isTristrip = 0x0001,
-        hasVertexPositions = 0x0002,
-        hasTextCoords = 0x0004,
-        hasVertexColors = 0x0008,
-        hasNormals = 0x0010,
-        hasLights = 0x0020,
-        modeulateMaterialColor = 0x00040,
-        hasTextCoords2 = 0x0080
-    }
-
-    public enum GeometryFlags2 : short
-    {
-        none = 0x0000,
-        isNativeGeometry = 0x0100
+        rpGEOMETRYTRISTRIP = 0x0001,
+        rpGEOMETRYPOSITIONS = 0x0002,
+        rpGEOMETRYTEXTURED = 0x0004,
+        rpGEOMETRYPRELIT = 0x0008,
+        rpGEOMETRYNORMALS = 0x0010,
+        rpGEOMETRYLIGHTS = 0x0020,
+        rpGEOMETRYMODULATEMATERIALCOLOR = 0x00040,
+        rpGEOMETRYTEXTURED2 = 0x0080,
+        rpGEOMETRYNATIVE = 0x01000000
     }
 
     public class Geometry_000F : RWSection
     {
-        public GeometryStruct_0001 geometryStruct;
-        public MaterialList_0008 materialList;
-        public Extension_0003 geometryExtension;
+        public GeometryStruct_0001 geometryStruct { get; set; }
+        public MaterialList_0008 materialList { get; set; }
+        public Extension_0003 geometryExtension { get; set; }
 
-        public Geometry_000F Read(BinaryReader binaryReader)
+        public Geometry_000F(MaterialList_0008 materialList, GeometryStruct_0001 geometryStruct, Extension_0003 geometryExtension)
+        {
+            this.geometryStruct = geometryStruct;
+            this.materialList = materialList;
+            this.geometryExtension = geometryExtension;
+        }
+
+        public Geometry_000F(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Geometry;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             long startSectionPosition = binaryReader.BaseStream.Position;
 
             Section geometryStructSection = (Section)binaryReader.ReadInt32();
             if (geometryStructSection != Section.Struct) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            geometryStruct = new GeometryStruct_0001().Read(binaryReader);
+            geometryStruct = new GeometryStruct_0001(binaryReader);
 
             Section materialListSection = (Section)binaryReader.ReadInt32();
             if (materialListSection != Section.MaterialList) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            materialList = new MaterialList_0008().Read(binaryReader);
+            materialList = new MaterialList_0008(binaryReader);
 
             Section geometryExtensionSection = (Section)binaryReader.ReadInt32();
             if (geometryExtensionSection != Section.Extension) throw new Exception(binaryReader.BaseStream.Position.ToString());
-            geometryExtension = new Extension_0003().Read(binaryReader);
+            geometryExtension = new Extension_0003(binaryReader);
 
             binaryReader.BaseStream.Position = startSectionPosition + sectionSize;
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Geometry;
 

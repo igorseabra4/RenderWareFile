@@ -6,30 +6,30 @@ namespace RenderWareFile.Sections
 {
     public class UserDataPLG_011F : RWSection
     {
-        public byte[] data;
+        public byte[] data { get; set; }
 
-        public int userDataType;
-        public int unknown2;
-        public string attribute;
-        public int unknown3;
-        public int numTriangles;
-        public Color[] collisionFlags;
-        public int unknown4;
-        public string userData;
-        public int unknown5;
-        public int unknown6;
-        public int unknown7;
+        public int userDataType { get; set; }
+        public int unknown2 { get; set; }
+        public string attribute { get; set; }
+        public int unknown3 { get; set; }
+        public int numTriangles { get; set; }
+        public Color[] collisionFlags { get; set; }
+        public int unknown4 { get; set; }
+        public string userData { get; set; }
+        public int unknown5 { get; set; }
+        public int unknown6 { get; set; }
+        public int unknown7 { get; set; }
 
-        public UserDataPLG_011F Read(BinaryReader binaryReader)
+        public UserDataPLG_011F(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.UserDataPLG;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             data = binaryReader.ReadBytes(sectionSize);
 
             if (!ReadFileMethods.isCollision)
-                return this;
+                return;
 
             binaryReader.BaseStream.Position -= sectionSize;
 
@@ -53,11 +53,9 @@ namespace RenderWareFile.Sections
             unknown5 = binaryReader.ReadInt32();
             unknown6 = binaryReader.ReadInt32();
             unknown7 = binaryReader.ReadInt32();
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.UserDataPLG;
 

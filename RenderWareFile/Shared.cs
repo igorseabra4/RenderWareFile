@@ -7,14 +7,6 @@ namespace RenderWareFile
 {
     public static class Shared
     {
-        public static int UnpackLibraryVersion(int libid)
-        {
-            if ((libid & 0xFFFF0000) != 0)
-                return (libid >> 14 & 0x3FF00) + 0x30000 |
-                       (libid >> 16 & 0x3F);
-            return libid << 8;
-        }
-
         public static bool DoNotSwitch = false;
 
         public static float Switch(float f)
@@ -29,10 +21,22 @@ namespace RenderWareFile
             return BitConverter.ToInt32(new byte[] { a[3], a[2], a[1], a[0] }, 0);
         }
 
+        public static uint Switch(uint f)
+        {
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToUInt32(new byte[] { a[3], a[2], a[1], a[0] }, 0);
+        }
+
         public static short Switch(short f)
         {
             byte[] a = BitConverter.GetBytes(f);
             return BitConverter.ToInt16(new byte[] { a[1], a[0] }, 0);
+        }
+
+        public static ushort Switch(ushort f)
+        {
+            byte[] a = BitConverter.GetBytes(f);
+            return BitConverter.ToUInt16(new byte[] { a[1], a[0] }, 0);
         }
 
         public static float SwitchToggleable(float f)

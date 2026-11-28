@@ -30,8 +30,9 @@
         MaterialEffectsPLG = 0x120,
         BinMeshPLG = 0x50E,
         NativeDataPLG = 0x510,
-        BFBB_CollisionData_Section1 = 0x00BEEF01,
-        BFBB_CollisionData_Section2 = 0x00BEEF02,
-        BFBB_CollisionData_Section3 = 0x00BEEF03,
+        HI_TAGS_BEEF01 = 0x00BEEF01,
+        HI_TAGS_BEEF02 = 0x00BEEF02,
+        HI_TAGS_BEEF03 = 0x00BEEF03,
+        HI_TAGS_BEEF04 = 0x00BEEF04,
     }
 }

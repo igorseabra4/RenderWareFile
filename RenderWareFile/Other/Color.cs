@@ -17,6 +17,14 @@ namespace RenderWareFile
             A = a;
         }
 
+        public Color(float r, float g, float b, float a)
+        {
+            R = (byte)(r * 255);
+            G = (byte)(g * 255);
+            B = (byte)(b * 255);
+            A = (byte)(a * 255);
+        }
+
         public Color(byte[] v)
         {
             R = v[0];

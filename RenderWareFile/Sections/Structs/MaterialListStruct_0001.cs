@@ -6,24 +6,28 @@ namespace RenderWareFile.Sections
 {
     public class MaterialListStruct_0001 : RWSection
     {
-        public int materialCount;
+        public int materialCount { get; internal set; }
 
-        public MaterialListStruct_0001 Read(BinaryReader binaryReader)
+        public MaterialListStruct_0001(int materialCount)
+        {
+            sectionIdentifier = Section.Struct;
+            this.materialCount = materialCount;
+        }
+
+        public MaterialListStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             materialCount = binaryReader.ReadInt32();
             for (int i = 0; i < materialCount; i++)
             {
                 binaryReader.ReadInt32();
             }
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 

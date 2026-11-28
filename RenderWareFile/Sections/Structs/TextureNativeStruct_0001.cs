@@ -7,8 +7,8 @@ namespace RenderWareFile.Sections
 {
     public struct MipMapEntry
     {
-        public int dataSize;
-        public byte[] data;
+        public int dataSize { get; set; }
+        public byte[] data { get; set; }
 
         public MipMapEntry(int dataSize, byte[] data)
         {
@@ -19,79 +19,91 @@ namespace RenderWareFile.Sections
 
     public class TextureNativeStruct_0001 : RWSection
     {
-        public int platformType;
-        public TextureFilterMode filterMode;
-        public TextureAddressMode addressModeU; // half a byte
-        public TextureAddressMode addressModeV; // half a byte
-        public string textureName;
-        public string alphaName;
-        public TextureRasterFormat rasterFormatFlags;
-        public bool hasAlpha;
-        public short width;
-        public short height;
-        public byte bitDepth;
-        public byte mipMapCount;
-        public byte type;
-        public byte compression;
-        public Color[] palette;
-        public MipMapEntry[] mipMaps;
+        public TexturePlatformID platformType { get; set; }
 
-        public int gcnUnknown1;
-        public int gcnUnknown2;
-        public int gcnUnknown3;
-        public int gcnUnknown4;
+        private int id { get; set; }
+        public TextureFilterMode filterMode
+        {
+            get => (TextureFilterMode)(id & 0xFF);
+            set { id = (id & ~0xff) | ((int)value & 0xff); }
+        }
+        public TextureAddressMode addressModeU
+        {
+            get => (TextureAddressMode)((id & 0xF000) >> 12);
+            set { id = (id & ~0xF000) | ((int)value << 12); }
+        }
+        public TextureAddressMode addressModeV
+        {
+            get => (TextureAddressMode)((id & 0xF00) >> 8);
+            set { id = (id & ~0xF00) | ((int)value << 8); }
+        }
+        private string _textureName;
+        public string textureName { get => _textureName; set { _textureName = value.Length > 32 ? value[..32] : value; } }
+        private string _alphaName;
+        public string alphaName { get => _alphaName; set { _alphaName = value.Length > 32 ? value[..32] : value; } }
+        public TextureRasterFormat rasterFormatFlags { get; set; }
+        public bool hasAlpha { get; set; }
+        public short width { get; set; }
+        public short height { get; set; }
+        public byte bitDepth { get; set; }
+        public byte mipMapCount { get; set; }
+        public byte type { get; set; }
+        public byte compression { get; set; }
+        public Color[] palette { get; set; }
+        public MipMapEntry[] mipMaps { get; set; }
 
-        public String_0002 ps2TextureNameString;
-        public String_0002 ps2AlphaNameString;
+        #region Gamecube
+        public uint maxAniso { get; set; }
+        public int biasClamp { get; set; }
+        public int edgeLod { get; set; }
+        public float lodBias { get; set; }
+        #endregion
 
-        private int totalMipMapDataSize;
+        private int totalMipMapDataSize { get; set; }
 
-        private byte[] sectionData;
-        private long startSectionPosition;
+        private byte[] sectionData { get; set; }
+        private long startSectionPosition { get; set; }
 
-        public TextureNativeStruct_0001 Read(BinaryReader binaryReader)
+        public TextureNativeStruct_0001() { }
+        public TextureNativeStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             startSectionPosition = binaryReader.BaseStream.Position;
 
-            platformType = binaryReader.ReadInt32();
+            platformType = (TexturePlatformID)binaryReader.ReadInt32();
 
-            if (platformType == 8 | platformType == 5)
+            id = platformType == TexturePlatformID.GameCube ? Shared.Switch(binaryReader.ReadInt32()) : binaryReader.ReadInt32();
+
+            switch (platformType)
             {
-                ReadNormalData(binaryReader, (int)startSectionPosition + sectionSize);
+                case TexturePlatformID.PCD3D8:
+                case TexturePlatformID.PCD3D9:
+                case TexturePlatformID.Xbox:
+                    ReadNormalData(binaryReader, (int)startSectionPosition + sectionSize); break;
+                case TexturePlatformID.GameCube:
+                    ReadGameCubeData(binaryReader); break;
+                case TexturePlatformID.PS2:
+                    return;
+                default:
+                    throw new InvalidDataException("Unsupported texture format: " + platformType.ToString());
+
             }
-            else if (platformType == 100663296)
-            {
-                ReadGameCubeData(binaryReader);
-            }
-            else if (platformType == 3298128)
-            {
-                ReadPS2Data(binaryReader);
-                return this;
-            }
-            else throw new InvalidDataException("Unsupported texture format: " + platformType.ToString());
 
             if (binaryReader.BaseStream.Position != startSectionPosition + sectionSize)
                 throw new Exception(binaryReader.BaseStream.Position.ToString());
 
-            return this;
+            return;
         }
 
         private void ReadNormalData(BinaryReader binaryReader, int endOfSectionPosition)
         {
-            filterMode = (TextureFilterMode)binaryReader.ReadByte();
-            byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
-            addressModeV = (TextureAddressMode)(addressMode & 0x0F);
-            binaryReader.BaseStream.Position += 2;
-
             textureName = ReadString(binaryReader);
             alphaName = ReadString(binaryReader);
 
-            rasterFormatFlags = (TextureRasterFormat)binaryReader.ReadInt32();
+            rasterFormatFlags = (TextureRasterFormat)binaryReader.ReadUInt32();
             hasAlpha = binaryReader.ReadInt32() != 0;
             width = binaryReader.ReadInt16();
             height = binaryReader.ReadInt16();
@@ -101,7 +113,7 @@ namespace RenderWareFile.Sections
             type = binaryReader.ReadByte();
             compression = binaryReader.ReadByte();
 
-            if (platformType == 5)
+            if (platformType == TexturePlatformID.Xbox)
                 totalMipMapDataSize = binaryReader.ReadInt32();
 
             int palleteSize =
@@ -121,9 +133,9 @@ namespace RenderWareFile.Sections
             {
                 int dataSize = 0;
 
-                if (platformType == 8)
+                if (platformType != TexturePlatformID.Xbox)
                     dataSize = binaryReader.ReadInt32();
-                else if (platformType == 5)
+                else
                     dataSize = BiggestPowerOfTwoUnder(totalMipMapDataSize - passedSize);
 
                 byte[] data = binaryReader.ReadBytes(dataSize);
@@ -133,26 +145,6 @@ namespace RenderWareFile.Sections
             }
         }
 
-        private void ReadPS2Data(BinaryReader binaryReader)
-        {
-            filterMode = (TextureFilterMode)binaryReader.ReadByte();
-            byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
-            addressModeV = (TextureAddressMode)(addressMode & 0x0F);
-            binaryReader.BaseStream.Position += 2;
-
-            binaryReader.ReadInt32();
-            textureName = new String_0002().Read(binaryReader).stringString;
-            binaryReader.ReadInt32();
-            alphaName = new String_0002().Read(binaryReader).stringString;
-
-            binaryReader.ReadInt32();
-            int sizeOfdata = binaryReader.ReadInt32();
-            binaryReader.ReadInt32();
-
-            sectionData = binaryReader.ReadBytes(sizeOfdata);
-        }
-
         private int BiggestPowerOfTwoUnder(int number)
         {
             return (int)Math.Pow(2, (Math.Floor(Math.Log(number, 2))));
@@ -160,25 +152,13 @@ namespace RenderWareFile.Sections
 
         private void ReadGameCubeData(BinaryReader binaryReader)
         {
-            binaryReader.BaseStream.Position += 2;
-            byte addressMode = binaryReader.ReadByte();
-            addressModeU = (TextureAddressMode)((addressMode & 0xF0) >> 4);
-            addressModeV = (TextureAddressMode)(addressMode & 0x0F);
-            filterMode = (TextureFilterMode)binaryReader.ReadByte();
-
-            gcnUnknown1 = Shared.Switch(binaryReader.ReadInt32());
-            gcnUnknown2 = Shared.Switch(binaryReader.ReadInt32());
-            gcnUnknown3 = Shared.Switch(binaryReader.ReadInt32());
-            gcnUnknown4 = Shared.Switch(binaryReader.ReadInt32());
+            maxAniso = Shared.Switch(binaryReader.ReadUInt32());
+            biasClamp = Shared.Switch(binaryReader.ReadInt32());
+            edgeLod = Shared.Switch(binaryReader.ReadInt32());
+            lodBias = Shared.Switch(binaryReader.ReadSingle());
 
             textureName = ReadString(binaryReader);
             alphaName = ReadString(binaryReader);
-
-            if (ReadFileMethods.treatStuffAsByteArray)
-            {
-                sectionData = binaryReader.ReadBytes((int)(sectionSize - (binaryReader.BaseStream.Position - startSectionPosition)));
-                return;
-            }
 
             rasterFormatFlags = (TextureRasterFormat)Shared.Switch(binaryReader.ReadInt32());
             width = Shared.Switch(binaryReader.ReadInt16());
@@ -188,6 +168,12 @@ namespace RenderWareFile.Sections
             mipMapCount = binaryReader.ReadByte();
             type = binaryReader.ReadByte();
             compression = binaryReader.ReadByte();
+
+            if (ReadFileMethods.treatStuffAsByteArray)
+            {
+                sectionData = binaryReader.ReadBytes((int)(sectionSize - (binaryReader.BaseStream.Position - startSectionPosition)));
+                return;
+            }
 
             int palleteSize =
                 ((rasterFormatFlags & TextureRasterFormat.RASTER_PAL4) != 0) ? 0x80 / 4 :
@@ -227,34 +213,31 @@ namespace RenderWareFile.Sections
             return new string(chars.ToArray());
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
-            listBytes.AddRange(BitConverter.GetBytes(platformType));
+            listBytes.AddRange(BitConverter.GetBytes((int)platformType));
+            listBytes.AddRange(platformType == TexturePlatformID.GameCube ? BitConverter.GetBytes(id).Reverse() : BitConverter.GetBytes(id));
 
-            if (platformType == 8 | platformType == 5)
+            switch (platformType)
             {
-                SetNormalListBytes(fileVersion, ref listBytes);
+                case TexturePlatformID.PS2:
+                    return;
+                case TexturePlatformID.PCD3D8:
+                case TexturePlatformID.PCD3D9:
+                case TexturePlatformID.Xbox:
+                    SetNormalListBytes(fileVersion, ref listBytes); break;
+                case TexturePlatformID.GameCube:
+                    SetGameCubeListBytes(fileVersion, ref listBytes); break;
+                default:
+                    throw new NotImplementedException("Unsupported writing of this platform type");
             }
-            else if (platformType == 100663296)
-            {
-                SetGameCubeListBytes(fileVersion, ref listBytes);
-            }
-            else if (platformType == 3298128)
-            {
-                SetPS2ListBytes(fileVersion, ref listBytes);
-            }
-            else throw new NotImplementedException("Unsupported writing of this platform type");
+            
         }
 
         private void SetNormalListBytes(int fileVersion, ref List<byte> listBytes)
         {
-            listBytes.Add((byte)filterMode);
-            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
-            listBytes.Add(0);
-            listBytes.Add(0);
-
             foreach (char i in textureName)
                 listBytes.Add((byte)i);
             for (int i = textureName.Length; i < 32; i++)
@@ -277,7 +260,7 @@ namespace RenderWareFile.Sections
             listBytes.Add(type);
             listBytes.Add(compression);
 
-            if (platformType == 5)
+            if (platformType == TexturePlatformID.Xbox)
             {
                 totalMipMapDataSize = 0;
                 foreach (MipMapEntry i in mipMaps)
@@ -297,60 +280,45 @@ namespace RenderWareFile.Sections
 
             foreach (MipMapEntry i in mipMaps)
             {
-                if (platformType == 8)
+                if (platformType != TexturePlatformID.Xbox)
                     listBytes.AddRange(BitConverter.GetBytes(i.dataSize));
 
                 foreach (byte j in i.data)
                     listBytes.Add(j);
             }
         }
-
-        private void SetPS2ListBytes(int fileVersion, ref List<byte> listBytes)
-        {
-            listBytes.Add((byte)filterMode);
-            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
-            listBytes.Add(0);
-            listBytes.Add(0);
-
-            listBytes.AddRange(new String_0002(textureName).GetBytes(fileVersion));
-            listBytes.AddRange(new String_0002(alphaName).GetBytes(fileVersion));
-
-            listBytes.Add(1);
-            listBytes.Add(0);
-            listBytes.Add(0);
-            listBytes.Add(0);
-            listBytes.AddRange(BitConverter.GetBytes(sectionData.Length));
-            listBytes.AddRange(BitConverter.GetBytes(renderWareVersion));
-            listBytes.AddRange(sectionData);
-        }
-
         private void SetGameCubeListBytes(int fileVersion, ref List<byte> listBytes)
         {
-            listBytes.Add(0);
-            listBytes.Add(0);
-            listBytes.Add((byte)((byte)addressModeV + ((byte)addressModeU << 4)));
-            listBytes.Add((byte)filterMode);
+            listBytes.AddRange(BitConverter.GetBytes(maxAniso).Reverse());
+            listBytes.AddRange(BitConverter.GetBytes(biasClamp).Reverse());
+            listBytes.AddRange(BitConverter.GetBytes(edgeLod).Reverse());
+            listBytes.AddRange(BitConverter.GetBytes(lodBias).Reverse());
 
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown1).Reverse().ToArray());
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown2).Reverse().ToArray());
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown3).Reverse().ToArray());
-            listBytes.AddRange(BitConverter.GetBytes(gcnUnknown4).Reverse().ToArray());
-
+            textureName += "\0";
             for (int i = 0; i < 32; i++)
             {
                 if (i < textureName.Length)
                     listBytes.Add((byte)textureName[i]);
                 else
-                    listBytes.Add(0);
+                    listBytes.Add(0xdd);
             }
 
+            alphaName += "\0";
             for (int i = 0; i < 32; i++)
             {
                 if (i < alphaName.Length)
                     listBytes.Add((byte)alphaName[i]);
                 else
-                    listBytes.Add(0);
+                    listBytes.Add(0xdd);
             }
+
+            listBytes.AddRange(BitConverter.GetBytes((int)rasterFormatFlags).Reverse());
+            listBytes.AddRange(BitConverter.GetBytes(width).Reverse());
+            listBytes.AddRange(BitConverter.GetBytes(height).Reverse());
+            listBytes.Add(bitDepth);
+            listBytes.Add(mipMapCount);
+            listBytes.Add(type);
+            listBytes.Add(compression);
 
             if (ReadFileMethods.treatStuffAsByteArray)
             {

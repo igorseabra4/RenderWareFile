@@ -6,20 +6,23 @@ namespace RenderWareFile.Sections
 {
     public class GeometryListStruct_0001 : RWSection
     {
-        public int numberOfGeometries;
+        public int numberOfGeometries { get; internal set; }
 
-        public GeometryListStruct_0001 Read(BinaryReader binaryReader)
+        public GeometryListStruct_0001(int numberOfGeometries)
+        {
+            this.numberOfGeometries = numberOfGeometries;
+        }
+
+        public GeometryListStruct_0001(BinaryReader binaryReader)
         {
             sectionIdentifier = Section.Struct;
             sectionSize = binaryReader.ReadInt32();
-            renderWareVersion = binaryReader.ReadInt32();
+            renderWareVersion = (RWVersion)binaryReader.ReadInt32();
 
             numberOfGeometries = binaryReader.ReadInt32();
-
-            return this;
         }
 
-        public override void SetListBytes(int fileVersion, ref List<byte> listBytes)
+        public override void SetListBytes(RWVersion fileVersion, ref List<byte> listBytes)
         {
             sectionIdentifier = Section.Struct;
 
